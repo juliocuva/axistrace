@@ -244,19 +244,7 @@ export default function LandingPage() {
                 </div>
             </section>
 
-            {/* TRUST BAR */}
-            <section className="relative z-10 py-6 px-4 border-b border-[#0C3C60]/40">
-                <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
-                    <span className="text-xs font-bold uppercase tracking-wider text-[#FAF2CA]/50">
-                        {t.trust.label}
-                    </span>
-                    <div className="flex flex-wrap items-center justify-center gap-6 text-xs font-bold text-[#FAF2CA]/70">
-                        {t.trust.badges.map((b, idx) => (
-                            <span key={idx} className="px-3 py-1 rounded-lg bg-[#082840]/60 border border-[#0C3C60]">{b}</span>
-                        ))}
-                    </div>
-                </div>
-            </section>
+
 
             {/* SECCIÓN ALCANCE AGRO CON TRAZO PERIMETRAL EN SCROLL */}
             <ScopeTimeline t={t} />
@@ -492,63 +480,7 @@ export default function LandingPage() {
                         </div>
                     </div>
 
-                    {/* BANNER BANCOLOMBIA & NEQUI DIRECTO (UN SOLO TONO) */}
-                    <div className="mt-8 p-5 sm:p-6 rounded-3xl bg-white border-2 border-[#83DF9C]/50 shadow-xl shadow-[#83DF9C]/10 flex flex-col md:flex-row items-center justify-between gap-5 text-[#082840]">
-                        <div className="flex items-center gap-4">
-                            <div className="flex items-center gap-2 shrink-0">
-                                <div className="h-10 px-3 rounded-xl bg-[#082840]/10 border border-[#082840]/20 flex items-center justify-center shadow-sm">
-                                    <Image src="/images/bancolombia-dark.png" alt="Bancolombia" width={95} height={22} className="h-4.5 w-auto object-contain" />
-                                </div>
-                                <div className="h-10 px-3 rounded-xl bg-[#082840]/10 border border-[#082840]/20 flex items-center justify-center shadow-sm">
-                                    <Image src="/images/nequi-dark.png" alt="Nequi" width={60} height={20} className="h-4.5 w-auto object-contain" />
-                                </div>
-                            </div>
-                            <div>
-                                <div className="flex flex-wrap items-center gap-2">
-                                    <h4 className="text-base font-black text-[#082840]">
-                                        {lang === 'es' ? 'Bancolombia & Nequi Directo' : 'Bancolombia & Nequi Direct'}
-                                    </h4>
-                                    <span className="px-2.5 py-0.5 rounded-full bg-[#0E5A36]/10 text-[#0E5A36] border border-[#0E5A36]/30 text-[10px] font-black">
-                                        {lang === 'es' ? 'Ahorros: 7089 0888702' : 'Savings: 7089 0888702'}
-                                    </span>
-                                    <span className="px-2.5 py-0.5 rounded-full bg-[#082840]/10 text-[#082840] border border-[#082840]/20 text-[10px] font-bold">
-                                        Nequi: 301 397 0002
-                                    </span>
-                                </div>
-                                <p className="text-xs text-[#0C3C60]/75 mt-0.5">
-                                    {lang === 'es'
-                                        ? 'Cuenta de Ahorros Bancolombia 7089 0888702 o Nequi 301 397 0002. Activación inmediata de predios y factura electrónica.'
-                                        : 'Bancolombia Savings 7089 0888702 or Nequi 301 397 0002. Immediate parcel activation & official tax invoice.'}
-                                </p>
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-3 w-full md:w-auto">
-                            <button
-                                onClick={() => openPaymentForPlan(
-                                    lang === 'es' ? 'Pase de Caminata Digital' : 'Digital Walk Pass',
-                                    '$25 USD',
-                                    '~ 100.000 COP',
-                                    'nequi'
-                                )}
-                                className="w-full md:w-auto px-5 py-3 rounded-xl bg-[#0E5A36] hover:bg-[#0A4529] text-white text-xs font-black transition-all shadow-lg shadow-[#0E5A36]/30 hover:scale-105 flex items-center justify-center gap-2 shrink-0 border border-[#83DF9C]/40"
-                            >
-                                <Image src="/images/nequi-white.png" alt="Nequi" width={55} height={18} className="h-3.5 w-auto object-contain mr-1" />
-                                <span>{lang === 'es' ? 'Pagar con Nequi (301 397 0002)' : 'Pay with Nequi (301 397 0002)'}</span>
-                            </button>
-                            <button
-                                onClick={() => openPaymentForPlan(
-                                    lang === 'es' ? 'Transferencia Bancolombia' : 'Bancolombia Wire Transfer',
-                                    'Tarifa según lote',
-                                    'Ahorros: 7089 0888702',
-                                    'bank'
-                                )}
-                                className="hidden sm:flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl bg-[#082840]/10 hover:bg-[#082840]/20 border border-[#082840]/20 text-xs font-bold text-[#082840] transition-all shrink-0"
-                            >
-                                <Image src="/images/bancolombia-dark.png" alt="Bancolombia" width={80} height={18} className="h-3.5 w-auto object-contain mr-1" />
-                                <span>{lang === 'es' ? 'Bancolombia' : 'Bancolombia'}</span>
-                            </button>
-                        </div>
-                    </div>
+
 
                     {/* Strip Adicional */}
                     <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
