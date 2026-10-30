@@ -15,15 +15,25 @@ import {
     Smartphone,
     PlusCircle,
     Activity,
-    Zap
+    Zap,
+    CreditCard,
+    Landmark
 } from 'lucide-react';
 import { translations, Language } from '@/translations/content';
 import ScopeTimeline from '@/components/ScopeTimeline';
 import WhatsAppFloating, { WhatsAppIcon } from '@/components/WhatsAppFloating';
+import PaymentModal, { PlanPaymentInfo } from '@/components/PaymentModal';
 
 export default function LandingPage() {
     const [lang, setLang] = useState<Language>('en');
+    const [paymentModalOpen, setPaymentModalOpen] = useState(false);
+    const [selectedPlanForPayment, setSelectedPlanForPayment] = useState<PlanPaymentInfo | null>(null);
     const t = translations[lang];
+
+    const openPaymentForPlan = (title: string, priceUsd: string, priceCop: string) => {
+        setSelectedPlanForPayment({ title, priceUsd, priceCop });
+        setPaymentModalOpen(true);
+    };
 
     return (
         <div className="min-h-screen bg-[#040E17] text-[#FAF2CA] flex flex-col selection:bg-[#83DF9C] selection:text-[#0C3C60] font-sans overflow-x-hidden">
@@ -387,6 +397,18 @@ export default function LandingPage() {
                                 <span>{t.pricing.plans.audit.cta}</span>
                                 <ArrowRight className="w-3.5 h-3.5" />
                             </Link>
+
+                            <button
+                                onClick={() => openPaymentForPlan(
+                                    t.pricing.plans.audit.title,
+                                    t.pricing.plans.audit.price,
+                                    t.pricing.plans.audit.ref
+                                )}
+                                className="mt-2.5 w-full py-2 px-3 rounded-xl bg-[#DA0081]/15 hover:bg-[#DA0081]/25 border border-[#DA0081]/30 text-[11px] font-bold text-[#FF63C3] text-center transition-all flex items-center justify-center gap-1.5"
+                            >
+                                <Smartphone className="w-3.5 h-3.5" />
+                                <span>{lang === 'es' ? 'Pagar con Nequi ($40.000 COP)' : 'Pay via Nequi / Transfer'}</span>
+                            </button>
                         </div>
 
                         {/* Plan 2: Featured */}
@@ -429,14 +451,28 @@ export default function LandingPage() {
                                 </ul>
                             </div>
 
-                            <Link
-                                href="/terminal"
-                                className="mt-8 w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-[#0c6056] to-[#83DF9C] text-[#040E17] font-black text-xs text-center shadow-lg hover:scale-[1.02] transition-all flex items-center justify-center gap-1.5"
-                            >
-                                <Compass className="w-4 h-4 text-[#040E17]" />
-                                <span>{t.pricing.plans.walk.cta}</span>
-                                <ArrowRight className="w-3.5 h-3.5 text-[#040E17]" />
-                            </Link>
+                            <div>
+                                <Link
+                                    href="/terminal"
+                                    className="mt-8 w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-[#0c6056] to-[#83DF9C] text-[#040E17] font-black text-xs text-center shadow-lg hover:scale-[1.02] transition-all flex items-center justify-center gap-1.5"
+                                >
+                                    <Compass className="w-4 h-4 text-[#040E17]" />
+                                    <span>{t.pricing.plans.walk.cta}</span>
+                                    <ArrowRight className="w-3.5 h-3.5 text-[#040E17]" />
+                                </Link>
+
+                                <button
+                                    onClick={() => openPaymentForPlan(
+                                        t.pricing.plans.walk.title,
+                                        t.pricing.plans.walk.price,
+                                        t.pricing.plans.walk.ref
+                                    )}
+                                    className="mt-2.5 w-full py-2.5 px-3 rounded-xl bg-[#DA0081] hover:bg-[#b8006e] text-white text-xs font-black text-center transition-all shadow-md flex items-center justify-center gap-1.5"
+                                >
+                                    <Smartphone className="w-3.5 h-3.5" />
+                                    <span>{lang === 'es' ? 'Pagar $100.000 COP con Nequi' : 'Pay $100.000 COP with Nequi'}</span>
+                                </button>
+                            </div>
                         </div>
 
                         {/* Plan 3 */}
@@ -475,19 +511,82 @@ export default function LandingPage() {
                                 </ul>
                             </div>
 
-                            <a
-                                href={t.pricing.plans.corporate.ctaHref || `https://wa.me/573013970002?text=${encodeURIComponent(
-                                    lang === 'es'
-                                        ? 'Hola, me interesa adquirir la Bolsa Corporativa (100 predios) de AxisTRACE.'
-                                        : 'Hello, I am interested in the Corporate Bulk Pack (100 lots) for AxisTRACE.'
-                                )}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="mt-8 w-full py-3.5 px-4 rounded-xl bg-[#25D366]/20 hover:bg-[#25D366]/30 border border-[#25D366]/50 text-xs font-bold text-white text-center transition-all flex items-center justify-center gap-2 group shadow-lg shadow-[#25D366]/10"
+                            <div>
+                                <a
+                                    href={t.pricing.plans.corporate.ctaHref || `https://wa.me/573013970002?text=${encodeURIComponent(
+                                        lang === 'es'
+                                            ? 'Hola, me interesa adquirir la Bolsa Corporativa (100 predios) de AxisTRACE.'
+                                            : 'Hello, I am interested in the Corporate Bulk Pack (100 lots) for AxisTRACE.'
+                                    )}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="mt-8 w-full py-3.5 px-4 rounded-xl bg-[#25D366]/20 hover:bg-[#25D366]/30 border border-[#25D366]/50 text-xs font-bold text-white text-center transition-all flex items-center justify-center gap-2 group shadow-lg shadow-[#25D366]/10"
+                                >
+                                    <WhatsAppIcon className="w-4 h-4 text-[#25D366] fill-current group-hover:scale-110 transition-transform" />
+                                    <span>{t.pricing.plans.corporate.cta}</span>
+                                </a>
+
+                                <button
+                                    onClick={() => openPaymentForPlan(
+                                        t.pricing.plans.corporate.title,
+                                        t.pricing.plans.corporate.price,
+                                        t.pricing.plans.corporate.ref
+                                    )}
+                                    className="mt-2.5 w-full py-2 px-3 rounded-xl bg-[#0C3C60]/70 hover:bg-[#0C3C60] border border-[#83DF9C]/30 text-[11px] font-bold text-[#83DF9C] text-center transition-all flex items-center justify-center gap-1.5"
+                                >
+                                    <Landmark className="w-3.5 h-3.5" />
+                                    <span>{lang === 'es' ? 'Transferencia Bancaria / Factura' : 'Bank Wire / Invoice'}</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* BANNER NEQUI & TRANSFERENCIAS BANCARIAS */}
+                    <div className="mt-8 p-5 sm:p-6 rounded-3xl bg-gradient-to-r from-[#1D003F]/90 via-[#082840]/90 to-[#040E17] border-2 border-[#DA0081]/50 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-5">
+                        <div className="flex items-center gap-4">
+                            <div className="relative w-12 h-12 rounded-2xl bg-[#DA0081] flex items-center justify-center text-white font-black text-lg shadow-lg shadow-[#DA0081]/40 shrink-0">
+                                N
+                                <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-[#83DF9C] border-2 border-[#040E17]" />
+                            </div>
+                            <div>
+                                <div className="flex flex-wrap items-center gap-2">
+                                    <h4 className="text-base font-black text-white">
+                                        {lang === 'es' ? 'Transferencias Bancarias & Nequi Directo' : 'Direct Bank Transfers & Nequi'}
+                                    </h4>
+                                    <span className="px-2.5 py-0.5 rounded-full bg-[#83DF9C]/20 text-[#83DF9C] border border-[#83DF9C]/30 text-[10px] font-bold">
+                                        {lang === 'es' ? 'Número Oficial: 301 397 0002' : 'Official Number: 301 397 0002'}
+                                    </span>
+                                </div>
+                                <p className="text-xs text-[#FAF2CA]/75 mt-0.5">
+                                    {lang === 'es'
+                                        ? 'Paga al instante desde Nequi, Bancolombia o Transfiya. Emisión de factura y activación en menos de 5 minutos.'
+                                        : 'Instant transfers from Nequi, Bancolombia or Transfiya. Immediate parcel activation in under 5 minutes.'}
+                                </p>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-3 w-full md:w-auto">
+                            <button
+                                onClick={() => openPaymentForPlan(
+                                    lang === 'es' ? 'Pase de Caminata Digital' : 'Digital Walk Pass',
+                                    '$25 USD',
+                                    '~ 100.000 COP'
+                                )}
+                                className="w-full md:w-auto px-5 py-3 rounded-xl bg-[#DA0081] hover:bg-[#b8006e] text-white text-xs font-bold transition-all shadow-lg shadow-[#DA0081]/30 hover:scale-105 flex items-center justify-center gap-2 shrink-0"
                             >
-                                <WhatsAppIcon className="w-4 h-4 text-[#25D366] fill-current group-hover:scale-110 transition-transform" />
-                                <span>{t.pricing.plans.corporate.cta}</span>
-                            </a>
+                                <Smartphone className="w-4 h-4" />
+                                <span>{lang === 'es' ? 'Pagar con Nequi (301 397 0002)' : 'Pay with Nequi (301 397 0002)'}</span>
+                            </button>
+                            <button
+                                onClick={() => openPaymentForPlan(
+                                    lang === 'es' ? 'Transferencia Bancaria' : 'Bank Wire Transfer',
+                                    'Tarifa según lote',
+                                    'Bancolombia / Factura'
+                                )}
+                                className="hidden sm:flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl bg-[#0C3C60]/70 hover:bg-[#0C3C60] border border-[#83DF9C]/40 text-xs font-bold text-white transition-all shrink-0"
+                            >
+                                <Landmark className="w-4 h-4 text-[#83DF9C]" />
+                                <span>{lang === 'es' ? 'Bancolombia' : 'Bank Transfer'}</span>
+                            </button>
                         </div>
                     </div>
 
@@ -584,6 +683,14 @@ export default function LandingPage() {
 
             {/* Floating WhatsApp Widget */}
             <WhatsAppFloating lang={lang} />
+
+            {/* Modal de Pagos Nequi & Transferencias */}
+            <PaymentModal
+                isOpen={paymentModalOpen}
+                onClose={() => setPaymentModalOpen(false)}
+                plan={selectedPlanForPayment}
+                lang={lang}
+            />
         </div>
     );
 }
