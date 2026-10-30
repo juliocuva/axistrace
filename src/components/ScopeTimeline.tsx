@@ -54,7 +54,7 @@ export default function ScopeTimeline({ t }: ScopeTimelineProps) {
                 {/* Timeline Container con el Trazo Vectorial Zig-Zag Flotante por Encima */}
                 <div className="relative">
                     
-                    {/* TRAZO VECTORIAL ZIG-ZAG QUE SE DIBUJA CON EL SCROLL POR ENCIMA DE LAS FOTOS (z-30) */}
+                    {/* TRAZO VECTORIAL ZIG-ZAG QUE SE DIBUJA CON EL SCROLL CON LOS NODOS DIRECTAMENTE SOBRE LA LÍNEA (z-30) */}
                     <div className="hidden lg:block absolute inset-0 z-30 pointer-events-none">
                         <svg className="w-full h-full" viewBox="0 0 1152 2380" fill="none" preserveAspectRatio="none">
                             <defs>
@@ -66,6 +66,9 @@ export default function ScopeTimeline({ t }: ScopeTimelineProps) {
                                 <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
                                     <feGaussianBlur stdDeviation="5" result="blur" />
                                     <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                                </filter>
+                                <filter id="nodeGlow" x="-50%" y="-50%" width="200%" height="200%">
+                                    <feDropShadow dx="0" dy="0" stdDeviation="6" floodColor="#83DF9C" floodOpacity="0.9" />
                                 </filter>
                             </defs>
 
@@ -101,6 +104,74 @@ export default function ScopeTimeline({ t }: ScopeTimelineProps) {
                                 strokeLinejoin="round"
                                 filter="url(#glow)"
                             />
+
+                            {/* ========================================================= */}
+                            {/* BOTONES CON NÚMEROS POSICIONADOS EXACTAMENTE SOBRE LA LÍNEA */}
+                            {/* ========================================================= */}
+                            {/* Vértice 1: Nodo #11 (Café) */}
+                            <g transform="translate(495, 170)">
+                                <circle r="26" fill="#83DF9C" opacity="0.2">
+                                    <animate attributeName="r" values="20;32;20" dur="3s" repeatCount="indefinite" />
+                                    <animate attributeName="opacity" values="0.3;0.05;0.3" dur="3s" repeatCount="indefinite" />
+                                </circle>
+                                <circle r="20" fill="none" stroke="#83DF9C" strokeWidth="1.5" strokeOpacity="0.7" strokeDasharray="3 3" />
+                                <circle r="17" fill="#040E17" stroke="#83DF9C" strokeWidth="2.5" filter="url(#nodeGlow)" />
+                                <text textAnchor="middle" dy="5" fill="#83DF9C" fontSize="13" fontWeight="900" fontFamily="sans-serif">
+                                    {t.scope.items.coffee.node}
+                                </text>
+                            </g>
+
+                            {/* Vértice 2: Nodo #22 (Cacao) */}
+                            <g transform="translate(655, 635)">
+                                <circle r="26" fill="#83DF9C" opacity="0.2">
+                                    <animate attributeName="r" values="20;32;20" dur="3s" repeatCount="indefinite" />
+                                    <animate attributeName="opacity" values="0.3;0.05;0.3" dur="3s" repeatCount="indefinite" />
+                                </circle>
+                                <circle r="20" fill="none" stroke="#83DF9C" strokeWidth="1.5" strokeOpacity="0.7" strokeDasharray="3 3" />
+                                <circle r="17" fill="#040E17" stroke="#83DF9C" strokeWidth="2.5" filter="url(#nodeGlow)" />
+                                <text textAnchor="middle" dy="5" fill="#83DF9C" fontSize="13" fontWeight="900" fontFamily="sans-serif">
+                                    {t.scope.items.cacao.node}
+                                </text>
+                            </g>
+
+                            {/* Vértice 3: Nodo #35 (Palma) */}
+                            <g transform="translate(495, 1100)">
+                                <circle r="26" fill="#83DF9C" opacity="0.2">
+                                    <animate attributeName="r" values="20;32;20" dur="3s" repeatCount="indefinite" />
+                                    <animate attributeName="opacity" values="0.3;0.05;0.3" dur="3s" repeatCount="indefinite" />
+                                </circle>
+                                <circle r="20" fill="none" stroke="#83DF9C" strokeWidth="1.5" strokeOpacity="0.7" strokeDasharray="3 3" />
+                                <circle r="17" fill="#040E17" stroke="#83DF9C" strokeWidth="2.5" filter="url(#nodeGlow)" />
+                                <text textAnchor="middle" dy="5" fill="#83DF9C" fontSize="13" fontWeight="900" fontFamily="sans-serif">
+                                    {t.scope.items.palm.node}
+                                </text>
+                            </g>
+
+                            {/* Vértice 4: Nodo #48 (Ganadería) */}
+                            <g transform="translate(655, 1565)">
+                                <circle r="26" fill="#83DF9C" opacity="0.2">
+                                    <animate attributeName="r" values="20;32;20" dur="3s" repeatCount="indefinite" />
+                                    <animate attributeName="opacity" values="0.3;0.05;0.3" dur="3s" repeatCount="indefinite" />
+                                </circle>
+                                <circle r="20" fill="none" stroke="#83DF9C" strokeWidth="1.5" strokeOpacity="0.7" strokeDasharray="3 3" />
+                                <circle r="17" fill="#040E17" stroke="#83DF9C" strokeWidth="2.5" filter="url(#nodeGlow)" />
+                                <text textAnchor="middle" dy="5" fill="#83DF9C" fontSize="13" fontWeight="900" fontFamily="sans-serif">
+                                    {t.scope.items.cattle.node}
+                                </text>
+                            </g>
+
+                            {/* Vértice 5: Nodo #58 (Cierre Agrónomo) */}
+                            <g transform="translate(576, 2045)">
+                                <circle r="28" fill="#83DF9C" opacity="0.25">
+                                    <animate attributeName="r" values="22;36;22" dur="3s" repeatCount="indefinite" />
+                                    <animate attributeName="opacity" values="0.35;0.05;0.35" dur="3s" repeatCount="indefinite" />
+                                </circle>
+                                <circle r="22" fill="none" stroke="#83DF9C" strokeWidth="1.5" strokeOpacity="0.8" strokeDasharray="3 3" />
+                                <circle r="19" fill="#83DF9C" stroke="#040E17" strokeWidth="2.5" filter="url(#nodeGlow)" />
+                                <text textAnchor="middle" dy="6" fill="#040E17" fontSize="14" fontWeight="900" fontFamily="sans-serif">
+                                    {t.scope.items.closing.node}
+                                </text>
+                            </g>
                         </svg>
                     </div>
 
@@ -127,11 +198,9 @@ export default function ScopeTimeline({ t }: ScopeTimelineProps) {
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-[#040E17]/80 via-transparent to-transparent" />
                                     
-                                    {/* NODO GPS #11 MONTADO SOBRE LA FOTO */}
-                                    <div className="absolute right-6 sm:right-10 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center">
-                                        <span className="absolute w-14 h-14 rounded-full bg-[#83DF9C]/25 animate-ping" />
-                                        <span className="absolute w-12 h-12 rounded-full border border-[#83DF9C]/60 animate-pulse" />
-                                        <div className="relative w-11 h-11 rounded-full bg-[#040E17]/95 border-2 border-[#83DF9C] shadow-[0_0_20px_rgba(131,223,156,0.9)] flex items-center justify-center text-sm font-black text-[#83DF9C]">
+                                    {/* NODO GPS #11 (VISIBLE EN MOBILE) */}
+                                    <div className="lg:hidden absolute top-4 left-4 z-30 flex items-center justify-center">
+                                        <div className="w-9 h-9 rounded-full bg-[#040E17]/95 border-2 border-[#83DF9C] flex items-center justify-center text-xs font-black text-[#83DF9C] shadow-lg">
                                             {t.scope.items.coffee.node}
                                         </div>
                                     </div>
@@ -250,11 +319,9 @@ export default function ScopeTimeline({ t }: ScopeTimelineProps) {
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-[#040E17]/80 via-transparent to-transparent" />
                                     
-                                    {/* NODO GPS #22 MONTADO SOBRE LA FOTO */}
-                                    <div className="absolute left-6 sm:left-10 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center">
-                                        <span className="absolute w-14 h-14 rounded-full bg-[#83DF9C]/25 animate-ping" />
-                                        <span className="absolute w-12 h-12 rounded-full border border-[#83DF9C]/60 animate-pulse" />
-                                        <div className="relative w-11 h-11 rounded-full bg-[#040E17]/95 border-2 border-[#83DF9C] shadow-[0_0_20px_rgba(131,223,156,0.9)] flex items-center justify-center text-sm font-black text-[#83DF9C]">
+                                    {/* NODO GPS #22 (VISIBLE EN MOBILE) */}
+                                    <div className="lg:hidden absolute top-4 left-4 z-30 flex items-center justify-center">
+                                        <div className="w-9 h-9 rounded-full bg-[#040E17]/95 border-2 border-[#83DF9C] flex items-center justify-center text-xs font-black text-[#83DF9C] shadow-lg">
                                             {t.scope.items.cacao.node}
                                         </div>
                                     </div>
@@ -283,11 +350,9 @@ export default function ScopeTimeline({ t }: ScopeTimelineProps) {
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-[#040E17]/80 via-transparent to-transparent" />
                                     
-                                    {/* NODO GPS #35 MONTADO SOBRE LA FOTO */}
-                                    <div className="absolute right-6 sm:right-10 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center">
-                                        <span className="absolute w-14 h-14 rounded-full bg-[#83DF9C]/25 animate-ping" />
-                                        <span className="absolute w-12 h-12 rounded-full border border-[#83DF9C]/60 animate-pulse" />
-                                        <div className="relative w-11 h-11 rounded-full bg-[#040E17]/95 border-2 border-[#83DF9C] shadow-[0_0_20px_rgba(131,223,156,0.9)] flex items-center justify-center text-sm font-black text-[#83DF9C]">
+                                    {/* NODO GPS #35 (VISIBLE EN MOBILE) */}
+                                    <div className="lg:hidden absolute top-4 left-4 z-30 flex items-center justify-center">
+                                        <div className="w-9 h-9 rounded-full bg-[#040E17]/95 border-2 border-[#83DF9C] flex items-center justify-center text-xs font-black text-[#83DF9C] shadow-lg">
                                             {t.scope.items.palm.node}
                                         </div>
                                     </div>
@@ -406,11 +471,9 @@ export default function ScopeTimeline({ t }: ScopeTimelineProps) {
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-[#040E17]/80 via-transparent to-transparent" />
                                     
-                                    {/* NODO GPS #48 MONTADO SOBRE LA FOTO */}
-                                    <div className="absolute left-6 sm:left-10 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center">
-                                        <span className="absolute w-14 h-14 rounded-full bg-[#83DF9C]/25 animate-ping" />
-                                        <span className="absolute w-12 h-12 rounded-full border border-[#83DF9C]/60 animate-pulse" />
-                                        <div className="relative w-11 h-11 rounded-full bg-[#040E17]/95 border-2 border-[#83DF9C] shadow-[0_0_20px_rgba(131,223,156,0.9)] flex items-center justify-center text-sm font-black text-[#83DF9C]">
+                                    {/* NODO GPS #48 (VISIBLE EN MOBILE) */}
+                                    <div className="lg:hidden absolute top-4 left-4 z-30 flex items-center justify-center">
+                                        <div className="w-9 h-9 rounded-full bg-[#040E17]/95 border-2 border-[#83DF9C] flex items-center justify-center text-xs font-black text-[#83DF9C] shadow-lg">
                                             {t.scope.items.cattle.node}
                                         </div>
                                     </div>
@@ -439,10 +502,9 @@ export default function ScopeTimeline({ t }: ScopeTimelineProps) {
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-[#040E17] via-[#040E17]/50 to-transparent" />
                                     
-                                    {/* NODO GPS #58 MONTADO EN EL CIERRE */}
-                                    <div className="absolute top-6 left-1/2 -translate-x-1/2 z-30 flex items-center justify-center">
-                                        <span className="absolute w-16 h-16 rounded-full bg-[#83DF9C]/30 animate-ping" />
-                                        <div className="relative w-12 h-12 rounded-full bg-[#83DF9C] border-2 border-[#040E17] shadow-[0_0_25px_rgba(131,223,156,0.9)] flex items-center justify-center text-base font-black text-[#040E17]">
+                                    {/* NODO GPS #58 (VISIBLE EN MOBILE) */}
+                                    <div className="lg:hidden absolute top-4 left-4 z-30 flex items-center justify-center">
+                                        <div className="w-10 h-10 rounded-full bg-[#83DF9C] border-2 border-[#040E17] flex items-center justify-center text-xs font-black text-[#040E17] shadow-lg">
                                             {t.scope.items.closing.node}
                                         </div>
                                     </div>

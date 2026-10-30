@@ -91,7 +91,7 @@ export default function PaymentModal({ isOpen, onClose, plan, lang }: PaymentMod
                                 onClick={() => setActiveTab('nequi')}
                                 className={`py-2 px-3 rounded-xl transition-all flex items-center justify-center gap-1.5 ${
                                     activeTab === 'nequi'
-                                        ? 'bg-[#DA0081] text-white shadow-lg'
+                                        ? 'bg-[#0E5A36] text-[#83DF9C] border border-[#83DF9C]/50 shadow-lg'
                                         : 'text-[#FAF2CA]/60 hover:text-white'
                                 }`}
                             >
@@ -124,10 +124,10 @@ export default function PaymentModal({ isOpen, onClose, plan, lang }: PaymentMod
 
                         {/* Tab Content: NEQUI */}
                         {activeTab === 'nequi' && (
-                            <div className="p-5 rounded-2xl bg-gradient-to-br from-[#1F0038]/80 to-[#0A0014]/90 border border-[#DA0081]/40 mb-6">
+                            <div className="p-5 rounded-2xl bg-gradient-to-br from-[#082840]/90 to-[#04131d]/95 border border-[#83DF9C]/40 mb-6">
                                 <div className="flex items-center justify-between mb-3">
                                     <div className="flex items-center gap-2">
-                                        <div className="w-8 h-8 rounded-lg bg-[#DA0081] flex items-center justify-center text-white font-black text-xs">
+                                        <div className="w-8 h-8 rounded-lg bg-[#0E5A36] border border-[#83DF9C]/50 flex items-center justify-center text-[#83DF9C] font-black text-xs">
                                             N
                                         </div>
                                         <div>
@@ -135,7 +135,7 @@ export default function PaymentModal({ isOpen, onClose, plan, lang }: PaymentMod
                                             <div className="text-[10px] text-white/60">Acepta pagos desde cualquier banco vía Transfiya</div>
                                         </div>
                                     </div>
-                                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-[#DA0081]/20 text-[#FF63C3] border border-[#DA0081]/40">
+                                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-[#83DF9C]/15 text-[#83DF9C] border border-[#83DF9C]/30">
                                         Sin comisión
                                     </span>
                                 </div>
@@ -151,24 +151,24 @@ export default function PaymentModal({ isOpen, onClose, plan, lang }: PaymentMod
                                     </div>
                                     <button
                                         onClick={handleCopy}
-                                        className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#DA0081] hover:bg-[#b8006e] text-white text-xs font-bold transition-all shadow"
+                                        className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#0E5A36] hover:bg-[#0A4529] text-white text-xs font-bold transition-all shadow border border-[#83DF9C]/40"
                                     >
-                                        {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                                        {copied ? <Check className="w-3.5 h-3.5 text-[#83DF9C]" /> : <Copy className="w-3.5 h-3.5 text-[#83DF9C]" />}
                                         <span>{copied ? (lang === 'es' ? '¡Copiado!' : 'Copied!') : (lang === 'es' ? 'Copiar' : 'Copy')}</span>
                                     </button>
                                 </div>
 
                                 <div className="mt-4 space-y-1.5 text-[11px] text-[#FAF2CA]/80">
                                     <div className="flex items-center gap-1.5">
-                                        <span className="w-4 h-4 rounded-full bg-[#DA0081]/30 text-[#FF63C3] flex items-center justify-center text-[10px] font-bold">1</span>
+                                        <span className="w-4 h-4 rounded-full bg-[#83DF9C]/20 text-[#83DF9C] flex items-center justify-center text-[10px] font-bold">1</span>
                                         <span>{lang === 'es' ? 'Abre tu app Nequi o tu banco habitual (Transfiya).' : 'Open your Nequi app or any bank with Transfiya.'}</span>
                                     </div>
                                     <div className="flex items-center gap-1.5">
-                                        <span className="w-4 h-4 rounded-full bg-[#DA0081]/30 text-[#FF63C3] flex items-center justify-center text-[10px] font-bold">2</span>
+                                        <span className="w-4 h-4 rounded-full bg-[#83DF9C]/20 text-[#83DF9C] flex items-center justify-center text-[10px] font-bold">2</span>
                                         <span>{lang === 'es' ? `Envía el valor exacto: ${priceText}.` : `Transfer exact amount: ${priceText}.`}</span>
                                     </div>
                                     <div className="flex items-center gap-1.5">
-                                        <span className="w-4 h-4 rounded-full bg-[#DA0081]/30 text-[#FF63C3] flex items-center justify-center text-[10px] font-bold">3</span>
+                                        <span className="w-4 h-4 rounded-full bg-[#83DF9C]/20 text-[#83DF9C] flex items-center justify-center text-[10px] font-bold">3</span>
                                         <span>{lang === 'es' ? 'Envía el pantallazo al WhatsApp para activar tu predio en 2 minutos.' : 'Send screenshot via WhatsApp for 2-min activation.'}</span>
                                     </div>
                                 </div>

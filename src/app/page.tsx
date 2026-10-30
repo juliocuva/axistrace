@@ -405,9 +405,9 @@ export default function LandingPage() {
                                         t.pricing.plans.audit.price,
                                         t.pricing.plans.audit.ref
                                     )}
-                                    className="mt-2.5 w-full py-2.5 px-3 rounded-xl bg-[#DA0081] hover:bg-[#b8006e] text-white text-xs font-black text-center transition-all shadow flex items-center justify-center gap-1.5"
+                                    className="mt-2.5 w-full py-2.5 px-3 rounded-xl bg-[#0E5A36] hover:bg-[#0A4529] text-white text-xs font-black text-center transition-all shadow flex items-center justify-center gap-1.5 border border-[#83DF9C]/30"
                                 >
-                                    <Smartphone className="w-3.5 h-3.5" />
+                                    <Smartphone className="w-3.5 h-3.5 text-[#83DF9C]" />
                                     <span>{lang === 'es' ? 'Pagar con Nequi ($40.000 COP)' : 'Pay via Nequi / Transfer'}</span>
                                 </button>
                             </div>
@@ -469,9 +469,9 @@ export default function LandingPage() {
                                         t.pricing.plans.walk.price,
                                         t.pricing.plans.walk.ref
                                     )}
-                                    className="mt-2.5 w-full py-2.5 px-3 rounded-xl bg-[#DA0081] hover:bg-[#b8006e] text-white text-xs font-black text-center transition-all shadow-md flex items-center justify-center gap-1.5"
+                                    className="mt-2.5 w-full py-2.5 px-3 rounded-xl bg-[#0E5A36] hover:bg-[#0A4529] text-white text-xs font-black text-center transition-all shadow-md flex items-center justify-center gap-1.5 border border-[#83DF9C]/40"
                                 >
-                                    <Smartphone className="w-3.5 h-3.5" />
+                                    <Smartphone className="w-3.5 h-3.5 text-[#83DF9C]" />
                                     <span>{lang === 'es' ? 'Pagar $100.000 COP con Nequi' : 'Pay $100.000 COP with Nequi'}</span>
                                 </button>
                             </div>
@@ -544,9 +544,9 @@ export default function LandingPage() {
                     </div>
 
                     {/* BANNER NEQUI & TRANSFERENCIAS BANCARIAS */}
-                    <div className="mt-8 p-5 sm:p-6 rounded-3xl bg-white border-2 border-[#DA0081]/40 shadow-xl shadow-[#DA0081]/10 flex flex-col md:flex-row items-center justify-between gap-5 text-[#082840]">
+                    <div className="mt-8 p-5 sm:p-6 rounded-3xl bg-white border-2 border-[#83DF9C]/50 shadow-xl shadow-[#83DF9C]/10 flex flex-col md:flex-row items-center justify-between gap-5 text-[#082840]">
                         <div className="flex items-center gap-4">
-                            <div className="relative w-12 h-12 rounded-2xl bg-[#DA0081] flex items-center justify-center text-white font-black text-lg shadow-lg shadow-[#DA0081]/30 shrink-0">
+                            <div className="relative w-12 h-12 rounded-2xl bg-[#0E5A36] border border-[#83DF9C]/50 flex items-center justify-center text-[#83DF9C] font-black text-lg shadow-lg shadow-[#0E5A36]/30 shrink-0">
                                 N
                                 <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-[#83DF9C] border-2 border-white" />
                             </div>
@@ -573,9 +573,9 @@ export default function LandingPage() {
                                     '$25 USD',
                                     '~ 100.000 COP'
                                 )}
-                                className="w-full md:w-auto px-5 py-3 rounded-xl bg-[#DA0081] hover:bg-[#b8006e] text-white text-xs font-black transition-all shadow-lg shadow-[#DA0081]/30 hover:scale-105 flex items-center justify-center gap-2 shrink-0"
+                                className="w-full md:w-auto px-5 py-3 rounded-xl bg-[#0E5A36] hover:bg-[#0A4529] text-white text-xs font-black transition-all shadow-lg shadow-[#0E5A36]/30 hover:scale-105 flex items-center justify-center gap-2 shrink-0 border border-[#83DF9C]/40"
                             >
-                                <Smartphone className="w-4 h-4" />
+                                <Smartphone className="w-4 h-4 text-[#83DF9C]" />
                                 <span>{lang === 'es' ? 'Pagar con Nequi (301 397 0002)' : 'Pay with Nequi (301 397 0002)'}</span>
                             </button>
                             <button
