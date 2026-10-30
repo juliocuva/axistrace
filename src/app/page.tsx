@@ -22,16 +22,23 @@ import {
 import { translations, Language } from '@/translations/content';
 import ScopeTimeline from '@/components/ScopeTimeline';
 import WhatsAppFloating, { WhatsAppIcon } from '@/components/WhatsAppFloating';
-import PaymentModal, { PlanPaymentInfo } from '@/components/PaymentModal';
+import PaymentModal, { PlanPaymentInfo, BancolombiaIcon, NequiIcon } from '@/components/PaymentModal';
 
 export default function LandingPage() {
     const [lang, setLang] = useState<Language>('en');
     const [paymentModalOpen, setPaymentModalOpen] = useState(false);
+    const [paymentModalTab, setPaymentModalTab] = useState<'nequi' | 'bank' | 'international'>('nequi');
     const [selectedPlanForPayment, setSelectedPlanForPayment] = useState<PlanPaymentInfo | null>(null);
     const t = translations[lang];
 
-    const openPaymentForPlan = (title: string, priceUsd: string, priceCop: string) => {
+    const openPaymentForPlan = (
+        title: string,
+        priceUsd: string,
+        priceCop: string,
+        tab: 'nequi' | 'bank' | 'international' = 'nequi'
+    ) => {
         setSelectedPlanForPayment({ title, priceUsd, priceCop });
+        setPaymentModalTab(tab);
         setPaymentModalOpen(true);
     };
 
@@ -543,26 +550,33 @@ export default function LandingPage() {
                         </div>
                     </div>
 
-                    {/* BANNER NEQUI & TRANSFERENCIAS BANCARIAS */}
+                    {/* BANNER BANCOLOMBIA & NEQUI DIRECTO (UN SOLO TONO) */}
                     <div className="mt-8 p-5 sm:p-6 rounded-3xl bg-white border-2 border-[#83DF9C]/50 shadow-xl shadow-[#83DF9C]/10 flex flex-col md:flex-row items-center justify-between gap-5 text-[#082840]">
                         <div className="flex items-center gap-4">
-                            <div className="relative w-12 h-12 rounded-2xl bg-[#0E5A36] border border-[#83DF9C]/50 flex items-center justify-center text-[#83DF9C] font-black text-lg shadow-lg shadow-[#0E5A36]/30 shrink-0">
-                                N
-                                <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-[#83DF9C] border-2 border-white" />
+                            <div className="flex items-center gap-2 shrink-0">
+                                <div className="w-11 h-11 rounded-2xl bg-[#0E5A36] border border-[#83DF9C]/50 flex items-center justify-center text-[#83DF9C] shadow-md shadow-[#0E5A36]/20">
+                                    <BancolombiaIcon className="w-5 h-5" />
+                                </div>
+                                <div className="w-11 h-11 rounded-2xl bg-[#0E5A36] border border-[#83DF9C]/50 flex items-center justify-center text-[#83DF9C] shadow-md shadow-[#0E5A36]/20">
+                                    <NequiIcon className="w-4 h-4" />
+                                </div>
                             </div>
                             <div>
                                 <div className="flex flex-wrap items-center gap-2">
                                     <h4 className="text-base font-black text-[#082840]">
-                                        {lang === 'es' ? 'Transferencias Bancarias & Nequi Directo' : 'Direct Bank Transfers & Nequi'}
+                                        {lang === 'es' ? 'Bancolombia & Nequi Directo' : 'Bancolombia & Nequi Direct'}
                                     </h4>
+                                    <span className="px-2.5 py-0.5 rounded-full bg-[#0E5A36]/10 text-[#0E5A36] border border-[#0E5A36]/30 text-[10px] font-black">
+                                        {lang === 'es' ? 'Ahorros: 7089 0888702' : 'Savings: 7089 0888702'}
+                                    </span>
                                     <span className="px-2.5 py-0.5 rounded-full bg-[#082840]/10 text-[#082840] border border-[#082840]/20 text-[10px] font-bold">
-                                        {lang === 'es' ? 'Número Oficial: 301 397 0002' : 'Official Number: 301 397 0002'}
+                                        Nequi: 301 397 0002
                                     </span>
                                 </div>
                                 <p className="text-xs text-[#0C3C60]/75 mt-0.5">
                                     {lang === 'es'
-                                        ? 'Paga al instante desde Nequi, Bancolombia o Transfiya. Emisión de factura y activación en menos de 5 minutos.'
-                                        : 'Instant transfers from Nequi, Bancolombia or Transfiya. Immediate parcel activation in under 5 minutes.'}
+                                        ? 'Cuenta de Ahorros Bancolombia 7089 0888702 o Nequi 301 397 0002. Activación inmediata de predios y factura electrónica.'
+                                        : 'Bancolombia Savings 7089 0888702 or Nequi 301 397 0002. Immediate parcel activation & official tax invoice.'}
                                 </p>
                             </div>
                         </div>
@@ -571,23 +585,25 @@ export default function LandingPage() {
                                 onClick={() => openPaymentForPlan(
                                     lang === 'es' ? 'Pase de Caminata Digital' : 'Digital Walk Pass',
                                     '$25 USD',
-                                    '~ 100.000 COP'
+                                    '~ 100.000 COP',
+                                    'nequi'
                                 )}
                                 className="w-full md:w-auto px-5 py-3 rounded-xl bg-[#0E5A36] hover:bg-[#0A4529] text-white text-xs font-black transition-all shadow-lg shadow-[#0E5A36]/30 hover:scale-105 flex items-center justify-center gap-2 shrink-0 border border-[#83DF9C]/40"
                             >
-                                <Smartphone className="w-4 h-4 text-[#83DF9C]" />
+                                <NequiIcon className="w-4 h-4 text-[#83DF9C]" />
                                 <span>{lang === 'es' ? 'Pagar con Nequi (301 397 0002)' : 'Pay with Nequi (301 397 0002)'}</span>
                             </button>
                             <button
                                 onClick={() => openPaymentForPlan(
-                                    lang === 'es' ? 'Transferencia Bancaria' : 'Bank Wire Transfer',
+                                    lang === 'es' ? 'Transferencia Bancolombia' : 'Bancolombia Wire Transfer',
                                     'Tarifa según lote',
-                                    'Bancolombia / Factura'
+                                    'Ahorros: 7089 0888702',
+                                    'bank'
                                 )}
-                                className="hidden sm:flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl bg-[#082840]/10 hover:bg-[#082840]/15 border border-[#082840]/20 text-xs font-bold text-[#082840] transition-all shrink-0"
+                                className="hidden sm:flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl bg-[#082840]/10 hover:bg-[#082840]/20 border border-[#082840]/20 text-xs font-bold text-[#082840] transition-all shrink-0"
                             >
-                                <Landmark className="w-4 h-4 text-[#082840]" />
-                                <span>{lang === 'es' ? 'Bancolombia' : 'Bank Transfer'}</span>
+                                <BancolombiaIcon className="w-4 h-4 text-[#082840]" />
+                                <span>{lang === 'es' ? 'Bancolombia' : 'Bancolombia'}</span>
                             </button>
                         </div>
                     </div>
@@ -692,6 +708,7 @@ export default function LandingPage() {
                 onClose={() => setPaymentModalOpen(false)}
                 plan={selectedPlanForPayment}
                 lang={lang}
+                defaultTab={paymentModalTab}
             />
         </div>
     );

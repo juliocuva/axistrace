@@ -11,23 +11,23 @@ interface ScopeTimelineProps {
 }
 
 export default function ScopeTimeline({ t }: ScopeTimelineProps) {
-    const containerRef = useRef<HTMLDivElement>(null);
+    const timelineRef = useRef<HTMLDivElement>(null);
 
-    // Scroll progress que va dibujando la línea a medida que el usuario hace scroll
+    // Scroll progress que dibuja la línea de manera continua y visible a lo largo de todo el scroll
     const { scrollYProgress } = useScroll({
-        target: containerRef,
-        offset: ["start 75%", "end 85%"]
+        target: timelineRef,
+        offset: ["start 80%", "end 55%"]
     });
 
     const pathLength = useSpring(scrollYProgress, {
-        stiffness: 300,
-        damping: 70,
+        stiffness: 250,
+        damping: 45,
         restDelta: 0.001
     });
 
     return (
         <section id="alcance" className="relative z-10 py-24 sm:py-32 px-4 bg-gradient-to-b from-[#040E17] via-[#061826] to-[#040E17] overflow-hidden">
-            <div className="max-w-6xl mx-auto" ref={containerRef}>
+            <div className="max-w-6xl mx-auto">
                 {/* Header animado */}
                 <motion.div 
                     initial={{ opacity: 0, y: -25 }}
@@ -52,7 +52,7 @@ export default function ScopeTimeline({ t }: ScopeTimelineProps) {
                 </motion.div>
 
                 {/* Timeline Container con el Trazo Vectorial Zig-Zag Flotante por Encima */}
-                <div className="relative">
+                <div className="relative" ref={timelineRef}>
                     
                     {/* TRAZO VECTORIAL ZIG-ZAG QUE SE DIBUJA CON EL SCROLL CON LOS NODOS DIRECTAMENTE SOBRE LA LÍNEA (z-30) */}
                     <div className="hidden lg:block absolute inset-0 z-30 pointer-events-none">
@@ -79,7 +79,7 @@ export default function ScopeTimeline({ t }: ScopeTimelineProps) {
                                    C 555,230 635,480 655,635 
                                    C 675,790 515,940 495,1100 
                                    C 475,1250 635,1410 655,1565 
-                                   C 675,1720 615,1900 576,2045"
+                                   C 675,1690 615,1800 576,1915"
                                 stroke="#83DF9C"
                                 strokeWidth="2"
                                 strokeDasharray="6 6"
@@ -95,7 +95,7 @@ export default function ScopeTimeline({ t }: ScopeTimelineProps) {
                                    C 555,230 635,480 655,635 
                                    C 675,790 515,940 495,1100 
                                    C 475,1250 635,1410 655,1565 
-                                   C 675,1720 615,1900 576,2045"
+                                   C 675,1690 615,1800 576,1915"
                                 style={{ pathLength }}
                                 stroke="url(#traceGlow)"
                                 strokeWidth="2.2"
@@ -160,8 +160,8 @@ export default function ScopeTimeline({ t }: ScopeTimelineProps) {
                                 </text>
                             </g>
 
-                            {/* Vértice 5: Nodo #58 (Cierre Agrónomo) */}
-                            <g transform="translate(576, 2045)">
+                            {/* Vértice 5: Nodo #58 (Cierre Agrónomo) - POSICIONADO MÁS ARRIBA EN EL CIELO DESPEJADO PARA NO TAPAR EL TEXTO */}
+                            <g transform="translate(576, 1915)">
                                 <circle r="28" fill="#83DF9C" opacity="0.25">
                                     <animate attributeName="r" values="22;36;22" dur="3s" repeatCount="indefinite" />
                                     <animate attributeName="opacity" values="0.35;0.05;0.35" dur="3s" repeatCount="indefinite" />
