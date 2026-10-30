@@ -17,7 +17,11 @@ import {
     Globe, 
     Zap,
     Download,
-    XCircle
+    XCircle,
+    FileText,
+    Users,
+    Smartphone,
+    PlusCircle
 } from 'lucide-react';
 
 export default function LandingPage() {
@@ -46,8 +50,11 @@ export default function LandingPage() {
                         </div>
                     </Link>
 
-                    <div className="flex items-center gap-3">
-                        <span className="hidden sm:inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-[#83DF9C]/10 text-[#83DF9C] border border-[#83DF9C]/25">
+                    <div className="flex items-center gap-4">
+                        <a href="#planes" className="hidden sm:inline text-xs font-semibold text-[#FAF2CA]/80 hover:text-[#83DF9C] transition-colors">
+                            Planes & Precios
+                        </a>
+                        <span className="hidden md:inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-[#83DF9C]/10 text-[#83DF9C] border border-[#83DF9C]/25">
                             <span className="w-1.5 h-1.5 rounded-full bg-[#83DF9C] animate-pulse" />
                             Reglamento (UE) 2023/1115
                         </span>
@@ -96,10 +103,10 @@ export default function LandingPage() {
                             <ArrowRight className="w-4 h-4 text-[#061826]" />
                         </Link>
                         <a
-                            href="#caracteristicas"
+                            href="#planes"
                             className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-[#0C3C60]/40 hover:bg-[#0C3C60]/70 border border-[#0C3C60] text-xs font-bold text-[#FAF2CA] transition-all flex items-center justify-center"
                         >
-                            Ver Características
+                            Ver Planes & Precios
                         </a>
                     </div>
 
@@ -156,6 +163,226 @@ export default function LandingPage() {
                             <p className="text-xs text-[#FAF2CA]/70 leading-relaxed">
                                 Hash inalterable con fecha UTC, productor y vértices para auditorías directas en el portal TRACES NT de la UE.
                             </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* SECCIÓN PLANES & PRECIOS (AUTOSERVICIO SAAS) */}
+            <section id="planes" className="relative z-10 py-16 sm:py-24 px-4 bg-gradient-to-b from-[#061826] via-[#082840]/50 to-[#061826] border-t border-[#0C3C60]/50">
+                <div className="max-w-6xl mx-auto">
+                    {/* Section Header */}
+                    <div className="text-center max-w-2xl mx-auto mb-12">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#83DF9C]/10 text-[#83DF9C] text-xs font-bold uppercase tracking-wider mb-3 border border-[#83DF9C]/25">
+                            Modelo 100% Autoservicio (SaaS)
+                        </div>
+                        <h2 className="text-2xl sm:text-4xl font-black text-white">
+                            Planes Transparentes por Predio
+                        </h2>
+                        <p className="mt-2 text-xs sm:text-sm text-[#FAF2CA]/75">
+                            Tú o tus operarios caminan la finca con su propio teléfono. Paga únicamente por predio procesado, sin suscripciones forzosas.
+                        </p>
+                    </div>
+
+                    {/* Pricing Cards Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
+                        
+                        {/* Plan 1: Auditoría Satelital */}
+                        <div className="p-6 sm:p-7 rounded-2xl bg-[#082840]/70 border border-[#0C3C60] hover:border-[#83DF9C]/40 transition-all flex flex-col justify-between">
+                            <div>
+                                <div className="flex items-center justify-between mb-4">
+                                    <div className="w-10 h-10 rounded-xl bg-[#0C3C60]/50 border border-[#0C3C60] flex items-center justify-center text-[#83DF9C]">
+                                        <Satellite className="w-5 h-5" />
+                                    </div>
+                                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-[#0C3C60]/60 text-[#FAF2CA]/70 border border-[#0C3C60]">
+                                        Sin caminata
+                                    </span>
+                                </div>
+                                <h3 className="text-lg font-bold text-white mb-1">Auditoría Satelital</h3>
+                                <p className="text-xs text-[#FAF2CA]/65 mb-6">
+                                    Para predios con coordenadas o cartografía previa.
+                                </p>
+                                
+                                <div className="mb-6 pb-6 border-b border-[#0C3C60]/60">
+                                    <div className="flex items-baseline gap-1">
+                                        <span className="text-3xl font-black text-white">$10</span>
+                                        <span className="text-xs text-[#FAF2CA]/60 font-semibold">USD / predio</span>
+                                    </div>
+                                    <div className="text-[11px] text-[#83DF9C] font-medium mt-0.5">
+                                        ~ $40.000 COP
+                                    </div>
+                                </div>
+
+                                <ul className="space-y-2.5 text-xs text-[#FAF2CA]/80">
+                                    <li className="flex items-start gap-2">
+                                        <CheckCircle2 className="w-4 h-4 text-[#83DF9C] shrink-0 mt-0.5" />
+                                        <span>Reparación topológica del polígono</span>
+                                    </li>
+                                    <li className="flex items-start gap-2">
+                                        <CheckCircle2 className="w-4 h-4 text-[#83DF9C] shrink-0 mt-0.5" />
+                                        <span>Cruce satelital línea base bosque post-2020</span>
+                                    </li>
+                                    <li className="flex items-start gap-2">
+                                        <CheckCircle2 className="w-4 h-4 text-[#83DF9C] shrink-0 mt-0.5" />
+                                        <span>GeoJSON válido TRACES NT + PDF oficial</span>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <Link
+                                href="/terminal"
+                                className="mt-8 w-full py-2.5 px-4 rounded-xl bg-[#0C3C60]/60 hover:bg-[#0C3C60] border border-[#0C3C60] text-xs font-bold text-[#FAF2CA] hover:text-white text-center transition-all flex items-center justify-center gap-1.5"
+                            >
+                                <span>Auditar Coordenadas</span>
+                                <ArrowRight className="w-3.5 h-3.5" />
+                            </Link>
+                        </div>
+
+                        {/* Plan 2: Pase Caminata Digital (Destacado) */}
+                        <div className="p-6 sm:p-7 rounded-2xl bg-gradient-to-b from-[#0C3C60]/70 via-[#082840]/90 to-[#082840] border-2 border-[#83DF9C] shadow-xl shadow-[#83DF9C]/10 flex flex-col justify-between relative">
+                            <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-[#83DF9C] text-[#061826] text-[10px] font-black uppercase tracking-wider shadow">
+                                Más Popular en Finca
+                            </div>
+
+                            <div>
+                                <div className="flex items-center justify-between mb-4">
+                                    <div className="w-10 h-10 rounded-xl bg-[#83DF9C]/15 border border-[#83DF9C]/30 flex items-center justify-center text-[#83DF9C]">
+                                        <Smartphone className="w-5 h-5" />
+                                    </div>
+                                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-[#83DF9C]/15 text-[#83DF9C] border border-[#83DF9C]/30">
+                                        1 a 5 Hectáreas
+                                    </span>
+                                </div>
+                                <h3 className="text-lg font-bold text-white mb-1">Pase Caminata Digital</h3>
+                                <p className="text-xs text-[#FAF2CA]/65 mb-6">
+                                    Autoservicio en terreno con el celular del operario.
+                                </p>
+                                
+                                <div className="mb-6 pb-6 border-b border-[#0C3C60]/60">
+                                    <div className="flex items-baseline gap-1">
+                                        <span className="text-3xl font-black text-[#83DF9C]">$25</span>
+                                        <span className="text-xs text-[#FAF2CA]/60 font-semibold">USD / lote base</span>
+                                    </div>
+                                    <div className="text-[11px] text-[#FAF2CA]/75 font-medium mt-0.5">
+                                        ~ $100.000 COP
+                                    </div>
+                                </div>
+
+                                <ul className="space-y-2.5 text-xs text-[#FAF2CA]/90">
+                                    <li className="flex items-start gap-2">
+                                        <CheckCircle2 className="w-4 h-4 text-[#83DF9C] shrink-0 mt-0.5" />
+                                        <span>Modo bolsillo con firma inercial antifraude</span>
+                                    </li>
+                                    <li className="flex items-start gap-2">
+                                        <CheckCircle2 className="w-4 h-4 text-[#83DF9C] shrink-0 mt-0.5" />
+                                        <span>Cruce satelital Sentinel-2 post-2020</span>
+                                    </li>
+                                    <li className="flex items-start gap-2">
+                                        <CheckCircle2 className="w-4 h-4 text-[#83DF9C] shrink-0 mt-0.5" />
+                                        <span>Ficha cartográfica Oficio 300 DPI con QR</span>
+                                    </li>
+                                    <li className="flex items-start gap-2">
+                                        <CheckCircle2 className="w-4 h-4 text-[#83DF9C] shrink-0 mt-0.5" />
+                                        <span>GeoJSON RFC 7946 sellado SHA-256</span>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <Link
+                                href="/terminal"
+                                className="mt-8 w-full py-3 px-4 rounded-xl bg-gradient-to-r from-[#0c6056] to-[#83DF9C] text-[#061826] font-black text-xs text-center shadow-lg hover:scale-[1.02] transition-all flex items-center justify-center gap-1.5"
+                            >
+                                <Compass className="w-4 h-4 text-[#061826]" />
+                                <span>Iniciar Caminata</span>
+                                <ArrowRight className="w-3.5 h-3.5 text-[#061826]" />
+                            </Link>
+                        </div>
+
+                        {/* Plan 3: Bolsa Corporativa */}
+                        <div className="p-6 sm:p-7 rounded-2xl bg-[#082840]/70 border border-[#0C3C60] hover:border-[#83DF9C]/40 transition-all flex flex-col justify-between">
+                            <div>
+                                <div className="flex items-center justify-between mb-4">
+                                    <div className="w-10 h-10 rounded-xl bg-[#0C3C60]/50 border border-[#0C3C60] flex items-center justify-center text-[#83DF9C]">
+                                        <Users className="w-5 h-5" />
+                                    </div>
+                                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-[#83DF9C]/10 text-[#83DF9C] border border-[#83DF9C]/20">
+                                        Hasta 100 Predios
+                                    </span>
+                                </div>
+                                <h3 className="text-lg font-bold text-white mb-1">Bolsa Corporativa</h3>
+                                <p className="text-xs text-[#FAF2CA]/65 mb-6">
+                                    Para asociaciones, cooperativas y exportadores.
+                                </p>
+                                
+                                <div className="mb-6 pb-6 border-b border-[#0C3C60]/60">
+                                    <div className="flex items-baseline gap-1">
+                                        <span className="text-3xl font-black text-white">$650</span>
+                                        <span className="text-xs text-[#FAF2CA]/60 font-semibold">USD / bolsa</span>
+                                    </div>
+                                    <div className="text-[11px] text-[#83DF9C] font-semibold mt-0.5">
+                                        $6,50 USD / predio (~ $2.600.000 COP total)
+                                    </div>
+                                </div>
+
+                                <ul className="space-y-2.5 text-xs text-[#FAF2CA]/80">
+                                    <li className="flex items-start gap-2">
+                                        <CheckCircle2 className="w-4 h-4 text-[#83DF9C] shrink-0 mt-0.5" />
+                                        <span>100 pases para técnicos propios</span>
+                                    </li>
+                                    <li className="flex items-start gap-2">
+                                        <CheckCircle2 className="w-4 h-4 text-[#83DF9C] shrink-0 mt-0.5" />
+                                        <span>Panel centralizado de lotes asociados</span>
+                                    </li>
+                                    <li className="flex items-start gap-2">
+                                        <CheckCircle2 className="w-4 h-4 text-[#83DF9C] shrink-0 mt-0.5" />
+                                        <span>Exportación masiva para aduanas UE</span>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <a
+                                href="mailto:soporte@axistrace.app?subject=Consulta%20Bolsa%20Corporativa%20AxisTrace"
+                                className="mt-8 w-full py-2.5 px-4 rounded-xl bg-[#0C3C60]/60 hover:bg-[#0C3C60] border border-[#0C3C60] text-xs font-bold text-[#FAF2CA] hover:text-white text-center transition-all flex items-center justify-center gap-1.5"
+                            >
+                                <span>Solicitar Bolsa</span>
+                                <ArrowRight className="w-3.5 h-3.5" />
+                            </a>
+                        </div>
+                    </div>
+
+                    {/* Strip Adicional: Hectárea Extra & Entregables */}
+                    <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {/* Hectárea Adicional */}
+                        <div className="p-4 sm:p-5 rounded-xl bg-[#082840]/60 border border-[#0C3C60] flex items-center justify-between gap-4">
+                            <div className="flex items-center gap-3">
+                                <div className="w-9 h-9 rounded-lg bg-[#83DF9C]/10 border border-[#83DF9C]/20 flex items-center justify-center text-[#83DF9C] shrink-0">
+                                    <PlusCircle className="w-4 h-4" />
+                                </div>
+                                <div>
+                                    <h4 className="text-sm font-bold text-white">Hectárea Adicional (Predios Extensos)</h4>
+                                    <p className="text-[11px] text-[#FAF2CA]/60">Aplica a partir de la 6ta hectárea en palma, ganadería o cacao extenso.</p>
+                                </div>
+                            </div>
+                            <div className="text-right shrink-0">
+                                <div className="text-base font-black text-[#83DF9C]">+$3 USD</div>
+                                <div className="text-[10px] text-[#FAF2CA]/50">~ $12.000 COP / ha</div>
+                            </div>
+                        </div>
+
+                        {/* Entregables Oficiales Incluidos */}
+                        <div className="p-4 sm:p-5 rounded-xl bg-[#082840]/60 border border-[#0C3C60] flex items-center justify-between gap-4">
+                            <div className="flex items-center gap-3">
+                                <div className="w-9 h-9 rounded-lg bg-[#83DF9C]/10 border border-[#83DF9C]/20 flex items-center justify-center text-[#83DF9C] shrink-0">
+                                    <FileText className="w-4 h-4" />
+                                </div>
+                                <div>
+                                    <h4 className="text-sm font-bold text-white">Entregables Oficiales Incluidos</h4>
+                                    <p className="text-[11px] text-[#FAF2CA]/60">Ficha Técnica Oficio 300 DPI + GeoJSON RFC 7946 con hash SHA-256 inmutable.</p>
+                                </div>
+                            </div>
+                            <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded bg-[#83DF9C]/15 text-[#83DF9C] border border-[#83DF9C]/30 shrink-0">
+                                Incluido
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -235,7 +462,7 @@ export default function LandingPage() {
                         Comienza a Georreferenciar Hoy
                     </h2>
                     <p className="mt-2 text-xs sm:text-sm text-[#FAF2CA]/70">
-                        Sin descargas ni registros previos. Abre la terminal desde cualquier celular o navegador.
+                        100% Autoservicio en campo con tu propio smartphone. Sin suscripciones fijas.
                     </p>
                     <div className="mt-6">
                         <Link
