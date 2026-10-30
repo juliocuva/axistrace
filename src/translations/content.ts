@@ -101,7 +101,7 @@ export const translations = {
             stats: [
                 { val: "100%", label: "Digital Self-Service", sub: "Operators survey with their own phone" },
                 { val: "0%", label: "Cellular Dependency", sub: "100% offline in remote mountain terrain" },
-                { val: "SHA-256", label: "Cryptographic Seal", sub: "Tamper-proof atomic UTC timestamp" }
+                { val: "100%", label: "Cryptographic Seal", sub: "Tamper-proof atomic UTC timestamp" }
             ],
             cards: [
                 {
@@ -302,7 +302,7 @@ export const translations = {
             stats: [
                 { val: "100%", label: "Autoservicio Digital", sub: "El operario mapea con su propio celular" },
                 { val: "0%", label: "Dependencia de Red", sub: "100% offline en zonas montañosas remotas" },
-                { val: "SHA-256", label: "Sello Criptográfico", sub: "Huella inmutable con hora atómica UTC" }
+                { val: "100%", label: "Sello Criptográfico", sub: "Huella inmutable con hora atómica UTC" }
             ],
             cards: [
                 {
