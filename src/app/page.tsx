@@ -487,24 +487,26 @@ export default function LandingPage() {
             </section>
 
             {/* CTA FINAL */}
-            <section className="relative z-10 py-24 sm:py-32 px-4 text-center overflow-hidden">
-                {/* Full-width Section Background Image (Edge-to-Edge) */}
+            <section className="relative z-10 py-32 sm:py-44 px-4 text-center overflow-hidden">
+                {/* Full-width Section Background Image (Edge-to-Edge & Clearly Visible) */}
                 <div className="absolute inset-0 z-0">
                     <Image
                         src="/images/hero-agritech.jpg"
                         alt="AxisTrace Agritech Field"
                         fill
-                        className="object-cover object-center filter brightness-[0.38] contrast-[1.15]"
+                        className="object-cover object-center filter brightness-[0.78] contrast-[1.10]"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#02070D] via-[#040E17]/80 to-[#040E17]/90" />
-                    <div className="absolute inset-0 bg-[#082840]/30" />
+                    {/* Balanced overlays: soft fade top & bottom, clear open center */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#02070D] via-[#02070D]/45 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-b from-[#040E17]/70 via-transparent to-transparent" />
+                    <div className="absolute inset-0 bg-[#040E17]/25" />
                 </div>
 
                 <div className="relative z-10 max-w-3xl mx-auto flex flex-col items-center">
-                    <h2 className="text-3xl sm:text-5xl font-black text-white drop-shadow-md tracking-tight">
+                    <h2 className="text-3xl sm:text-5xl font-black text-white drop-shadow-[0_4px_20px_rgba(0,0,0,0.9)] tracking-tight">
                         {t.finalCta.title}
                     </h2>
-                    <p className="mt-4 text-sm sm:text-base text-[#FAF2CA]/90 max-w-xl drop-shadow leading-relaxed">
+                    <p className="mt-4 text-sm sm:text-base text-[#FAF2CA] font-medium max-w-xl drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)] leading-relaxed">
                         {t.finalCta.subtitle}
                     </p>
                     <div className="mt-8 flex flex-col sm:flex-row gap-3.5 w-full sm:w-auto items-center justify-center">
