@@ -129,116 +129,114 @@ export default function LandingPage() {
                 </div>
             </header>
 
-            {/* HERO SECTION */}
-            <section className="relative z-10 pt-4 sm:pt-6 pb-12 sm:pb-20 px-3 sm:px-6">
-                <div className="max-w-7xl mx-auto">
-                    <div className="relative rounded-3xl sm:rounded-[36px] overflow-hidden border border-[#0C3C60]/80 shadow-2xl bg-[#082840]/90">
-                        <div className="absolute inset-0 z-0">
-                            <Image
-                                src="/images/hero-agritech.jpg"
-                                alt="AxisTrace Precision Landscape"
-                                fill
-                                priority
-                                className="object-cover object-center filter brightness-[0.78] contrast-[1.12]"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-[#040E17] via-[#040E17]/45 to-transparent" />
-                            <div className="absolute inset-0 bg-gradient-to-r from-[#040E17]/95 via-[#040E17]/60 to-transparent sm:w-2/3" />
+            {/* HERO SECTION (FULL WIDTH EDGE-TO-EDGE, SIN BORDES REDONDEADOS) */}
+            <section className="relative z-10 w-full overflow-hidden border-b border-[#0C3C60]/50">
+                {/* Full-bleed Landscape Background */}
+                <div className="absolute inset-0 z-0">
+                    <Image
+                        src="/images/hero-agritech.jpg"
+                        alt="AxisTrace Precision Landscape"
+                        fill
+                        priority
+                        className="object-cover object-center filter brightness-[0.88] contrast-[1.08]"
+                    />
+                    {/* Balanced overlays: soft fade on bottom to merge with next section, subtle side gradient for crystal-clear readability */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#040E17] via-[#040E17]/45 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-[#040E17]/80 via-[#040E17]/40 to-transparent sm:w-3/5" />
+                </div>
+
+                <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-8 pt-8 sm:pt-14 pb-14 sm:pb-20 flex flex-col justify-between min-h-[620px] sm:min-h-[680px]">
+                    <div className="flex flex-wrap items-center gap-3 mb-6">
+                        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#040E17]/70 backdrop-blur-md border border-[#83DF9C]/40 text-[#83DF9C] text-xs font-semibold shadow-lg">
+                            <ShieldCheck className="w-4 h-4 text-[#83DF9C]" />
+                            <span>{t.hero.badge}</span>
                         </div>
+                        <span className="text-[11px] text-[#FAF2CA]/75 hidden sm:inline-flex items-center gap-1.5 bg-[#040E17]/50 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
+                            <span className="text-[#83DF9C]">★</span> {t.hero.rating}
+                        </span>
+                    </div>
 
-                        <div className="relative z-10 p-6 sm:p-12 md:p-16 lg:p-20 flex flex-col justify-between min-h-[580px] sm:min-h-[640px]">
-                            <div className="flex flex-wrap items-center gap-3 mb-6">
-                                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#040E17]/70 backdrop-blur-md border border-[#83DF9C]/40 text-[#83DF9C] text-xs font-semibold shadow-lg">
-                                    <ShieldCheck className="w-4 h-4 text-[#83DF9C]" />
-                                    <span>{t.hero.badge}</span>
-                                </div>
-                                <span className="text-[11px] text-[#FAF2CA]/75 hidden sm:inline-flex items-center gap-1.5 bg-[#040E17]/50 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
-                                    <span className="text-[#83DF9C]">★</span> {t.hero.rating}
-                                </span>
+                    <div className="max-w-2xl">
+                        <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-white tracking-tight leading-[1.08] drop-shadow-md">
+                            {t.hero.title1} <br />
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#83DF9C] via-[#FAF2CA] to-[#83DF9C]">
+                                {t.hero.title2}
+                            </span> <br />
+                            {t.hero.title3}
+                        </h1>
+
+                        <p className="mt-5 text-sm sm:text-base md:text-lg text-[#FAF2CA]/90 font-medium leading-relaxed drop-shadow">
+                            {t.hero.description}
+                        </p>
+
+                        <div className="mt-8 flex flex-col sm:flex-row items-center gap-3.5">
+                            <Link
+                                href="/terminal"
+                                className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-[#83DF9C] hover:bg-[#9cf0b3] text-[#040E17] font-black text-sm shadow-xl shadow-[#83DF9C]/25 hover:scale-[1.02] transition-all flex items-center justify-center gap-2"
+                            >
+                                <Compass className="w-5 h-5 text-[#040E17]" />
+                                <span>{t.hero.ctaPrimary}</span>
+                                <ArrowRight className="w-4 h-4 text-[#040E17]" />
+                            </Link>
+                            <a
+                                href="#planes"
+                                className="w-full sm:w-auto px-6 py-4 rounded-2xl bg-[#040E17]/70 hover:bg-[#040E17] backdrop-blur-md border border-[#FAF2CA]/30 text-xs font-bold text-white transition-all flex items-center justify-center gap-2"
+                            >
+                                <FileText className="w-4 h-4 text-[#83DF9C]" />
+                                <span>{t.hero.ctaSecondary}</span>
+                            </a>
+                        </div>
+                        <div className="mt-3 text-[11px] text-[#FAF2CA]/60 flex items-center gap-2">
+                            <span>✓ {t.hero.perks[0]}</span>
+                            <span>•</span>
+                            <span>✓ {t.hero.perks[1]}</span>
+                        </div>
+                    </div>
+
+                    {/* Floating Telemetry Card */}
+                    <div className="absolute top-8 right-8 hidden lg:block w-72 rounded-2xl bg-[#040E17]/85 backdrop-blur-xl border border-[#83DF9C]/30 p-4 shadow-2xl">
+                        <div className="flex items-center justify-between pb-3 border-b border-[#0C3C60]">
+                            <div className="flex items-center gap-2 text-xs font-bold text-white">
+                                <Activity className="w-4 h-4 text-[#83DF9C] animate-pulse" />
+                                <span>{t.hero.telemetry.title}</span>
                             </div>
-
-                            <div className="max-w-2xl">
-                                <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-white tracking-tight leading-[1.08] drop-shadow-md">
-                                    {t.hero.title1} <br />
-                                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#83DF9C] via-[#FAF2CA] to-[#83DF9C]">
-                                        {t.hero.title2}
-                                    </span> <br />
-                                    {t.hero.title3}
-                                </h1>
-
-                                <p className="mt-5 text-sm sm:text-base md:text-lg text-[#FAF2CA]/90 font-medium leading-relaxed drop-shadow">
-                                    {t.hero.description}
-                                </p>
-
-                                <div className="mt-8 flex flex-col sm:flex-row items-center gap-3.5">
-                                    <Link
-                                        href="/terminal"
-                                        className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-[#83DF9C] hover:bg-[#9cf0b3] text-[#040E17] font-black text-sm shadow-xl shadow-[#83DF9C]/25 hover:scale-[1.02] transition-all flex items-center justify-center gap-2"
-                                    >
-                                        <Compass className="w-5 h-5 text-[#040E17]" />
-                                        <span>{t.hero.ctaPrimary}</span>
-                                        <ArrowRight className="w-4 h-4 text-[#040E17]" />
-                                    </Link>
-                                    <a
-                                        href="#planes"
-                                        className="w-full sm:w-auto px-6 py-4 rounded-2xl bg-[#040E17]/70 hover:bg-[#040E17] backdrop-blur-md border border-[#FAF2CA]/30 text-xs font-bold text-white transition-all flex items-center justify-center gap-2"
-                                    >
-                                        <FileText className="w-4 h-4 text-[#83DF9C]" />
-                                        <span>{t.hero.ctaSecondary}</span>
-                                    </a>
-                                </div>
-                                <div className="mt-3 text-[11px] text-[#FAF2CA]/60 flex items-center gap-2">
-                                    <span>✓ {t.hero.perks[0]}</span>
-                                    <span>•</span>
-                                    <span>✓ {t.hero.perks[1]}</span>
-                                </div>
+                            <span className="text-[10px] uppercase font-black px-2 py-0.5 rounded bg-[#83DF9C]/20 text-[#83DF9C]">
+                                {t.hero.telemetry.status}
+                            </span>
+                        </div>
+                        <div className="mt-3 space-y-2.5 text-xs">
+                            <div className="flex justify-between items-center">
+                                <span className="text-[#FAF2CA]/60">{t.hero.telemetry.accuracy}</span>
+                                <span className="font-bold text-[#83DF9C]">{t.hero.telemetry.accuracyVal}</span>
                             </div>
-
-                            {/* Floating Telemetry Card */}
-                            <div className="absolute top-8 right-8 hidden lg:block w-72 rounded-2xl bg-[#040E17]/85 backdrop-blur-xl border border-[#83DF9C]/30 p-4 shadow-2xl">
-                                <div className="flex items-center justify-between pb-3 border-b border-[#0C3C60]">
-                                    <div className="flex items-center gap-2 text-xs font-bold text-white">
-                                        <Activity className="w-4 h-4 text-[#83DF9C] animate-pulse" />
-                                        <span>{t.hero.telemetry.title}</span>
-                                    </div>
-                                    <span className="text-[10px] uppercase font-black px-2 py-0.5 rounded bg-[#83DF9C]/20 text-[#83DF9C]">
-                                        {t.hero.telemetry.status}
-                                    </span>
-                                </div>
-                                <div className="mt-3 space-y-2.5 text-xs">
-                                    <div className="flex justify-between items-center">
-                                        <span className="text-[#FAF2CA]/60">{t.hero.telemetry.accuracy}</span>
-                                        <span className="font-bold text-[#83DF9C]">{t.hero.telemetry.accuracyVal}</span>
-                                    </div>
-                                    <div className="w-full bg-[#0C3C60]/60 rounded-full h-1.5 overflow-hidden">
-                                        <div className="bg-[#83DF9C] h-full w-[94%]" />
-                                    </div>
-                                    <div className="flex justify-between items-center text-[11px]">
-                                        <span className="text-[#FAF2CA]/60">{t.hero.telemetry.deforestation}</span>
-                                        <span className="font-semibold text-white">{t.hero.telemetry.deforestationVal}</span>
-                                    </div>
-                                    <div className="flex justify-between items-center text-[11px]">
-                                        <span className="text-[#FAF2CA]/60">{t.hero.telemetry.crypto}</span>
-                                        <span className="font-mono text-[#83DF9C] text-[10px]">{t.hero.telemetry.cryptoVal}</span>
-                                    </div>
-                                </div>
+                            <div className="w-full bg-[#0C3C60]/60 rounded-full h-1.5 overflow-hidden">
+                                <div className="bg-[#83DF9C] h-full w-[94%]" />
                             </div>
-
-                            <div className="mt-8 pt-6 border-t border-white/10 flex flex-wrap items-center justify-between gap-4 text-xs text-[#FAF2CA]/80">
-                                <div className="flex items-center gap-6">
-                                    <span className="flex items-center gap-1.5 font-medium">
-                                        <CheckCircle2 className="w-4 h-4 text-[#83DF9C]" /> {t.hero.bottom.selfService}
-                                    </span>
-                                    <span className="hidden sm:flex items-center gap-1.5 font-medium">
-                                        <CheckCircle2 className="w-4 h-4 text-[#83DF9C]" /> {t.hero.bottom.resolution}
-                                    </span>
-                                    <span className="hidden md:flex items-center gap-1.5 font-medium">
-                                        <CheckCircle2 className="w-4 h-4 text-[#83DF9C]" /> {t.hero.bottom.standard}
-                                    </span>
-                                </div>
-                                <div className="text-[11px] text-[#FAF2CA]/50 font-mono">
-                                    CRS: OGC:1.3:CRS84 (WGS84)
-                                </div>
+                            <div className="flex justify-between items-center text-[11px]">
+                                <span className="text-[#FAF2CA]/60">{t.hero.telemetry.deforestation}</span>
+                                <span className="font-semibold text-white">{t.hero.telemetry.deforestationVal}</span>
                             </div>
+                            <div className="flex justify-between items-center text-[11px]">
+                                <span className="text-[#FAF2CA]/60">{t.hero.telemetry.crypto}</span>
+                                <span className="font-mono text-[#83DF9C] text-[10px]">{t.hero.telemetry.cryptoVal}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="mt-8 pt-6 border-t border-white/10 flex flex-wrap items-center justify-between gap-4 text-xs text-[#FAF2CA]/80">
+                        <div className="flex items-center gap-6">
+                            <span className="flex items-center gap-1.5 font-medium">
+                                <CheckCircle2 className="w-4 h-4 text-[#83DF9C]" /> {t.hero.bottom.selfService}
+                            </span>
+                            <span className="hidden sm:flex items-center gap-1.5 font-medium">
+                                <CheckCircle2 className="w-4 h-4 text-[#83DF9C]" /> {t.hero.bottom.resolution}
+                            </span>
+                            <span className="hidden md:flex items-center gap-1.5 font-medium">
+                                <CheckCircle2 className="w-4 h-4 text-[#83DF9C]" /> {t.hero.bottom.standard}
+                            </span>
+                        </div>
+                        <div className="text-[11px] text-[#FAF2CA]/50 font-mono">
+                            CRS: OGC:1.3:CRS84 (WGS84)
                         </div>
                     </div>
                 </div>
@@ -487,26 +485,25 @@ export default function LandingPage() {
             </section>
 
             {/* CTA FINAL */}
-            <section className="relative z-10 py-32 sm:py-44 px-4 text-center overflow-hidden">
-                {/* Full-width Section Background Image (Edge-to-Edge & Clearly Visible) */}
+            <section className="relative z-10 py-36 sm:py-52 px-4 text-center overflow-hidden">
+                {/* Full-width Section Background Image showing the mountain peaks clearly */}
                 <div className="absolute inset-0 z-0">
                     <Image
                         src="/images/hero-agritech.jpg"
-                        alt="AxisTrace Agritech Field"
+                        alt="AxisTrace Agritech Mountain Field"
                         fill
-                        className="object-cover object-center filter brightness-[0.78] contrast-[1.10]"
+                        className="object-cover object-[center_25%] sm:object-top filter brightness-[0.92] contrast-[1.08]"
                     />
-                    {/* Balanced overlays: soft fade top & bottom, clear open center */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#02070D] via-[#02070D]/45 to-transparent" />
-                    <div className="absolute inset-0 bg-gradient-to-b from-[#040E17]/70 via-transparent to-transparent" />
-                    <div className="absolute inset-0 bg-[#040E17]/25" />
+                    {/* Minimal overlays so the mountain and sky are clearly visible */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#02070D] via-transparent to-transparent opacity-90" />
+                    <div className="absolute inset-0 bg-gradient-to-b from-[#040E17]/50 via-transparent to-transparent" />
                 </div>
 
                 <div className="relative z-10 max-w-3xl mx-auto flex flex-col items-center">
-                    <h2 className="text-3xl sm:text-5xl font-black text-white drop-shadow-[0_4px_20px_rgba(0,0,0,0.9)] tracking-tight">
+                    <h2 className="text-3xl sm:text-5xl font-black text-white drop-shadow-[0_4px_24px_rgba(0,0,0,0.95)] tracking-tight">
                         {t.finalCta.title}
                     </h2>
-                    <p className="mt-4 text-sm sm:text-base text-[#FAF2CA] font-medium max-w-xl drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)] leading-relaxed">
+                    <p className="mt-4 text-sm sm:text-base text-[#FAF2CA] font-medium max-w-xl drop-shadow-[0_2px_14px_rgba(0,0,0,0.95)] leading-relaxed">
                         {t.finalCta.subtitle}
                     </p>
                     <div className="mt-8 flex flex-col sm:flex-row gap-3.5 w-full sm:w-auto items-center justify-center">
@@ -549,8 +546,18 @@ export default function LandingPage() {
                         <span>•</span>
                         <span>EUDR Regulation (EU) 2023/1115</span>
                     </div>
-                    <div className="text-[11px] text-[#FAF2CA]/40">
-                        © {new Date().getFullYear()} AxisTrace. {t.footer.rights}
+                    <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-[11px] text-[#FAF2CA]/50">
+                        <span>© {new Date().getFullYear()} AxisTrace. {t.footer.rights}</span>
+                        <span className="hidden sm:inline text-[#0C3C60]">•</span>
+                        <a 
+                            href="https://mouselab.dev" 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-[#FAF2CA]/70 hover:text-[#83DF9C] transition-colors font-medium flex items-center gap-1 group"
+                        >
+                            <span>{lang === 'es' ? 'Desarrollado por' : 'Developed by'}</span>
+                            <span className="font-bold text-white group-hover:text-[#83DF9C] underline underline-offset-4 decoration-[#83DF9C]/50 group-hover:decoration-[#83DF9C] transition-all">Mouselab</span>
+                        </a>
                     </div>
                 </div>
             </footer>
