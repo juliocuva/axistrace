@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Copy, Check, Globe, ShieldCheck, ArrowRight } from 'lucide-react';
 import { WhatsAppIcon } from './WhatsAppFloating';
@@ -156,7 +157,7 @@ export default function PaymentModal({ isOpen, onClose, plan, lang, defaultTab =
                                         : 'text-[#FAF2CA]/60 hover:text-white'
                                 }`}
                             >
-                                <NequiIcon className="w-4 h-4" />
+                                <Image src="/images/nequi-emerald.png" alt="Nequi" width={55} height={18} className="h-3.5 w-auto object-contain" />
                                 <span>Nequi</span>
                             </button>
                             <button
@@ -167,7 +168,7 @@ export default function PaymentModal({ isOpen, onClose, plan, lang, defaultTab =
                                         : 'text-[#FAF2CA]/60 hover:text-white'
                                 }`}
                             >
-                                <BancolombiaIcon className="w-4 h-4" />
+                                <Image src="/images/bancolombia-emerald.png" alt="Bancolombia" width={75} height={18} className="h-3.5 w-auto object-contain" />
                                 <span>Bancolombia</span>
                             </button>
                             <button
@@ -187,9 +188,9 @@ export default function PaymentModal({ isOpen, onClose, plan, lang, defaultTab =
                         {activeTab === 'nequi' && (
                             <div className="p-5 rounded-2xl bg-gradient-to-br from-[#082840]/90 to-[#04131d]/95 border border-[#83DF9C]/40 mb-6">
                                 <div className="flex items-center justify-between mb-3">
-                                    <div className="flex items-center gap-2.5">
-                                        <div className="w-8 h-8 rounded-lg bg-[#0E5A36] border border-[#83DF9C]/50 flex items-center justify-center text-[#83DF9C] shadow">
-                                            <NequiIcon className="w-4 h-4" />
+                                    <div className="flex items-center gap-3">
+                                        <div className="h-8 px-2.5 rounded-lg bg-[#0E5A36] border border-[#83DF9C]/50 flex items-center justify-center shadow">
+                                            <Image src="/images/nequi-white.png" alt="Nequi" width={60} height={20} className="h-4 w-auto object-contain" />
                                         </div>
                                         <div>
                                             <div className="text-sm font-black text-white">Nequi / Transfiya Colombia</div>
@@ -240,9 +241,9 @@ export default function PaymentModal({ isOpen, onClose, plan, lang, defaultTab =
                         {activeTab === 'bank' && (
                             <div className="p-5 rounded-2xl bg-gradient-to-br from-[#082840]/90 to-[#04131d]/95 border border-[#83DF9C]/40 mb-6">
                                 <div className="flex items-center justify-between mb-3">
-                                    <div className="flex items-center gap-2.5">
-                                        <div className="w-8 h-8 rounded-lg bg-[#0E5A36] border border-[#83DF9C]/50 flex items-center justify-center text-[#83DF9C] shadow">
-                                            <BancolombiaIcon className="w-4 h-4" />
+                                    <div className="flex items-center gap-3">
+                                        <div className="h-8 px-2.5 rounded-lg bg-[#0E5A36] border border-[#83DF9C]/50 flex items-center justify-center shadow">
+                                            <Image src="/images/bancolombia-white.png" alt="Bancolombia" width={80} height={20} className="h-4 w-auto object-contain" />
                                         </div>
                                         <div>
                                             <div className="text-sm font-black text-white">Bancolombia • Cuenta de Ahorros</div>

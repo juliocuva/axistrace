@@ -72,11 +72,10 @@ export default function ScopeTimeline({ t }: ScopeTimelineProps) {
                                 </filter>
                             </defs>
 
-                            {/* Guía base tenue del trazo con curvas suaves y redondeadas (sin ir a los extremos laterales) */}
+                            {/* Guía base tenue del trazo conectando directamente los 5 vértices */}
                             <path
-                                d="M 380,80 
-                                   C 420,110 460,135 495,170 
-                                   C 555,230 635,480 655,635 
+                                d="M 495,170 
+                                   C 540,260 635,460 655,635 
                                    C 675,790 515,940 495,1100 
                                    C 475,1250 635,1410 655,1565 
                                    C 675,1690 615,1800 576,1915"
@@ -88,11 +87,10 @@ export default function ScopeTimeline({ t }: ScopeTimelineProps) {
                                 strokeLinejoin="round"
                             />
 
-                            {/* Línea animada con el SCROLL suave, delgada y redondeada pasando directo por los vértices */}
+                            {/* Línea animada con el SCROLL que nace en el Nodo #11 y viaja fluido hasta el #58 */}
                             <motion.path
-                                d="M 380,80 
-                                   C 420,110 460,135 495,170 
-                                   C 555,230 635,480 655,635 
+                                d="M 495,170 
+                                   C 540,260 635,460 655,635 
                                    C 675,790 515,940 495,1100 
                                    C 475,1250 635,1410 655,1565 
                                    C 675,1690 615,1800 576,1915"

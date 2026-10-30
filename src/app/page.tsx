@@ -485,10 +485,7 @@ export default function LandingPage() {
                                     )}
                                     className="mt-2.5 w-full py-2.5 px-3 rounded-xl bg-[#082840]/10 hover:bg-[#082840]/15 border border-[#082840]/20 text-[11px] font-bold text-[#082840] text-center transition-all flex items-center justify-center gap-1.5"
                                 >
-                                    <Landmark className="w-3.5 h-3.5" />
-                                    <span>{lang === 'es' ? 'Transferencia Bancaria / Factura' : 'Bank Wire / Invoice'}</span>
-                                </button>
-                                    <Landmark className="w-3.5 h-3.5" />
+                                    <Image src="/images/bancolombia-dark.png" alt="Bancolombia" width={75} height={18} className="h-3.5 w-auto object-contain mr-1" />
                                     <span>{lang === 'es' ? 'Transferencia Bancaria / Factura' : 'Bank Wire / Invoice'}</span>
                                 </button>
                             </div>
@@ -499,11 +496,11 @@ export default function LandingPage() {
                     <div className="mt-8 p-5 sm:p-6 rounded-3xl bg-white border-2 border-[#83DF9C]/50 shadow-xl shadow-[#83DF9C]/10 flex flex-col md:flex-row items-center justify-between gap-5 text-[#082840]">
                         <div className="flex items-center gap-4">
                             <div className="flex items-center gap-2 shrink-0">
-                                <div className="w-11 h-11 rounded-2xl bg-[#0E5A36] border border-[#83DF9C]/50 flex items-center justify-center text-[#83DF9C] shadow-md shadow-[#0E5A36]/20">
-                                    <BancolombiaIcon className="w-5 h-5" />
+                                <div className="h-10 px-3 rounded-xl bg-[#082840]/10 border border-[#082840]/20 flex items-center justify-center shadow-sm">
+                                    <Image src="/images/bancolombia-dark.png" alt="Bancolombia" width={95} height={22} className="h-4.5 w-auto object-contain" />
                                 </div>
-                                <div className="w-11 h-11 rounded-2xl bg-[#0E5A36] border border-[#83DF9C]/50 flex items-center justify-center text-[#83DF9C] shadow-md shadow-[#0E5A36]/20">
-                                    <NequiIcon className="w-4 h-4" />
+                                <div className="h-10 px-3 rounded-xl bg-[#082840]/10 border border-[#082840]/20 flex items-center justify-center shadow-sm">
+                                    <Image src="/images/nequi-dark.png" alt="Nequi" width={60} height={20} className="h-4.5 w-auto object-contain" />
                                 </div>
                             </div>
                             <div>
@@ -535,7 +532,7 @@ export default function LandingPage() {
                                 )}
                                 className="w-full md:w-auto px-5 py-3 rounded-xl bg-[#0E5A36] hover:bg-[#0A4529] text-white text-xs font-black transition-all shadow-lg shadow-[#0E5A36]/30 hover:scale-105 flex items-center justify-center gap-2 shrink-0 border border-[#83DF9C]/40"
                             >
-                                <NequiIcon className="w-4 h-4 text-[#83DF9C]" />
+                                <Image src="/images/nequi-white.png" alt="Nequi" width={55} height={18} className="h-3.5 w-auto object-contain mr-1" />
                                 <span>{lang === 'es' ? 'Pagar con Nequi (301 397 0002)' : 'Pay with Nequi (301 397 0002)'}</span>
                             </button>
                             <button
@@ -547,7 +544,7 @@ export default function LandingPage() {
                                 )}
                                 className="hidden sm:flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl bg-[#082840]/10 hover:bg-[#082840]/20 border border-[#082840]/20 text-xs font-bold text-[#082840] transition-all shrink-0"
                             >
-                                <BancolombiaIcon className="w-4 h-4 text-[#082840]" />
+                                <Image src="/images/bancolombia-dark.png" alt="Bancolombia" width={80} height={18} className="h-3.5 w-auto object-contain mr-1" />
                                 <span>{lang === 'es' ? 'Bancolombia' : 'Bancolombia'}</span>
                             </button>
                         </div>
