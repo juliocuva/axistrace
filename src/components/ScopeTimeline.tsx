@@ -187,7 +187,7 @@ export default function ScopeTimeline({ t }: ScopeTimelineProps) {
                                 transition={{ duration: 0.75, ease: "easeOut" }}
                                 className="lg:col-span-6 relative z-20"
                             >
-                                <div className="relative rounded-3xl overflow-hidden border-2 border-[#0C3C60] hover:border-[#83DF9C]/60 transition-all shadow-2xl group h-72 sm:h-84">
+                                <div className="relative rounded-3xl overflow-hidden border-2 border-[#0C3C60] hover:border-[#83DF9C]/60 transition-all shadow-2xl group h-80 sm:h-[380px] lg:h-[410px]">
                                     <Image
                                         src="/images/coffee-plantation.jpg"
                                         alt={t.scope.items.coffee.title}
@@ -308,7 +308,7 @@ export default function ScopeTimeline({ t }: ScopeTimelineProps) {
                                 transition={{ duration: 0.75, ease: "easeOut" }}
                                 className="lg:col-span-6 order-1 lg:order-2 relative z-20"
                             >
-                                <div className="relative rounded-3xl overflow-hidden border-2 border-[#0C3C60] hover:border-[#83DF9C]/60 transition-all shadow-2xl group h-72 sm:h-84">
+                                <div className="relative rounded-3xl overflow-hidden border-2 border-[#0C3C60] hover:border-[#83DF9C]/60 transition-all shadow-2xl group h-80 sm:h-[380px] lg:h-[410px]">
                                     <Image
                                         src="/images/cacao-plantation.jpg"
                                         alt={t.scope.items.cacao.title}
@@ -339,7 +339,7 @@ export default function ScopeTimeline({ t }: ScopeTimelineProps) {
                                 transition={{ duration: 0.75, ease: "easeOut" }}
                                 className="lg:col-span-6 relative z-20"
                             >
-                                <div className="relative rounded-3xl overflow-hidden border-2 border-[#0C3C60] hover:border-[#83DF9C]/60 transition-all shadow-2xl group h-72 sm:h-84">
+                                <div className="relative rounded-3xl overflow-hidden border-2 border-[#0C3C60] hover:border-[#83DF9C]/60 transition-all shadow-2xl group h-80 sm:h-[380px] lg:h-[410px]">
                                     <Image
                                         src="/images/palm-plantation.jpg"
                                         alt={t.scope.items.palm.title}
@@ -460,7 +460,7 @@ export default function ScopeTimeline({ t }: ScopeTimelineProps) {
                                 transition={{ duration: 0.75, ease: "easeOut" }}
                                 className="lg:col-span-6 order-1 lg:order-2 relative z-20"
                             >
-                                <div className="relative rounded-3xl overflow-hidden border-2 border-[#0C3C60] hover:border-[#83DF9C]/60 transition-all shadow-2xl group h-72 sm:h-84">
+                                <div className="relative rounded-3xl overflow-hidden border-2 border-[#0C3C60] hover:border-[#83DF9C]/60 transition-all shadow-2xl group h-80 sm:h-[380px] lg:h-[410px]">
                                     <Image
                                         src="/images/cattle-ranching.jpg"
                                         alt={t.scope.items.cattle.title}
