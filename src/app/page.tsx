@@ -43,7 +43,7 @@ export default function LandingPage() {
     };
 
     return (
-        <div className="min-h-screen bg-[#040E17] text-[#FAF2CA] flex flex-col selection:bg-[#83DF9C] selection:text-[#0C3C60] font-sans overflow-x-hidden">
+        <div className="min-h-screen bg-[#040E17] text-[#FAF2CA] flex flex-col selection:bg-[#83DF9C] selection:text-[#0C3C60] font-sans overflow-x-clip">
             {/* Top Announcement Bar */}
             <div className="bg-gradient-to-r from-[#00594C] via-[#0C3C60] to-[#082840] border-b border-[#83DF9C]/20 px-4 py-2 text-center text-[11px] font-semibold text-[#FAF2CA] flex items-center justify-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-[#83DF9C] animate-pulse" />
@@ -53,7 +53,7 @@ export default function LandingPage() {
             </div>
 
             {/* Top Navigation */}
-            <header className="sticky top-0 z-50 bg-[#040E17]/85 backdrop-blur-xl border-b border-[#0C3C60]/50 px-4 py-3.5 transition-all">
+            <header className="sticky top-0 z-50 bg-[#040E17]/95 backdrop-blur-xl border-b border-[#0C3C60]/80 px-4 py-3.5 transition-all shadow-xl">
                 <div className="max-w-7xl mx-auto flex items-center justify-between">
                     <Link href="/" className="flex items-center gap-3 group">
                         <div className="h-9 relative flex items-center group-hover:scale-105 transition-transform">
