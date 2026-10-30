@@ -119,7 +119,7 @@ export default function LandingPage() {
 
                         <Link
                             href="/terminal"
-                            className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#0c6056] to-[#83DF9C] text-[#040E17] font-extrabold text-xs shadow-lg shadow-[#83DF9C]/20 hover:scale-[1.03] transition-all flex items-center gap-1.5"
+                            className="px-4 py-2 rounded-xl bg-[#83DF9C] hover:bg-[#9cf0b3] text-[#040E17] font-extrabold text-xs shadow-lg shadow-[#83DF9C]/20 hover:scale-[1.03] transition-all flex items-center gap-1.5"
                         >
                             <Compass className="w-4 h-4 text-[#040E17]" />
                             <span>{t.nav.terminal}</span>
@@ -392,7 +392,7 @@ export default function LandingPage() {
                             <div className="mt-8">
                                 <Link
                                     href="/terminal"
-                                    className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-[#0c6056] to-[#83DF9C] text-[#040E17] font-black text-xs text-center shadow-lg hover:scale-[1.02] transition-all flex items-center justify-center gap-1.5"
+                                    className="w-full py-3.5 px-4 rounded-xl bg-[#83DF9C] hover:bg-[#9cf0b3] text-[#040E17] font-black text-xs text-center shadow-lg hover:scale-[1.02] transition-all flex items-center justify-center gap-1.5"
                                 >
                                     <Compass className="w-4 h-4 text-[#040E17]" />
                                     <span>{t.pricing.plans.walk.cta}</span>
@@ -498,7 +498,7 @@ export default function LandingPage() {
                     <div className="mt-8 flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
                         <Link
                             href="/terminal"
-                            className="px-8 py-4 rounded-xl bg-gradient-to-r from-[#0c6056] to-[#83DF9C] text-[#040E17] font-black text-sm shadow-xl shadow-[#83DF9C]/25 hover:scale-105 transition-all flex items-center justify-center gap-2"
+                            className="px-8 py-4 rounded-xl bg-[#83DF9C] hover:bg-[#9cf0b3] text-[#040E17] font-black text-sm shadow-xl shadow-[#83DF9C]/25 hover:scale-105 transition-all flex items-center justify-center gap-2"
                         >
                             <Compass className="w-5 h-5 text-[#040E17]" />
                             <span>{t.finalCta.button}</span>
