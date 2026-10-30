@@ -487,50 +487,48 @@ export default function LandingPage() {
             </section>
 
             {/* CTA FINAL */}
-            <section className="relative z-10 py-16 sm:py-20 px-4 text-center">
-                <div className="relative max-w-3xl mx-auto flex flex-col items-center p-8 sm:p-14 rounded-3xl overflow-hidden border border-[#83DF9C]/40 shadow-2xl">
-                    {/* Background Hero Image with Dark Overlays for High Contrast */}
-                    <div className="absolute inset-0 z-0">
-                        <Image
-                            src="/images/hero-agritech.jpg"
-                            alt="AxisTrace Agritech Field"
-                            fill
-                            className="object-cover object-center filter brightness-[0.45] contrast-[1.15]"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#040E17] via-[#040E17]/80 to-[#040E17]/60" />
-                        <div className="absolute inset-0 bg-[#082840]/30 backdrop-blur-[1px]" />
-                    </div>
+            <section className="relative z-10 py-24 sm:py-32 px-4 text-center overflow-hidden">
+                {/* Full-width Section Background Image (Edge-to-Edge) */}
+                <div className="absolute inset-0 z-0">
+                    <Image
+                        src="/images/hero-agritech.jpg"
+                        alt="AxisTrace Agritech Field"
+                        fill
+                        className="object-cover object-center filter brightness-[0.38] contrast-[1.15]"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#02070D] via-[#040E17]/80 to-[#040E17]/90" />
+                    <div className="absolute inset-0 bg-[#082840]/30" />
+                </div>
 
-                    <div className="relative z-10 flex flex-col items-center text-center">
-                        <h2 className="text-2xl sm:text-4xl font-black text-white drop-shadow-md">
-                            {t.finalCta.title}
-                        </h2>
-                        <p className="mt-3 text-xs sm:text-sm text-[#FAF2CA]/85 max-w-lg drop-shadow">
-                            {t.finalCta.subtitle}
-                        </p>
-                        <div className="mt-8 flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-                            <Link
-                                href="/terminal"
-                                className="px-8 py-4 rounded-xl bg-[#83DF9C] hover:bg-[#9cf0b3] text-[#040E17] font-black text-sm shadow-xl shadow-[#83DF9C]/25 hover:scale-105 transition-all flex items-center justify-center gap-2"
-                            >
-                                <Compass className="w-5 h-5 text-[#040E17]" />
-                                <span>{t.finalCta.button}</span>
-                                <ArrowRight className="w-4 h-4 text-[#040E17]" />
-                            </Link>
-                            <a
-                                href={`https://wa.me/573013970002?text=${encodeURIComponent(
-                                    lang === 'es'
-                                        ? 'Hola, me gustaría contactarme para recibir más información y asesoría sobre georreferenciación EUDR con AxisTRACE.'
-                                        : 'Hello, I would like to contact you for more information and advisory on AxisTRACE EUDR georeferencing.'
-                                )}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="px-6 py-4 rounded-xl bg-white hover:bg-[#FAF2CA] text-[#040E17] font-black text-sm shadow-xl hover:scale-105 transition-all flex items-center justify-center gap-2 border border-white/40"
-                            >
-                                <WhatsAppIcon className="w-5 h-5 text-[#040E17] fill-current" />
-                                <span>{lang === 'es' ? 'Contáctame' : 'Contact me'}</span>
-                            </a>
-                        </div>
+                <div className="relative z-10 max-w-3xl mx-auto flex flex-col items-center">
+                    <h2 className="text-3xl sm:text-5xl font-black text-white drop-shadow-md tracking-tight">
+                        {t.finalCta.title}
+                    </h2>
+                    <p className="mt-4 text-sm sm:text-base text-[#FAF2CA]/90 max-w-xl drop-shadow leading-relaxed">
+                        {t.finalCta.subtitle}
+                    </p>
+                    <div className="mt-8 flex flex-col sm:flex-row gap-3.5 w-full sm:w-auto items-center justify-center">
+                        <Link
+                            href="/terminal"
+                            className="w-full sm:w-auto px-8 py-4 rounded-xl bg-[#83DF9C] hover:bg-[#9cf0b3] text-[#040E17] font-black text-sm shadow-xl shadow-[#83DF9C]/25 hover:scale-105 transition-all flex items-center justify-center gap-2"
+                        >
+                            <Compass className="w-5 h-5 text-[#040E17]" />
+                            <span>{t.finalCta.button}</span>
+                            <ArrowRight className="w-4 h-4 text-[#040E17]" />
+                        </Link>
+                        <a
+                            href={`https://wa.me/573013970002?text=${encodeURIComponent(
+                                lang === 'es'
+                                    ? 'Hola, me gustaría contactarme para recibir más información y asesoría sobre georreferenciación EUDR con AxisTRACE.'
+                                    : 'Hello, I would like to contact you for more information and advisory on AxisTRACE EUDR georeferencing.'
+                            )}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-full sm:w-auto px-6 py-4 rounded-xl bg-white hover:bg-[#FAF2CA] text-[#040E17] font-black text-sm shadow-xl hover:scale-105 transition-all flex items-center justify-center gap-2 border border-white/40"
+                        >
+                            <WhatsAppIcon className="w-5 h-5 text-[#040E17] fill-current" />
+                            <span>{lang === 'es' ? 'Contáctame' : 'Contact me'}</span>
+                        </a>
                     </div>
                 </div>
             </section>
