@@ -408,7 +408,7 @@ export default function LandingPage() {
                                     className="mt-2.5 w-full py-2.5 px-3 rounded-xl bg-[#E6EAEC] hover:bg-white border border-[#082840]/20 text-[11px] font-bold text-[#082840] text-center transition-all flex items-center justify-center gap-1.5 shadow-sm"
                                 >
                                     <Image src="/images/nequi-dark.png" alt="Nequi" width={52} height={18} className="h-3.5 w-auto object-contain mr-1" />
-                                    <span>{lang === 'es' ? 'Pagar $100.000 COP ($25 USD)' : 'Pay $25 USD (~100,000 COP)'}</span>
+                                    <span>{lang === 'es' ? 'Transferencia' : 'Transfer'}</span>
                                 </button>
                             </div>
                         </div>
