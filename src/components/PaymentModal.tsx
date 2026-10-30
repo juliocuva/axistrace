@@ -151,25 +151,25 @@ export default function PaymentModal({ isOpen, onClose, plan, lang, defaultTab =
                         <div className="grid grid-cols-3 gap-1 p-1 bg-[#040E17] border border-[#0C3C60] rounded-2xl mb-6 text-xs font-bold">
                             <button
                                 onClick={() => setActiveTab('nequi')}
-                                className={`py-2 px-3 rounded-xl transition-all flex items-center justify-center gap-2 ${
+                                className={`py-2 px-3 rounded-xl transition-all flex items-center justify-center ${
                                     activeTab === 'nequi'
                                         ? 'bg-[#0E5A36] text-[#83DF9C] border border-[#83DF9C]/50 shadow-lg'
                                         : 'text-[#FAF2CA]/60 hover:text-white'
                                 }`}
+                                title="Nequi"
                             >
-                                <Image src="/images/nequi-emerald.png" alt="Nequi" width={55} height={18} className="h-3.5 w-auto object-contain" />
-                                <span>Nequi</span>
+                                <Image src="/images/nequi-emerald.png" alt="Nequi" width={65} height={20} className="h-4 w-auto object-contain" />
                             </button>
                             <button
                                 onClick={() => setActiveTab('bank')}
-                                className={`py-2 px-3 rounded-xl transition-all flex items-center justify-center gap-2 ${
+                                className={`py-2 px-3 rounded-xl transition-all flex items-center justify-center ${
                                     activeTab === 'bank'
                                         ? 'bg-[#0E5A36] text-[#83DF9C] border border-[#83DF9C]/50 shadow-lg'
                                         : 'text-[#FAF2CA]/60 hover:text-white'
                                 }`}
+                                title="Bancolombia"
                             >
-                                <Image src="/images/bancolombia-emerald.png" alt="Bancolombia" width={75} height={18} className="h-3.5 w-auto object-contain" />
-                                <span>Bancolombia</span>
+                                <Image src="/images/bancolombia-emerald.png" alt="Bancolombia" width={90} height={20} className="h-4 w-auto object-contain" />
                             </button>
                             <button
                                 onClick={() => setActiveTab('international')}

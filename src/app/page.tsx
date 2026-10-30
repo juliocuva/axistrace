@@ -43,7 +43,7 @@ export default function LandingPage() {
     };
 
     return (
-        <div className="min-h-screen bg-[#040E17] text-[#FAF2CA] flex flex-col selection:bg-[#83DF9C] selection:text-[#0C3C60] font-sans overflow-x-clip">
+        <div className="min-h-screen bg-[#082840] text-[#FAF2CA] flex flex-col selection:bg-[#83DF9C] selection:text-[#0C3C60] font-sans overflow-x-clip">
             {/* Top Announcement Bar */}
             <div className="bg-gradient-to-r from-[#00594C] via-[#0C3C60] to-[#082840] border-b border-[#83DF9C]/20 px-4 py-2 text-center text-[11px] font-semibold text-[#FAF2CA] flex items-center justify-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-[#83DF9C] animate-pulse" />
@@ -52,8 +52,8 @@ export default function LandingPage() {
                 <span className="hidden sm:inline text-[#FAF2CA]/80">{t.banner.subtitle}</span>
             </div>
 
-            {/* Top Navigation */}
-            <header className="sticky top-0 z-50 bg-[#040E17]/95 backdrop-blur-xl border-b border-[#0C3C60]/80 px-4 py-3.5 transition-all shadow-xl">
+            {/* Top Navigation (Unificado con la Terminal) */}
+            <header className="sticky top-0 z-50 bg-[#082840]/95 backdrop-blur-xl border-b border-[#0C3C60]/60 px-4 py-3.5 transition-all shadow-xl">
                 <div className="max-w-7xl mx-auto flex items-center justify-between">
                     <Link href="/" className="flex items-center gap-3 group">
                         <div className="h-9 relative flex items-center group-hover:scale-105 transition-transform">
@@ -131,18 +131,17 @@ export default function LandingPage() {
 
             {/* HERO SECTION (FULL WIDTH EDGE-TO-EDGE, SIN BORDES REDONDEADOS) */}
             <section className="relative z-10 w-full overflow-hidden border-b border-[#0C3C60]/50">
-                {/* Full-bleed Landscape Background */}
+                {/* Full-bleed Landscape Background - Zero opacity on center and right */}
                 <div className="absolute inset-0 z-0">
                     <Image
                         src="/images/hero-agritech.jpg"
                         alt="AxisTrace Precision Landscape"
                         fill
                         priority
-                        className="object-cover object-center filter brightness-[0.88] contrast-[1.08]"
+                        className="object-cover object-center filter brightness-[1.0] contrast-[1.04]"
                     />
-                    {/* Balanced overlays: soft fade on bottom to merge with next section, subtle side gradient for crystal-clear readability */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#040E17] via-[#040E17]/45 to-transparent" />
-                    <div className="absolute inset-0 bg-gradient-to-r from-[#040E17]/80 via-[#040E17]/40 to-transparent sm:w-3/5" />
+                    {/* Only soft gradient on left behind text; center and right have ZERO dark overlay for 100% natural landscape view */}
+                    <div className="absolute inset-y-0 left-0 w-full sm:w-1/2 bg-gradient-to-r from-[#082840]/90 via-[#082840]/40 to-transparent pointer-events-none" />
                 </div>
 
                 <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-8 pt-8 sm:pt-14 pb-14 sm:pb-20 flex flex-col justify-between min-h-[620px] sm:min-h-[680px]">
@@ -330,25 +329,25 @@ export default function LandingPage() {
                 </div>
             </section>
 
-            {/* SECCIÓN PLANES & PRECIOS (Fondo Claro Elegante) */}
-            <section id="planes" className="relative z-10 py-20 sm:py-28 px-4 bg-gradient-to-b from-[#F9F6EA] via-[#FAF3DB] to-[#F2EAD0] text-[#082840] border-y border-[#E5DAC0]">
+            {/* SECCIÓN PLANES & PRECIOS (Tonos Unificados con la Terminal y App) */}
+            <section id="planes" className="relative z-10 py-20 sm:py-28 px-4 bg-[#082840] text-[#FAF2CA] border-y border-[#0C3C60]/60">
                 <div className="max-w-6xl mx-auto">
                     <div className="text-center max-w-2xl mx-auto mb-14">
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#082840]/10 text-[#082840] text-xs font-bold uppercase tracking-wider mb-3 border border-[#082840]/20">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#83DF9C]/15 text-[#83DF9C] text-xs font-bold uppercase tracking-wider mb-3 border border-[#83DF9C]/30">
                             {t.pricing.tag}
                         </div>
-                        <h2 className="text-2xl sm:text-4xl font-black text-[#082840]">
+                        <h2 className="text-2xl sm:text-4xl font-black text-white">
                             {t.pricing.title}
                         </h2>
-                        <p className="mt-2 text-xs sm:text-sm text-[#0C3C60]/80">
+                        <p className="mt-2 text-xs sm:text-sm text-[#FAF2CA]/75">
                             {t.pricing.subtitle}
                         </p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto items-stretch">
 
-                        {/* Plan 2: Featured (Tarjeta Oscura Destacada para Máximo Contraste) */}
-                        <div className="p-6 sm:p-7 rounded-3xl bg-[#082840] text-white border-2 border-[#83DF9C] shadow-2xl shadow-[#082840]/30 flex flex-col justify-between relative scale-[1.02]">
+                        {/* Plan 2: Featured (Tarjeta Destacada) */}
+                        <div className="p-6 sm:p-7 rounded-3xl bg-[#0C3C60]/40 text-white border-2 border-[#83DF9C] shadow-2xl shadow-[#83DF9C]/10 flex flex-col justify-between relative scale-[1.02]">
                             <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3.5 py-0.5 rounded-full bg-[#83DF9C] text-[#040E17] text-[10px] font-black uppercase tracking-wider shadow">
                                 {t.pricing.plans.walk.popular}
                             </div>
@@ -411,36 +410,36 @@ export default function LandingPage() {
                             </div>
                         </div>
 
-                        {/* Plan 3 */}
-                        <div className="p-6 sm:p-7 rounded-3xl bg-white border border-[#082840]/15 shadow-xl shadow-[#082840]/5 flex flex-col justify-between text-[#082840]">
+                        {/* Plan 3: Corporate */}
+                        <div className="p-6 sm:p-7 rounded-3xl bg-[#0C3C60]/30 border border-[#0C3C60]/70 shadow-xl flex flex-col justify-between text-[#FAF2CA]">
                             <div>
                                 <div className="flex items-center justify-between mb-4">
-                                    <div className="w-10 h-10 rounded-xl bg-[#082840]/10 border border-[#082840]/15 flex items-center justify-center text-[#082840]">
+                                    <div className="w-10 h-10 rounded-xl bg-[#0C3C60]/50 border border-[#0C3C60] flex items-center justify-center text-[#83DF9C]">
                                         <Users className="w-5 h-5" />
                                     </div>
-                                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-[#082840]/10 text-[#082840] border border-[#082840]/20">
+                                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-[#0C3C60]/50 text-[#FAF2CA]/80 border border-[#0C3C60]">
                                         {t.pricing.plans.corporate.badge}
                                     </span>
                                 </div>
-                                <h3 className="text-lg font-bold text-[#082840] mb-1">{t.pricing.plans.corporate.title}</h3>
-                                <p className="text-xs text-[#0C3C60]/75 mb-6">
+                                <h3 className="text-lg font-bold text-white mb-1">{t.pricing.plans.corporate.title}</h3>
+                                <p className="text-xs text-[#FAF2CA]/70 mb-6">
                                     {t.pricing.plans.corporate.subtitle}
                                 </p>
                                 
-                                <div className="mb-6 pb-6 border-b border-[#082840]/15">
+                                <div className="mb-6 pb-6 border-b border-[#0C3C60]/60">
                                     <div className="flex items-baseline gap-1">
-                                        <span className="text-3xl font-black text-[#082840]">{t.pricing.plans.corporate.price}</span>
-                                        <span className="text-xs text-[#0C3C60]/70 font-semibold">{t.pricing.plans.corporate.unit}</span>
+                                        <span className="text-3xl font-black text-white">{t.pricing.plans.corporate.price}</span>
+                                        <span className="text-xs text-[#FAF2CA]/60 font-semibold">{t.pricing.plans.corporate.unit}</span>
                                     </div>
-                                    <div className="text-[11px] text-[#0C6056] font-bold mt-0.5">
+                                    <div className="text-[11px] text-[#83DF9C] font-bold mt-0.5">
                                         {t.pricing.plans.corporate.ref}
                                     </div>
                                 </div>
 
-                                <ul className="space-y-2.5 text-xs text-[#082840]/85">
+                                <ul className="space-y-2.5 text-xs text-[#FAF2CA]/85">
                                     {t.pricing.plans.corporate.features.map((f, idx) => (
                                         <li key={idx} className="flex items-start gap-2">
-                                            <CheckCircle2 className="w-4 h-4 text-[#0C6056] shrink-0 mt-0.5" />
+                                            <CheckCircle2 className="w-4 h-4 text-[#83DF9C] shrink-0 mt-0.5" />
                                             <span>{f}</span>
                                         </li>
                                     ))}
@@ -456,7 +455,7 @@ export default function LandingPage() {
                                     )}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="w-full py-3.5 px-4 rounded-xl bg-[#082840] hover:bg-[#0C3C60] text-xs font-black text-white text-center transition-all flex items-center justify-center gap-2 group shadow-md"
+                                    className="w-full py-3.5 px-4 rounded-xl bg-[#082840] hover:bg-[#0C3C60] border border-[#0C3C60] text-xs font-black text-white text-center transition-all flex items-center justify-center gap-2 group shadow-md"
                                 >
                                     <WhatsAppIcon className="w-4 h-4 text-white fill-current group-hover:scale-110 transition-transform" />
                                     <span>{lang === 'es' ? 'Contactar por WhatsApp' : 'Chat on WhatsApp'}</span>
@@ -469,7 +468,7 @@ export default function LandingPage() {
                                         t.pricing.plans.corporate.ref,
                                         'bank'
                                     )}
-                                    className="mt-2.5 w-full py-2.5 px-3 rounded-xl bg-[#082840]/10 hover:bg-[#082840]/15 border border-[#082840]/20 text-[11px] font-bold text-[#082840] text-center transition-all flex items-center justify-center gap-1.5"
+                                    className="mt-2.5 w-full py-2.5 px-3 rounded-xl bg-[#E6EAEC] hover:bg-white border border-[#082840]/20 text-[11px] font-bold text-[#082840] text-center transition-all flex items-center justify-center gap-1.5"
                                 >
                                     <Image src="/images/bancolombia-dark.png" alt="Bancolombia" width={75} height={18} className="h-3.5 w-auto object-contain mr-1" />
                                     <span>{lang === 'es' ? 'Transferencia Bancaria / Factura' : 'Bank Wire / Invoice'}</span>
