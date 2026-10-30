@@ -1,9 +1,9 @@
 'use client';
 
-import React from 'react';
+import React, { useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { motion, useScroll, useSpring } from 'framer-motion';
 import { Coffee, TreePine, Sparkles, ShieldCheck, Compass, ArrowRight } from 'lucide-react';
 
 interface ScopeTimelineProps {
@@ -11,9 +11,23 @@ interface ScopeTimelineProps {
 }
 
 export default function ScopeTimeline({ t }: ScopeTimelineProps) {
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    // Scroll progress que va dibujando la línea a medida que el usuario hace scroll
+    const { scrollYProgress } = useScroll({
+        target: containerRef,
+        offset: ["start 75%", "end 85%"]
+    });
+
+    const pathLength = useSpring(scrollYProgress, {
+        stiffness: 300,
+        damping: 70,
+        restDelta: 0.001
+    });
+
     return (
         <section id="alcance" className="relative z-10 py-24 sm:py-32 px-4 bg-gradient-to-b from-[#040E17] via-[#061826] to-[#040E17] overflow-hidden">
-            <div className="max-w-6xl mx-auto">
+            <div className="max-w-6xl mx-auto" ref={containerRef}>
                 {/* Header animado */}
                 <motion.div 
                     initial={{ opacity: 0, y: -25 }}
@@ -40,13 +54,13 @@ export default function ScopeTimeline({ t }: ScopeTimelineProps) {
                 {/* Timeline Container con el Trazo Vectorial Zig-Zag Flotante por Encima */}
                 <div className="relative">
                     
-                    {/* TRAZO VECTORIAL ZIG-ZAG DINÁMICO POR ENCIMA DE LAS FOTOS (z-30) */}
+                    {/* TRAZO VECTORIAL ZIG-ZAG QUE SE DIBUJA CON EL SCROLL POR ENCIMA DE LAS FOTOS (z-30) */}
                     <div className="hidden lg:block absolute inset-0 z-30 pointer-events-none">
-                        <svg className="w-full h-full" viewBox="0 0 1152 2450" fill="none" preserveAspectRatio="none">
+                        <svg className="w-full h-full" viewBox="0 0 1152 2380" fill="none" preserveAspectRatio="none">
                             <defs>
                                 <linearGradient id="traceGlow" x1="0%" y1="0%" x2="0%" y2="100%">
                                     <stop offset="0%" stopColor="#83DF9C" stopOpacity="0.9" />
-                                    <stop offset="50%" stopColor="#FAF2CA" stopOpacity="0.9" />
+                                    <stop offset="50%" stopColor="#FAF2CA" stopOpacity="0.95" />
                                     <stop offset="100%" stopColor="#83DF9C" stopOpacity="1" />
                                 </linearGradient>
                                 <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
@@ -54,19 +68,42 @@ export default function ScopeTimeline({ t }: ScopeTimelineProps) {
                                     <feComposite in="SourceGraphic" in2="blur" operator="over" />
                                 </filter>
                             </defs>
-                            {/* Línea Zig-Zag que cruza sobre las imágenes de un lado al otro */}
+
+                            {/* Guía base tenue del trazo */}
                             <path
-                                d="M 288,140 
-                                   L 864,620 
-                                   L 288,1100 
-                                   L 864,1580 
+                                d="M 120,60 
+                                   L 500,165 
+                                   L 652,625 
+                                   L 1040,710 
+                                   L 500,1095 
+                                   L 110,1180 
+                                   L 652,1565 
+                                   L 1040,1650 
                                    L 576,2040"
+                                stroke="#83DF9C"
+                                strokeWidth="3"
+                                strokeDasharray="8 8"
+                                strokeOpacity="0.15"
+                                strokeLinecap="round"
+                            />
+
+                            {/* Línea animada con el SCROLL (pathLength) */}
+                            <motion.path
+                                d="M 120,60 
+                                   L 500,165 
+                                   L 652,625 
+                                   L 1040,710 
+                                   L 500,1095 
+                                   L 110,1180 
+                                   L 652,1565 
+                                   L 1040,1650 
+                                   L 576,2040"
+                                style={{ pathLength }}
                                 stroke="url(#traceGlow)"
                                 strokeWidth="4.5"
-                                strokeDasharray="12 12"
+                                strokeDasharray="10 10"
                                 strokeLinecap="round"
                                 filter="url(#glow)"
-                                className="animate-pulse"
                             />
                         </svg>
                     </div>
@@ -74,21 +111,10 @@ export default function ScopeTimeline({ t }: ScopeTimelineProps) {
                     <div className="space-y-24 sm:space-y-36 relative z-10">
                         
                         {/* ========================================================= */}
-                        {/* ITEM 1: CAFÉ (Foto izquierda entra de izq, texto entra fade) */}
+                        {/* ITEM 1: CAFÉ (Foto izquierda, texto derecha)              */}
                         {/* ========================================================= */}
                         <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-                            {/* Nodo GPS #11 */}
-                            <motion.div 
-                                initial={{ scale: 0, rotate: -45 }}
-                                whileInView={{ scale: 1, rotate: 0 }}
-                                viewport={{ once: true, margin: "-80px" }}
-                                transition={{ duration: 0.5, delay: 0.2 }}
-                                className="hidden lg:flex absolute left-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-[#040E17] border-4 border-[#83DF9C] items-center justify-center text-sm font-black text-[#83DF9C] shadow-[0_0_20px_rgba(131,223,156,0.6)] z-40"
-                            >
-                                {t.scope.items.coffee.node}
-                            </motion.div>
-
-                            {/* Imagen Izquierda (Entra deslizándose desde la izquierda) */}
+                            {/* Imagen Izquierda con el Nodo GPS #11 MONTADO DIRECTO SOBRE LA FOTO */}
                             <motion.div 
                                 initial={{ opacity: 0, x: -80 }}
                                 whileInView={{ opacity: 1, x: 0 }}
@@ -103,14 +129,15 @@ export default function ScopeTimeline({ t }: ScopeTimelineProps) {
                                         fill
                                         className="object-cover group-hover:scale-105 transition-transform duration-700"
                                     />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-[#040E17] via-[#040E17]/25 to-transparent" />
-                                    <div className="absolute top-4 left-4 flex items-center gap-2 z-10">
-                                        <span className="w-8 h-8 rounded-full bg-[#83DF9C] text-[#040E17] font-black text-xs flex items-center justify-center shadow">
+                                    <div className="absolute inset-0 bg-gradient-to-t from-[#040E17]/80 via-transparent to-transparent" />
+                                    
+                                    {/* NODO GPS #11 MONTADO SOBRE LA FOTO */}
+                                    <div className="absolute right-6 sm:right-10 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center">
+                                        <span className="absolute w-14 h-14 rounded-full bg-[#83DF9C]/25 animate-ping" />
+                                        <span className="absolute w-12 h-12 rounded-full border border-[#83DF9C]/60 animate-pulse" />
+                                        <div className="relative w-11 h-11 rounded-full bg-[#040E17]/95 border-2 border-[#83DF9C] shadow-[0_0_20px_rgba(131,223,156,0.9)] flex items-center justify-center text-sm font-black text-[#83DF9C]">
                                             {t.scope.items.coffee.node}
-                                        </span>
-                                        <span className="px-3 py-1 rounded-full bg-[#040E17]/85 backdrop-blur-md text-xs font-bold text-white border border-[#83DF9C]/30">
-                                            {t.scope.items.coffee.badge}
-                                        </span>
+                                        </div>
                                     </div>
                                 </div>
                             </motion.div>
@@ -162,20 +189,9 @@ export default function ScopeTimeline({ t }: ScopeTimelineProps) {
                         </div>
 
                         {/* ========================================================= */}
-                        {/* ITEM 2: CACAO (Foto derecha entra de der, texto entra fade) */}
+                        {/* ITEM 2: CACAO (Texto izquierda, foto derecha)              */}
                         {/* ========================================================= */}
                         <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-                            {/* Nodo GPS #22 */}
-                            <motion.div 
-                                initial={{ scale: 0, rotate: 45 }}
-                                whileInView={{ scale: 1, rotate: 0 }}
-                                viewport={{ once: true, margin: "-80px" }}
-                                transition={{ duration: 0.5, delay: 0.2 }}
-                                className="hidden lg:flex absolute left-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-[#040E17] border-4 border-[#83DF9C] items-center justify-center text-sm font-black text-[#83DF9C] shadow-[0_0_20px_rgba(131,223,156,0.6)] z-40"
-                            >
-                                {t.scope.items.cacao.node}
-                            </motion.div>
-
                             {/* Texto Izquierda */}
                             <div className="lg:col-span-6 order-2 lg:order-1 lg:pr-10 lg:text-right relative z-20">
                                 <motion.div 
@@ -221,7 +237,7 @@ export default function ScopeTimeline({ t }: ScopeTimelineProps) {
                                 </motion.div>
                             </div>
 
-                            {/* Imagen Derecha (Entra deslizándose desde la derecha) */}
+                            {/* Imagen Derecha con el Nodo GPS #22 MONTADO DIRECTO SOBRE LA FOTO */}
                             <motion.div 
                                 initial={{ opacity: 0, x: 80 }}
                                 whileInView={{ opacity: 1, x: 0 }}
@@ -236,35 +252,25 @@ export default function ScopeTimeline({ t }: ScopeTimelineProps) {
                                         fill
                                         className="object-cover group-hover:scale-105 transition-transform duration-700"
                                     />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-[#040E17] via-[#040E17]/25 to-transparent" />
-                                    <div className="absolute top-4 left-4 flex items-center gap-2 z-10">
-                                        <span className="w-8 h-8 rounded-full bg-[#83DF9C] text-[#040E17] font-black text-xs flex items-center justify-center shadow">
+                                    <div className="absolute inset-0 bg-gradient-to-t from-[#040E17]/80 via-transparent to-transparent" />
+                                    
+                                    {/* NODO GPS #22 MONTADO SOBRE LA FOTO */}
+                                    <div className="absolute left-6 sm:left-10 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center">
+                                        <span className="absolute w-14 h-14 rounded-full bg-[#83DF9C]/25 animate-ping" />
+                                        <span className="absolute w-12 h-12 rounded-full border border-[#83DF9C]/60 animate-pulse" />
+                                        <div className="relative w-11 h-11 rounded-full bg-[#040E17]/95 border-2 border-[#83DF9C] shadow-[0_0_20px_rgba(131,223,156,0.9)] flex items-center justify-center text-sm font-black text-[#83DF9C]">
                                             {t.scope.items.cacao.node}
-                                        </span>
-                                        <span className="px-3 py-1 rounded-full bg-[#040E17]/85 backdrop-blur-md text-xs font-bold text-white border border-[#83DF9C]/30">
-                                            {t.scope.items.cacao.badge}
-                                        </span>
+                                        </div>
                                     </div>
                                 </div>
                             </motion.div>
                         </div>
 
                         {/* ========================================================= */}
-                        {/* ITEM 3: PALMA DE ACEITE (Foto izquierda entra de izq)    */}
+                        {/* ITEM 3: PALMA DE ACEITE (Foto izquierda, texto derecha)    */}
                         {/* ========================================================= */}
                         <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-                            {/* Nodo GPS #35 */}
-                            <motion.div 
-                                initial={{ scale: 0, rotate: -45 }}
-                                whileInView={{ scale: 1, rotate: 0 }}
-                                viewport={{ once: true, margin: "-80px" }}
-                                transition={{ duration: 0.5, delay: 0.2 }}
-                                className="hidden lg:flex absolute left-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-[#040E17] border-4 border-[#83DF9C] items-center justify-center text-sm font-black text-[#83DF9C] shadow-[0_0_20px_rgba(131,223,156,0.6)] z-40"
-                            >
-                                {t.scope.items.palm.node}
-                            </motion.div>
-
-                            {/* Imagen Izquierda */}
+                            {/* Imagen Izquierda con Nodo GPS #35 MONTADO SOBRE LA FOTO */}
                             <motion.div 
                                 initial={{ opacity: 0, x: -80 }}
                                 whileInView={{ opacity: 1, x: 0 }}
@@ -279,14 +285,15 @@ export default function ScopeTimeline({ t }: ScopeTimelineProps) {
                                         fill
                                         className="object-cover group-hover:scale-105 transition-transform duration-700"
                                     />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-[#040E17] via-[#040E17]/25 to-transparent" />
-                                    <div className="absolute top-4 left-4 flex items-center gap-2 z-10">
-                                        <span className="w-8 h-8 rounded-full bg-[#83DF9C] text-[#040E17] font-black text-xs flex items-center justify-center shadow">
+                                    <div className="absolute inset-0 bg-gradient-to-t from-[#040E17]/80 via-transparent to-transparent" />
+                                    
+                                    {/* NODO GPS #35 MONTADO SOBRE LA FOTO */}
+                                    <div className="absolute right-6 sm:right-10 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center">
+                                        <span className="absolute w-14 h-14 rounded-full bg-[#83DF9C]/25 animate-ping" />
+                                        <span className="absolute w-12 h-12 rounded-full border border-[#83DF9C]/60 animate-pulse" />
+                                        <div className="relative w-11 h-11 rounded-full bg-[#040E17]/95 border-2 border-[#83DF9C] shadow-[0_0_20px_rgba(131,223,156,0.9)] flex items-center justify-center text-sm font-black text-[#83DF9C]">
                                             {t.scope.items.palm.node}
-                                        </span>
-                                        <span className="px-3 py-1 rounded-full bg-[#040E17]/85 backdrop-blur-md text-xs font-bold text-white border border-[#83DF9C]/30">
-                                            {t.scope.items.palm.badge}
-                                        </span>
+                                        </div>
                                     </div>
                                 </div>
                             </motion.div>
@@ -338,20 +345,9 @@ export default function ScopeTimeline({ t }: ScopeTimelineProps) {
                         </div>
 
                         {/* ========================================================= */}
-                        {/* ITEM 4: GANADERÍA (Foto derecha entra de der)            */}
+                        {/* ITEM 4: GANADERÍA (Texto izquierda, foto derecha)          */}
                         {/* ========================================================= */}
                         <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-                            {/* Nodo GPS #48 */}
-                            <motion.div 
-                                initial={{ scale: 0, rotate: 45 }}
-                                whileInView={{ scale: 1, rotate: 0 }}
-                                viewport={{ once: true, margin: "-80px" }}
-                                transition={{ duration: 0.5, delay: 0.2 }}
-                                className="hidden lg:flex absolute left-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-[#040E17] border-4 border-[#83DF9C] items-center justify-center text-sm font-black text-[#83DF9C] shadow-[0_0_20px_rgba(131,223,156,0.6)] z-40"
-                            >
-                                {t.scope.items.cattle.node}
-                            </motion.div>
-
                             {/* Texto Izquierda */}
                             <div className="lg:col-span-6 order-2 lg:order-1 lg:pr-10 lg:text-right relative z-20">
                                 <motion.div 
@@ -397,7 +393,7 @@ export default function ScopeTimeline({ t }: ScopeTimelineProps) {
                                 </motion.div>
                             </div>
 
-                            {/* Imagen Derecha */}
+                            {/* Imagen Derecha con Nodo GPS #48 MONTADO SOBRE LA FOTO */}
                             <motion.div 
                                 initial={{ opacity: 0, x: 80 }}
                                 whileInView={{ opacity: 1, x: 0 }}
@@ -412,14 +408,15 @@ export default function ScopeTimeline({ t }: ScopeTimelineProps) {
                                         fill
                                         className="object-cover group-hover:scale-105 transition-transform duration-700"
                                     />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-[#040E17] via-[#040E17]/25 to-transparent" />
-                                    <div className="absolute top-4 left-4 flex items-center gap-2 z-10">
-                                        <span className="w-8 h-8 rounded-full bg-[#83DF9C] text-[#040E17] font-black text-xs flex items-center justify-center shadow">
+                                    <div className="absolute inset-0 bg-gradient-to-t from-[#040E17]/80 via-transparent to-transparent" />
+                                    
+                                    {/* NODO GPS #48 MONTADO SOBRE LA FOTO */}
+                                    <div className="absolute left-6 sm:left-10 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center">
+                                        <span className="absolute w-14 h-14 rounded-full bg-[#83DF9C]/25 animate-ping" />
+                                        <span className="absolute w-12 h-12 rounded-full border border-[#83DF9C]/60 animate-pulse" />
+                                        <div className="relative w-11 h-11 rounded-full bg-[#040E17]/95 border-2 border-[#83DF9C] shadow-[0_0_20px_rgba(131,223,156,0.9)] flex items-center justify-center text-sm font-black text-[#83DF9C]">
                                             {t.scope.items.cattle.node}
-                                        </span>
-                                        <span className="px-3 py-1 rounded-full bg-[#040E17]/85 backdrop-blur-md text-xs font-bold text-white border border-[#83DF9C]/30">
-                                            {t.scope.items.cattle.badge}
-                                        </span>
+                                        </div>
                                     </div>
                                 </div>
                             </motion.div>
@@ -429,18 +426,7 @@ export default function ScopeTimeline({ t }: ScopeTimelineProps) {
                         {/* ITEM 5: GRAN CIERRE DE CAMINATA (Agrónomo en el centro)   */}
                         {/* ========================================================= */}
                         <div className="relative pt-12">
-                            {/* Nodo GPS #58 */}
-                            <motion.div 
-                                initial={{ scale: 0 }}
-                                whileInView={{ scale: 1 }}
-                                viewport={{ once: true }}
-                                transition={{ duration: 0.6, type: "spring" }}
-                                className="hidden lg:flex absolute left-1/2 -translate-x-1/2 -top-2 w-14 h-14 rounded-full bg-[#83DF9C] border-4 border-[#040E17] items-center justify-center text-base font-black text-[#040E17] shadow-[0_0_25px_rgba(131,223,156,0.8)] z-40"
-                            >
-                                {t.scope.items.closing.node}
-                            </motion.div>
-
-                            {/* Card Gigante Animada */}
+                            {/* Card Gigante Animada con Nodo GPS #58 MONTADO SOBRE LA FOTO */}
                             <motion.div 
                                 initial={{ opacity: 0, y: 60 }}
                                 whileInView={{ opacity: 1, y: 0 }}
@@ -457,13 +443,21 @@ export default function ScopeTimeline({ t }: ScopeTimelineProps) {
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-[#040E17] via-[#040E17]/50 to-transparent" />
                                     
+                                    {/* NODO GPS #58 MONTADO EN EL CIERRE */}
+                                    <div className="absolute top-6 left-1/2 -translate-x-1/2 z-30 flex items-center justify-center">
+                                        <span className="absolute w-16 h-16 rounded-full bg-[#83DF9C]/30 animate-ping" />
+                                        <div className="relative w-12 h-12 rounded-full bg-[#83DF9C] border-2 border-[#040E17] shadow-[0_0_25px_rgba(131,223,156,0.9)] flex items-center justify-center text-base font-black text-[#040E17]">
+                                            {t.scope.items.closing.node}
+                                        </div>
+                                    </div>
+
                                     <div className="absolute inset-0 p-6 sm:p-12 md:p-16 flex flex-col justify-end text-center items-center">
                                         <motion.div 
                                             initial={{ opacity: 0, y: -15 }}
                                             whileInView={{ opacity: 1, y: 0 }}
                                             viewport={{ once: true }}
                                             transition={{ duration: 0.5, delay: 0.2 }}
-                                            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#83DF9C] text-[#040E17] text-xs font-black uppercase tracking-wider mb-4 shadow-lg"
+                                            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#83DF9C]/15 border border-[#83DF9C]/40 text-[#83DF9C] text-xs font-bold uppercase tracking-wider mb-4 shadow-lg backdrop-blur-md"
                                         >
                                             <span>{t.scope.items.closing.badge}</span>
                                         </motion.div>
