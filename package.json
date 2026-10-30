@@ -4,7 +4,7 @@
   "description": "AxisTrace - Infraestructura Digital de Georreferenciación EUDR y Diligencia Debida",
   "scripts": {
     "dev": "next dev -H 0.0.0.0",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start",
     "lint": "next lint"
   },
