@@ -10,7 +10,8 @@ export const translations = {
             scope: "Agri Scope",
             solutions: "Platform",
             pricing: "Plans & Pricing",
-            terminal: "Launch Terminal"
+            terminal: "Launch Terminal",
+            whatsapp: "WhatsApp"
         },
         hero: {
             badge: "EUDR 2023/1115 & TRACES NT Ready",
@@ -86,7 +87,8 @@ export const translations = {
                     question: "Which Agricultural Supply Chain Do You Need to Georeference for Europe?",
                     desc: "Regardless of your commodity or farm size—whether coffee, cocoa, palm, rubber, timber, soy, or livestock—AxisTrace is your digital customs passport guaranteeing zero delays across EU borders.",
                     ctaPrimary: "Launch Field Walk on Smartphone",
-                    ctaSecondary: "View Lot Rates"
+                    ctaSecondary: "Talk via WhatsApp (+57 301 397 0002)",
+                    ctaSecondaryHref: "https://wa.me/573013970002?text=Hello%2C%20I%20would%20like%20advisory%20on%20EUDR%20georeferencing%20for%20my%20crop."
                 }
             }
         },
@@ -98,7 +100,6 @@ export const translations = {
             stats: [
                 { val: "100%", label: "Digital Self-Service", sub: "Operators survey with their own phone" },
                 { val: "0%", label: "Cellular Dependency", sub: "100% offline in remote mountain terrain" },
-                { val: "300 DPI", label: "Legal Dossier Export", sub: "Print-ready with verifiable QR code" },
                 { val: "SHA-256", label: "Cryptographic Seal", sub: "Tamper-proof atomic UTC timestamp" }
             ],
             cards: [
@@ -172,7 +173,8 @@ export const translations = {
                         "Centralized dashboard for member lots",
                         "Bulk batch export for EU customs clearance"
                     ],
-                    cta: "Inquire Bulk Pack"
+                    cta: "Order via WhatsApp",
+                    ctaHref: "https://wa.me/573013970002?text=Hello%2C%20I%20am%20interested%20in%20the%20Corporate%20Bulk%20Pack%20(100%20lots)%20for%20AxisTRACE."
                 }
             },
             addons: {
@@ -192,7 +194,8 @@ export const translations = {
         finalCta: {
             title: "Start Georeferencing Today",
             subtitle: "100% Field self-service on your smartphone. Zero mandatory monthly subscriptions.",
-            button: "Launch Field Terminal Now"
+            button: "Launch Field Terminal Now",
+            whatsappButton: "Chat on WhatsApp (+57 301 397 0002)"
         },
         footer: {
             rights: "All rights reserved. Designed for Global Agricultural First-Mile Traceability."
@@ -207,7 +210,8 @@ export const translations = {
             scope: "Alcance Agro",
             solutions: "Plataforma",
             pricing: "Planes & Precios",
-            terminal: "Abrir Terminal"
+            terminal: "Abrir Terminal",
+            whatsapp: "WhatsApp"
         },
         hero: {
             badge: "EUDR 2023/1115 & TRACES NT Ready",
@@ -283,7 +287,8 @@ export const translations = {
                     question: "¿En qué rama del agro necesitas georreferenciar para ingresar a Europa?",
                     desc: "No importa tu cultivo ni el tamaño de tu predio. Si produces café, cacao, palma, caucho, madera o ganado, AxisTrace es el pasaporte digital que garantiza que tu cosecha cruce las aduanas europeas sin tropiezos.",
                     ctaPrimary: "Iniciar Caminata en Terreno Ahora",
-                    ctaSecondary: "Ver Tarifas por Lote"
+                    ctaSecondary: "Hablar por WhatsApp (+57 301 397 0002)",
+                    ctaSecondaryHref: "https://wa.me/573013970002?text=Hola%2C%20quisiera%20asesor%C3%ADa%20sobre%20georreferenciaci%C3%B3n%20EUDR%20para%20mi%20cultivo."
                 }
             }
         },
@@ -295,7 +300,6 @@ export const translations = {
             stats: [
                 { val: "100%", label: "Autoservicio Digital", sub: "El operario mapea con su propio celular" },
                 { val: "0%", label: "Dependencia de Red", sub: "100% offline en zonas montañosas remotas" },
-                { val: "300 DPI", label: "Ficha Cartográfica Oficio", sub: "Lista para imprimir con QR auditable" },
                 { val: "SHA-256", label: "Sello Criptográfico", sub: "Huella inmutable con hora atómica UTC" }
             ],
             cards: [
@@ -369,7 +373,8 @@ export const translations = {
                         "Panel centralizado de lotes asociados",
                         "Exportación masiva para aduanas UE"
                     ],
-                    cta: "Solicitar Bolsa"
+                    cta: "Pedir por WhatsApp",
+                    ctaHref: "https://wa.me/573013970002?text=Hola%2C%20me%20interesa%20adquirir%20la%20Bolsa%20Corporativa%20(100%20predios)%20de%20AxisTRACE."
                 }
             },
             addons: {
@@ -389,7 +394,8 @@ export const translations = {
         finalCta: {
             title: "Comienza a Georreferenciar Hoy Mismo",
             subtitle: "100% Autoservicio en campo con tu propio smartphone. Sin suscripciones fijas ni cobros mensuales.",
-            button: "Abrir Terminal de Campo"
+            button: "Abrir Terminal de Campo",
+            whatsappButton: "Hablar por WhatsApp (+57 301 397 0002)"
         },
         footer: {
             rights: "Todos los derechos reservados. Diseñado para la Primera Milla Agrícola Global."

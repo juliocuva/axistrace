@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { translations, Language } from '@/translations/content';
 import ScopeTimeline from '@/components/ScopeTimeline';
+import WhatsAppFloating, { WhatsAppIcon } from '@/components/WhatsAppFloating';
 
 export default function LandingPage() {
     const [lang, setLang] = useState<Language>('en');
@@ -83,6 +84,21 @@ export default function LandingPage() {
                                 ES
                             </button>
                         </div>
+
+                        <a
+                            href={`https://wa.me/573013970002?text=${encodeURIComponent(
+                                lang === 'es'
+                                    ? 'Hola, me gustaría recibir más información y asesoría sobre georreferenciación EUDR con AxisTRACE.'
+                                    : 'Hello, I would like more information and advisory on AxisTRACE EUDR georeferencing.'
+                            )}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#25D366]/15 hover:bg-[#25D366]/25 border border-[#25D366]/40 text-[#25D366] font-bold text-xs transition-all hover:scale-[1.03]"
+                            title="WhatsApp: +57 301 397 0002"
+                        >
+                            <WhatsAppIcon className="w-4 h-4 fill-current" />
+                            <span>WhatsApp</span>
+                        </a>
 
                         <Link
                             href="/terminal"
@@ -253,49 +269,60 @@ export default function LandingPage() {
                         </p>
                     </div>
 
-                    {/* Strip de 4 Métricas Clave de Ingeniería (Compacto y Potente) */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-12">
+                    {/* Strip de 3 Métricas Clave de Ingeniería */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-12">
                         {t.unifiedPlatform.stats.map((stat, idx) => (
-                            <div key={idx} className="p-4 rounded-2xl bg-[#082840]/70 border border-[#0C3C60] text-center">
-                                <div className="text-2xl sm:text-3xl font-black text-[#83DF9C]">{stat.val}</div>
-                                <div className="text-xs font-bold text-white mt-1">{stat.label}</div>
-                                <div className="text-[10px] text-[#FAF2CA]/60 mt-0.5">{stat.sub}</div>
+                            <div key={idx} className="p-6 rounded-2xl bg-[#082840]/70 border border-[#0C3C60] hover:border-[#83DF9C]/40 text-center transition-all duration-300">
+                                <div className="text-3xl sm:text-4xl font-black text-[#83DF9C] tracking-tight">{stat.val}</div>
+                                <div className="text-sm font-bold text-white mt-1.5">{stat.label}</div>
+                                <div className="text-xs text-[#FAF2CA]/65 mt-1">{stat.sub}</div>
                             </div>
                         ))}
                     </div>
 
-                    {/* Las 3 Cards Fotográficas Optimizadas */}
+                    {/* Las 3 Cards de Plataforma (Diseño Minimalista High-Tech sin Imágenes) */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {t.unifiedPlatform.cards.map((card, idx) => (
-                            <div key={idx} className="group rounded-3xl overflow-hidden bg-[#082840]/60 border border-[#0C3C60] hover:border-[#83DF9C]/50 transition-all flex flex-col justify-between">
-                                <div>
-                                    <div className="relative h-52 w-full overflow-hidden">
-                                        <Image
-                                            src={card.image}
-                                            alt={card.title}
-                                            fill
-                                            className="object-cover group-hover:scale-105 transition-transform duration-500"
-                                        />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-[#082840] via-transparent to-transparent" />
-                                        <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-[#040E17]/85 backdrop-blur-md text-[10px] font-bold text-[#83DF9C] border border-[#83DF9C]/30">
-                                            {card.tag}
+                        {t.unifiedPlatform.cards.map((card, idx) => {
+                            const icons = [
+                                <Smartphone key="0" className="w-5 h-5" />,
+                                <Satellite key="1" className="w-5 h-5" />,
+                                <ShieldCheck key="2" className="w-5 h-5" />
+                            ];
+                            return (
+                                <div 
+                                    key={idx} 
+                                    className="group rounded-3xl p-7 bg-gradient-to-b from-[#082840]/90 to-[#040E17]/90 border border-[#0C3C60] hover:border-[#83DF9C]/60 hover:shadow-2xl hover:shadow-[#83DF9C]/10 transition-all duration-300 flex flex-col justify-between"
+                                >
+                                    <div>
+                                        {/* Top Icon & Tag */}
+                                        <div className="flex items-center justify-between gap-3 mb-6">
+                                            <div className="w-12 h-12 rounded-2xl bg-[#83DF9C]/10 border border-[#83DF9C]/30 text-[#83DF9C] flex items-center justify-center group-hover:scale-110 group-hover:bg-[#83DF9C] group-hover:text-[#040E17] transition-all duration-300">
+                                                {icons[idx] || <CheckCircle2 className="w-5 h-5" />}
+                                            </div>
+                                            <div className="px-3 py-1 rounded-full bg-[#040E17] border border-[#0C3C60] text-[10px] font-bold text-[#83DF9C] tracking-wide">
+                                                {card.tag}
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div className="p-6">
-                                        <h3 className="text-base font-bold text-white mb-2">{card.title}</h3>
-                                        <p className="text-xs text-[#FAF2CA]/70 leading-relaxed mb-4">
+
+                                        {/* Text Info */}
+                                        <h3 className="text-lg font-bold text-white mb-3 group-hover:text-[#83DF9C] transition-colors">
+                                            {card.title}
+                                        </h3>
+                                        <p className="text-xs text-[#FAF2CA]/70 leading-relaxed mb-6">
                                             {card.desc}
                                         </p>
                                     </div>
-                                </div>
-                                <div className="px-6 pb-6 pt-0 border-t border-[#0C3C60]/40 mt-auto">
-                                    <div className="pt-3 flex items-center gap-2 text-[11px] font-medium text-[#83DF9C]">
-                                        <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
-                                        <span>{card.bullet}</span>
+
+                                    {/* Bottom Bullet */}
+                                    <div className="pt-4 border-t border-[#0C3C60]/60">
+                                        <div className="flex items-center gap-2 text-xs font-semibold text-[#83DF9C]">
+                                            <CheckCircle2 className="w-4 h-4 shrink-0" />
+                                            <span>{card.bullet}</span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 </div>
             </section>
@@ -449,11 +476,17 @@ export default function LandingPage() {
                             </div>
 
                             <a
-                                href="mailto:support@axistrace.app?subject=AxisTrace%20Corporate%20Pack%20Inquiry"
-                                className="mt-8 w-full py-3 px-4 rounded-xl bg-[#0C3C60]/60 hover:bg-[#0C3C60] border border-[#0C3C60] text-xs font-bold text-[#FAF2CA] hover:text-white text-center transition-all flex items-center justify-center gap-1.5"
+                                href={t.pricing.plans.corporate.ctaHref || `https://wa.me/573013970002?text=${encodeURIComponent(
+                                    lang === 'es'
+                                        ? 'Hola, me interesa adquirir la Bolsa Corporativa (100 predios) de AxisTRACE.'
+                                        : 'Hello, I am interested in the Corporate Bulk Pack (100 lots) for AxisTRACE.'
+                                )}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="mt-8 w-full py-3.5 px-4 rounded-xl bg-[#25D366]/20 hover:bg-[#25D366]/30 border border-[#25D366]/50 text-xs font-bold text-white text-center transition-all flex items-center justify-center gap-2 group shadow-lg shadow-[#25D366]/10"
                             >
+                                <WhatsAppIcon className="w-4 h-4 text-[#25D366] fill-current group-hover:scale-110 transition-transform" />
                                 <span>{t.pricing.plans.corporate.cta}</span>
-                                <ArrowRight className="w-3.5 h-3.5" />
                             </a>
                         </div>
                     </div>
@@ -512,6 +545,19 @@ export default function LandingPage() {
                             <span>{t.finalCta.button}</span>
                             <ArrowRight className="w-4 h-4 text-[#040E17]" />
                         </Link>
+                        <a
+                            href={`https://wa.me/573013970002?text=${encodeURIComponent(
+                                lang === 'es'
+                                    ? 'Hola, me gustaría recibir más información y asesoría sobre georreferenciación EUDR con AxisTRACE.'
+                                    : 'Hello, I would like more information and advisory on AxisTRACE EUDR georeferencing.'
+                            )}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-6 py-4 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-white font-extrabold text-sm shadow-xl shadow-[#25D366]/25 hover:scale-105 transition-all flex items-center justify-center gap-2"
+                        >
+                            <WhatsAppIcon className="w-5 h-5 fill-current" />
+                            <span>{t.finalCta.whatsappButton || (lang === 'es' ? 'Hablar por WhatsApp (+57 301 397 0002)' : 'Chat on WhatsApp (+57 301 397 0002)')}</span>
+                        </a>
                     </div>
                 </div>
             </section>
@@ -535,6 +581,9 @@ export default function LandingPage() {
                     </div>
                 </div>
             </footer>
+
+            {/* Floating WhatsApp Widget */}
+            <WhatsAppFloating lang={lang} />
         </div>
     );
 }
