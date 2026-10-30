@@ -69,40 +69,34 @@ export default function ScopeTimeline({ t }: ScopeTimelineProps) {
                                 </filter>
                             </defs>
 
-                            {/* Guía base tenue del trazo con curvas redondeadas */}
+                            {/* Guía base tenue del trazo con curvas suaves y redondeadas (sin ir a los extremos laterales) */}
                             <path
-                                d="M 120,60 
-                                   C 260,95 400,130 500,165 
-                                   C 580,210 570,540 652,625 
-                                   C 740,710 930,670 1040,710 
-                                   C 930,860 590,980 500,1095 
-                                   C 390,1210 210,1140 110,1180 
-                                   C 230,1340 570,1450 652,1565 
-                                   C 740,1700 930,1610 1040,1650 
-                                   C 930,1830 670,1940 576,2040"
+                                d="M 380,80 
+                                   C 420,110 460,135 495,170 
+                                   C 555,230 635,480 655,635 
+                                   C 675,790 515,940 495,1100 
+                                   C 475,1250 635,1410 655,1565 
+                                   C 675,1720 615,1900 576,2045"
                                 stroke="#83DF9C"
-                                strokeWidth="3"
-                                strokeDasharray="8 8"
+                                strokeWidth="2"
+                                strokeDasharray="6 6"
                                 strokeOpacity="0.18"
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
                             />
 
-                            {/* Línea animada con el SCROLL (pathLength) con puntas y curvas redondeadas */}
+                            {/* Línea animada con el SCROLL suave, delgada y redondeada pasando directo por los vértices */}
                             <motion.path
-                                d="M 120,60 
-                                   C 260,95 400,130 500,165 
-                                   C 580,210 570,540 652,625 
-                                   C 740,710 930,670 1040,710 
-                                   C 930,860 590,980 500,1095 
-                                   C 390,1210 210,1140 110,1180 
-                                   C 230,1340 570,1450 652,1565 
-                                   C 740,1700 930,1610 1040,1650 
-                                   C 930,1830 670,1940 576,2040"
+                                d="M 380,80 
+                                   C 420,110 460,135 495,170 
+                                   C 555,230 635,480 655,635 
+                                   C 675,790 515,940 495,1100 
+                                   C 475,1250 635,1410 655,1565 
+                                   C 675,1720 615,1900 576,2045"
                                 style={{ pathLength }}
                                 stroke="url(#traceGlow)"
-                                strokeWidth="4.5"
-                                strokeDasharray="10 10"
+                                strokeWidth="2.2"
+                                strokeDasharray="8 8"
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
                                 filter="url(#glow)"
@@ -500,15 +494,15 @@ export default function ScopeTimeline({ t }: ScopeTimelineProps) {
                                                 <ArrowRight className="w-4 h-4 text-[#040E17]" />
                                             </Link>
                                             <a
-                                                href={t.scope.items.closing.ctaSecondaryHref || "#planes"}
-                                                target={t.scope.items.closing.ctaSecondaryHref ? "_blank" : undefined}
-                                                rel={t.scope.items.closing.ctaSecondaryHref ? "noopener noreferrer" : undefined}
-                                                className="w-full sm:w-auto px-6 py-4 rounded-2xl bg-[#040E17]/80 hover:bg-[#040E17] border border-[#25D366]/60 hover:border-[#25D366] text-xs font-bold text-white transition-all flex items-center justify-center gap-2 group shadow-lg shadow-[#25D366]/10"
+                                                href={t.scope.items.closing.ctaSecondaryHref || "https://wa.me/573013970002?text=Hola%2C%20quisiera%20asesor%C3%ADa%20sobre%20georreferenciaci%C3%B3n%20EUDR%20para%20mi%20cultivo."}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="w-full sm:w-auto px-6 py-4 rounded-2xl bg-white hover:bg-[#FAF2CA] text-[#040E17] text-xs font-black transition-all flex items-center justify-center gap-2 group shadow-xl hover:scale-105 border border-white/30"
                                             >
-                                                <svg className="w-4 h-4 text-[#25D366] fill-current group-hover:scale-110 transition-transform" viewBox="0 0 24 24">
+                                                <svg className="w-4 h-4 text-[#040E17] fill-current group-hover:scale-110 transition-transform" viewBox="0 0 24 24">
                                                     <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
                                                 </svg>
-                                                <span>{t.scope.items.closing.ctaSecondary}</span>
+                                                <span>Contáctame</span>
                                             </a>
                                         </motion.div>
                                     </div>

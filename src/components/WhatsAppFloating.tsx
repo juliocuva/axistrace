@@ -19,17 +19,15 @@ export default function WhatsAppFloating({ lang }: WhatsAppFloatingProps) {
     const [isHovered, setIsHovered] = useState(false);
 
     const defaultMsg = lang === 'es'
-        ? 'Hola, me gustaría recibir más información y asesoría sobre georreferenciación EUDR con AxisTRACE.'
-        : 'Hello, I would like more information and advisory on AxisTRACE EUDR georeferencing.';
+        ? 'Hola, me gustaría contactarme para recibir más información y asesoría sobre georreferenciación EUDR con AxisTRACE.'
+        : 'Hello, I would like to contact you for more information and advisory on AxisTRACE EUDR georeferencing.';
 
-    const tooltipTitle = lang === 'es' ? '¿Tienes dudas sobre tu predio?' : 'Questions about your farm?';
-    const tooltipAction = lang === 'es' ? 'Chatear por WhatsApp (+57 301 397 0002)' : 'Chat on WhatsApp (+57 301 397 0002)';
-
+    const tooltipAction = lang === 'es' ? 'Contáctame (+57 301 397 0002)' : 'Contact me (+57 301 397 0002)';
     const waHref = `https://wa.me/573013970002?text=${encodeURIComponent(defaultMsg)}`;
 
     return (
         <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3">
-            {/* Tooltip visible on hover / focus */}
+            {/* Tooltip visible on hover */}
             <AnimatePresence>
                 {isHovered && (
                     <motion.div
@@ -37,31 +35,34 @@ export default function WhatsAppFloating({ lang }: WhatsAppFloatingProps) {
                         animate={{ opacity: 1, scale: 1, x: 0 }}
                         exit={{ opacity: 0, scale: 0.9, x: 10 }}
                         transition={{ duration: 0.2 }}
-                        className="hidden sm:flex flex-col bg-[#040E17]/95 backdrop-blur-md border border-[#25D366]/40 text-white rounded-2xl py-2 px-3.5 shadow-2xl shadow-black/60 pointer-events-none"
+                        className="hidden sm:flex flex-col bg-[#040E17]/95 backdrop-blur-md border border-white/20 text-white rounded-2xl py-2 px-3.5 shadow-2xl pointer-events-none"
                     >
-                        <span className="text-[11px] font-bold text-[#25D366]">{tooltipTitle}</span>
-                        <span className="text-[12px] text-white/90 font-medium">{tooltipAction}</span>
+                        <span className="text-[12px] font-bold text-white flex items-center gap-1.5">
+                            <WhatsAppIcon className="w-3.5 h-3.5 text-[#83DF9C]" />
+                            {tooltipAction}
+                        </span>
                     </motion.div>
                 )}
             </AnimatePresence>
 
-            {/* Floating Button */}
+            {/* Floating Button EN BLANCO con icono */}
             <a
                 href={waHref}
                 target="_blank"
                 rel="noopener noreferrer"
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
-                className="group relative flex items-center justify-center w-14 h-14 rounded-full bg-[#25D366] hover:bg-[#20bd5a] text-white shadow-xl shadow-[#25D366]/35 hover:shadow-[#25D366]/60 hover:scale-110 active:scale-95 transition-all duration-300"
-                aria-label="WhatsApp Contact"
+                className="group relative flex items-center gap-2 px-4 py-3 sm:px-5 sm:py-3.5 rounded-full bg-white hover:bg-[#FAF2CA] text-[#040E17] font-black text-xs sm:text-sm shadow-2xl shadow-black/50 hover:shadow-white/20 hover:scale-105 active:scale-95 transition-all duration-300 border border-white/40"
+                aria-label="Contáctame por WhatsApp"
             >
-                {/* Ping animado */}
-                <span className="absolute -top-1 -right-1 flex h-4 w-4">
+                {/* Ping animado sutil */}
+                <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#83DF9C] opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-4 w-4 bg-[#83DF9C] border-2 border-[#040E17]"></span>
+                    <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-[#83DF9C] border-2 border-[#040E17]"></span>
                 </span>
 
-                <WhatsAppIcon className="w-7 h-7 text-white fill-current" />
+                <WhatsAppIcon className="w-5 h-5 text-[#040E17] fill-current group-hover:scale-110 transition-transform" />
+                <span className="tracking-tight">{lang === 'es' ? 'Contáctame' : 'Contact me'}</span>
             </a>
         </div>
     );

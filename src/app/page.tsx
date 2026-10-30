@@ -98,16 +98,16 @@ export default function LandingPage() {
                         <a
                             href={`https://wa.me/573013970002?text=${encodeURIComponent(
                                 lang === 'es'
-                                    ? 'Hola, me gustaría recibir más información y asesoría sobre georreferenciación EUDR con AxisTRACE.'
-                                    : 'Hello, I would like more information and advisory on AxisTRACE EUDR georeferencing.'
+                                    ? 'Hola, me gustaría contactarme para recibir más información y asesoría sobre georreferenciación EUDR con AxisTRACE.'
+                                    : 'Hello, I would like to contact you for more information and advisory on AxisTRACE EUDR georeferencing.'
                             )}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#25D366]/15 hover:bg-[#25D366]/25 border border-[#25D366]/40 text-[#25D366] font-bold text-xs transition-all hover:scale-[1.03]"
+                            className="hidden sm:flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white hover:bg-[#FAF2CA] text-[#040E17] font-black text-xs transition-all shadow-md hover:scale-[1.03] border border-white/30"
                             title="WhatsApp: +57 301 397 0002"
                         >
-                            <WhatsAppIcon className="w-4 h-4 fill-current" />
-                            <span>WhatsApp</span>
+                            <WhatsAppIcon className="w-4 h-4 text-[#040E17] fill-current" />
+                            <span>{lang === 'es' ? 'Contáctame' : 'Contact me'}</span>
                         </a>
 
                         <Link
@@ -279,13 +279,13 @@ export default function LandingPage() {
                         </p>
                     </div>
 
-                    {/* Strip de 3 Métricas Clave de Ingeniería */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-12">
+                    {/* Strip de 3 Métricas Clave de Ingeniería (Sin recuadro) */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-10 py-6 mb-12 border-y border-[#0C3C60]/40">
                         {t.unifiedPlatform.stats.map((stat, idx) => (
-                            <div key={idx} className="p-6 rounded-2xl bg-[#082840]/70 border border-[#0C3C60] hover:border-[#83DF9C]/40 text-center transition-all duration-300">
-                                <div className="text-3xl sm:text-4xl font-black text-[#83DF9C] tracking-tight">{stat.val}</div>
-                                <div className="text-sm font-bold text-white mt-1.5">{stat.label}</div>
-                                <div className="text-xs text-[#FAF2CA]/65 mt-1">{stat.sub}</div>
+                            <div key={idx} className="text-center md:text-left md:pl-6 md:border-l first:border-l-0 border-[#0C3C60]/60">
+                                <div className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#83DF9C] tracking-tight">{stat.val}</div>
+                                <div className="text-sm sm:text-base font-bold text-white mt-1.5">{stat.label}</div>
+                                <div className="text-xs text-[#FAF2CA]/65 mt-0.5">{stat.sub}</div>
                             </div>
                         ))}
                     </div>
@@ -337,17 +337,17 @@ export default function LandingPage() {
                 </div>
             </section>
 
-            {/* SECCIÓN PLANES & PRECIOS */}
-            <section id="planes" className="relative z-10 py-16 sm:py-24 px-4">
+            {/* SECCIÓN PLANES & PRECIOS (Fondo Claro Elegante) */}
+            <section id="planes" className="relative z-10 py-20 sm:py-28 px-4 bg-gradient-to-b from-[#F9F6EA] via-[#FAF3DB] to-[#F2EAD0] text-[#082840] border-y border-[#E5DAC0]">
                 <div className="max-w-6xl mx-auto">
-                    <div className="text-center max-w-2xl mx-auto mb-12">
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#83DF9C]/10 text-[#83DF9C] text-xs font-bold uppercase tracking-wider mb-3 border border-[#83DF9C]/25">
+                    <div className="text-center max-w-2xl mx-auto mb-14">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#082840]/10 text-[#082840] text-xs font-bold uppercase tracking-wider mb-3 border border-[#082840]/20">
                             {t.pricing.tag}
                         </div>
-                        <h2 className="text-2xl sm:text-4xl font-black text-white">
+                        <h2 className="text-2xl sm:text-4xl font-black text-[#082840]">
                             {t.pricing.title}
                         </h2>
-                        <p className="mt-2 text-xs sm:text-sm text-[#FAF2CA]/75">
+                        <p className="mt-2 text-xs sm:text-sm text-[#0C3C60]/80">
                             {t.pricing.subtitle}
                         </p>
                     </div>
@@ -355,64 +355,66 @@ export default function LandingPage() {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
                         
                         {/* Plan 1 */}
-                        <div className="p-6 sm:p-7 rounded-3xl bg-[#082840]/70 border border-[#0C3C60] hover:border-[#83DF9C]/40 transition-all flex flex-col justify-between">
+                        <div className="p-6 sm:p-7 rounded-3xl bg-white border border-[#082840]/15 shadow-xl shadow-[#082840]/5 flex flex-col justify-between text-[#082840]">
                             <div>
                                 <div className="flex items-center justify-between mb-4">
-                                    <div className="w-10 h-10 rounded-xl bg-[#0C3C60]/50 border border-[#0C3C60] flex items-center justify-center text-[#83DF9C]">
+                                    <div className="w-10 h-10 rounded-xl bg-[#082840]/10 border border-[#082840]/15 flex items-center justify-center text-[#082840]">
                                         <Satellite className="w-5 h-5" />
                                     </div>
-                                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-[#0C3C60]/60 text-[#FAF2CA]/70 border border-[#0C3C60]">
+                                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-[#082840]/10 text-[#082840] border border-[#082840]/20">
                                         {t.pricing.plans.audit.badge}
                                     </span>
                                 </div>
-                                <h3 className="text-lg font-bold text-white mb-1">{t.pricing.plans.audit.title}</h3>
-                                <p className="text-xs text-[#FAF2CA]/65 mb-6">
+                                <h3 className="text-lg font-bold text-[#082840] mb-1">{t.pricing.plans.audit.title}</h3>
+                                <p className="text-xs text-[#0C3C60]/75 mb-6">
                                     {t.pricing.plans.audit.subtitle}
                                 </p>
                                 
-                                <div className="mb-6 pb-6 border-b border-[#0C3C60]/60">
+                                <div className="mb-6 pb-6 border-b border-[#082840]/15">
                                     <div className="flex items-baseline gap-1">
-                                        <span className="text-3xl font-black text-white">{t.pricing.plans.audit.price}</span>
-                                        <span className="text-xs text-[#FAF2CA]/60 font-semibold">{t.pricing.plans.audit.unit}</span>
+                                        <span className="text-3xl font-black text-[#082840]">{t.pricing.plans.audit.price}</span>
+                                        <span className="text-xs text-[#0C3C60]/70 font-semibold">{t.pricing.plans.audit.unit}</span>
                                     </div>
-                                    <div className="text-[11px] text-[#83DF9C] font-medium mt-0.5">
+                                    <div className="text-[11px] text-[#0C6056] font-bold mt-0.5">
                                         {t.pricing.plans.audit.ref}
                                     </div>
                                 </div>
 
-                                <ul className="space-y-2.5 text-xs text-[#FAF2CA]/80">
+                                <ul className="space-y-2.5 text-xs text-[#082840]/85">
                                     {t.pricing.plans.audit.features.map((f, idx) => (
                                         <li key={idx} className="flex items-start gap-2">
-                                            <CheckCircle2 className="w-4 h-4 text-[#83DF9C] shrink-0 mt-0.5" />
+                                            <CheckCircle2 className="w-4 h-4 text-[#0C6056] shrink-0 mt-0.5" />
                                             <span>{f}</span>
                                         </li>
                                     ))}
                                 </ul>
                             </div>
 
-                            <Link
-                                href="/terminal"
-                                className="mt-8 w-full py-3 px-4 rounded-xl bg-[#0C3C60]/60 hover:bg-[#0C3C60] border border-[#0C3C60] text-xs font-bold text-[#FAF2CA] hover:text-white text-center transition-all flex items-center justify-center gap-1.5"
-                            >
-                                <span>{t.pricing.plans.audit.cta}</span>
-                                <ArrowRight className="w-3.5 h-3.5" />
-                            </Link>
+                            <div className="mt-8">
+                                <Link
+                                    href="/terminal"
+                                    className="w-full py-3 px-4 rounded-xl bg-[#082840] hover:bg-[#0C3C60] text-xs font-bold text-white text-center transition-all flex items-center justify-center gap-1.5 shadow"
+                                >
+                                    <span>{t.pricing.plans.audit.cta}</span>
+                                    <ArrowRight className="w-3.5 h-3.5" />
+                                </Link>
 
-                            <button
-                                onClick={() => openPaymentForPlan(
-                                    t.pricing.plans.audit.title,
-                                    t.pricing.plans.audit.price,
-                                    t.pricing.plans.audit.ref
-                                )}
-                                className="mt-2.5 w-full py-2 px-3 rounded-xl bg-[#DA0081]/15 hover:bg-[#DA0081]/25 border border-[#DA0081]/30 text-[11px] font-bold text-[#FF63C3] text-center transition-all flex items-center justify-center gap-1.5"
-                            >
-                                <Smartphone className="w-3.5 h-3.5" />
-                                <span>{lang === 'es' ? 'Pagar con Nequi ($40.000 COP)' : 'Pay via Nequi / Transfer'}</span>
-                            </button>
+                                <button
+                                    onClick={() => openPaymentForPlan(
+                                        t.pricing.plans.audit.title,
+                                        t.pricing.plans.audit.price,
+                                        t.pricing.plans.audit.ref
+                                    )}
+                                    className="mt-2.5 w-full py-2.5 px-3 rounded-xl bg-[#DA0081] hover:bg-[#b8006e] text-white text-xs font-black text-center transition-all shadow flex items-center justify-center gap-1.5"
+                                >
+                                    <Smartphone className="w-3.5 h-3.5" />
+                                    <span>{lang === 'es' ? 'Pagar con Nequi ($40.000 COP)' : 'Pay via Nequi / Transfer'}</span>
+                                </button>
+                            </div>
                         </div>
 
-                        {/* Plan 2: Featured */}
-                        <div className="p-6 sm:p-7 rounded-3xl bg-gradient-to-b from-[#0C3C60]/70 via-[#082840]/90 to-[#082840] border-2 border-[#83DF9C] shadow-2xl shadow-[#83DF9C]/15 flex flex-col justify-between relative">
+                        {/* Plan 2: Featured (Tarjeta Oscura Destacada para Máximo Contraste) */}
+                        <div className="p-6 sm:p-7 rounded-3xl bg-[#082840] text-white border-2 border-[#83DF9C] shadow-2xl shadow-[#082840]/30 flex flex-col justify-between relative scale-[1.02]">
                             <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3.5 py-0.5 rounded-full bg-[#83DF9C] text-[#040E17] text-[10px] font-black uppercase tracking-wider shadow">
                                 {t.pricing.plans.walk.popular}
                             </div>
@@ -451,10 +453,10 @@ export default function LandingPage() {
                                 </ul>
                             </div>
 
-                            <div>
+                            <div className="mt-8">
                                 <Link
                                     href="/terminal"
-                                    className="mt-8 w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-[#0c6056] to-[#83DF9C] text-[#040E17] font-black text-xs text-center shadow-lg hover:scale-[1.02] transition-all flex items-center justify-center gap-1.5"
+                                    className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-[#0c6056] to-[#83DF9C] text-[#040E17] font-black text-xs text-center shadow-lg hover:scale-[1.02] transition-all flex items-center justify-center gap-1.5"
                                 >
                                     <Compass className="w-4 h-4 text-[#040E17]" />
                                     <span>{t.pricing.plans.walk.cta}</span>
@@ -476,42 +478,42 @@ export default function LandingPage() {
                         </div>
 
                         {/* Plan 3 */}
-                        <div className="p-6 sm:p-7 rounded-3xl bg-[#082840]/70 border border-[#0C3C60] hover:border-[#83DF9C]/40 transition-all flex flex-col justify-between">
+                        <div className="p-6 sm:p-7 rounded-3xl bg-white border border-[#082840]/15 shadow-xl shadow-[#082840]/5 flex flex-col justify-between text-[#082840]">
                             <div>
                                 <div className="flex items-center justify-between mb-4">
-                                    <div className="w-10 h-10 rounded-xl bg-[#0C3C60]/50 border border-[#0C3C60] flex items-center justify-center text-[#83DF9C]">
+                                    <div className="w-10 h-10 rounded-xl bg-[#082840]/10 border border-[#082840]/15 flex items-center justify-center text-[#082840]">
                                         <Users className="w-5 h-5" />
                                     </div>
-                                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-[#83DF9C]/10 text-[#83DF9C] border border-[#83DF9C]/20">
+                                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-[#082840]/10 text-[#082840] border border-[#082840]/20">
                                         {t.pricing.plans.corporate.badge}
                                     </span>
                                 </div>
-                                <h3 className="text-lg font-bold text-white mb-1">{t.pricing.plans.corporate.title}</h3>
-                                <p className="text-xs text-[#FAF2CA]/65 mb-6">
+                                <h3 className="text-lg font-bold text-[#082840] mb-1">{t.pricing.plans.corporate.title}</h3>
+                                <p className="text-xs text-[#0C3C60]/75 mb-6">
                                     {t.pricing.plans.corporate.subtitle}
                                 </p>
                                 
-                                <div className="mb-6 pb-6 border-b border-[#0C3C60]/60">
+                                <div className="mb-6 pb-6 border-b border-[#082840]/15">
                                     <div className="flex items-baseline gap-1">
-                                        <span className="text-3xl font-black text-white">{t.pricing.plans.corporate.price}</span>
-                                        <span className="text-xs text-[#FAF2CA]/60 font-semibold">{t.pricing.plans.corporate.unit}</span>
+                                        <span className="text-3xl font-black text-[#082840]">{t.pricing.plans.corporate.price}</span>
+                                        <span className="text-xs text-[#0C3C60]/70 font-semibold">{t.pricing.plans.corporate.unit}</span>
                                     </div>
-                                    <div className="text-[11px] text-[#83DF9C] font-semibold mt-0.5">
+                                    <div className="text-[11px] text-[#0C6056] font-bold mt-0.5">
                                         {t.pricing.plans.corporate.ref}
                                     </div>
                                 </div>
 
-                                <ul className="space-y-2.5 text-xs text-[#FAF2CA]/80">
+                                <ul className="space-y-2.5 text-xs text-[#082840]/85">
                                     {t.pricing.plans.corporate.features.map((f, idx) => (
                                         <li key={idx} className="flex items-start gap-2">
-                                            <CheckCircle2 className="w-4 h-4 text-[#83DF9C] shrink-0 mt-0.5" />
+                                            <CheckCircle2 className="w-4 h-4 text-[#0C6056] shrink-0 mt-0.5" />
                                             <span>{f}</span>
                                         </li>
                                     ))}
                                 </ul>
                             </div>
 
-                            <div>
+                            <div className="mt-8">
                                 <a
                                     href={t.pricing.plans.corporate.ctaHref || `https://wa.me/573013970002?text=${encodeURIComponent(
                                         lang === 'es'
@@ -520,10 +522,10 @@ export default function LandingPage() {
                                     )}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="mt-8 w-full py-3.5 px-4 rounded-xl bg-[#25D366]/20 hover:bg-[#25D366]/30 border border-[#25D366]/50 text-xs font-bold text-white text-center transition-all flex items-center justify-center gap-2 group shadow-lg shadow-[#25D366]/10"
+                                    className="w-full py-3.5 px-4 rounded-xl bg-[#082840] hover:bg-[#0C3C60] text-xs font-black text-white text-center transition-all flex items-center justify-center gap-2 group shadow-md"
                                 >
-                                    <WhatsAppIcon className="w-4 h-4 text-[#25D366] fill-current group-hover:scale-110 transition-transform" />
-                                    <span>{t.pricing.plans.corporate.cta}</span>
+                                    <WhatsAppIcon className="w-4 h-4 text-white fill-current group-hover:scale-110 transition-transform" />
+                                    <span>Contáctame</span>
                                 </a>
 
                                 <button
@@ -532,7 +534,7 @@ export default function LandingPage() {
                                         t.pricing.plans.corporate.price,
                                         t.pricing.plans.corporate.ref
                                     )}
-                                    className="mt-2.5 w-full py-2 px-3 rounded-xl bg-[#0C3C60]/70 hover:bg-[#0C3C60] border border-[#83DF9C]/30 text-[11px] font-bold text-[#83DF9C] text-center transition-all flex items-center justify-center gap-1.5"
+                                    className="mt-2.5 w-full py-2.5 px-3 rounded-xl bg-[#082840]/10 hover:bg-[#082840]/15 border border-[#082840]/20 text-[11px] font-bold text-[#082840] text-center transition-all flex items-center justify-center gap-1.5"
                                 >
                                     <Landmark className="w-3.5 h-3.5" />
                                     <span>{lang === 'es' ? 'Transferencia Bancaria / Factura' : 'Bank Wire / Invoice'}</span>
@@ -542,22 +544,22 @@ export default function LandingPage() {
                     </div>
 
                     {/* BANNER NEQUI & TRANSFERENCIAS BANCARIAS */}
-                    <div className="mt-8 p-5 sm:p-6 rounded-3xl bg-gradient-to-r from-[#1D003F]/90 via-[#082840]/90 to-[#040E17] border-2 border-[#DA0081]/50 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-5">
+                    <div className="mt-8 p-5 sm:p-6 rounded-3xl bg-white border-2 border-[#DA0081]/40 shadow-xl shadow-[#DA0081]/10 flex flex-col md:flex-row items-center justify-between gap-5 text-[#082840]">
                         <div className="flex items-center gap-4">
-                            <div className="relative w-12 h-12 rounded-2xl bg-[#DA0081] flex items-center justify-center text-white font-black text-lg shadow-lg shadow-[#DA0081]/40 shrink-0">
+                            <div className="relative w-12 h-12 rounded-2xl bg-[#DA0081] flex items-center justify-center text-white font-black text-lg shadow-lg shadow-[#DA0081]/30 shrink-0">
                                 N
-                                <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-[#83DF9C] border-2 border-[#040E17]" />
+                                <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-[#83DF9C] border-2 border-white" />
                             </div>
                             <div>
                                 <div className="flex flex-wrap items-center gap-2">
-                                    <h4 className="text-base font-black text-white">
+                                    <h4 className="text-base font-black text-[#082840]">
                                         {lang === 'es' ? 'Transferencias Bancarias & Nequi Directo' : 'Direct Bank Transfers & Nequi'}
                                     </h4>
-                                    <span className="px-2.5 py-0.5 rounded-full bg-[#83DF9C]/20 text-[#83DF9C] border border-[#83DF9C]/30 text-[10px] font-bold">
+                                    <span className="px-2.5 py-0.5 rounded-full bg-[#082840]/10 text-[#082840] border border-[#082840]/20 text-[10px] font-bold">
                                         {lang === 'es' ? 'Número Oficial: 301 397 0002' : 'Official Number: 301 397 0002'}
                                     </span>
                                 </div>
-                                <p className="text-xs text-[#FAF2CA]/75 mt-0.5">
+                                <p className="text-xs text-[#0C3C60]/75 mt-0.5">
                                     {lang === 'es'
                                         ? 'Paga al instante desde Nequi, Bancolombia o Transfiya. Emisión de factura y activación en menos de 5 minutos.'
                                         : 'Instant transfers from Nequi, Bancolombia or Transfiya. Immediate parcel activation in under 5 minutes.'}
@@ -571,7 +573,7 @@ export default function LandingPage() {
                                     '$25 USD',
                                     '~ 100.000 COP'
                                 )}
-                                className="w-full md:w-auto px-5 py-3 rounded-xl bg-[#DA0081] hover:bg-[#b8006e] text-white text-xs font-bold transition-all shadow-lg shadow-[#DA0081]/30 hover:scale-105 flex items-center justify-center gap-2 shrink-0"
+                                className="w-full md:w-auto px-5 py-3 rounded-xl bg-[#DA0081] hover:bg-[#b8006e] text-white text-xs font-black transition-all shadow-lg shadow-[#DA0081]/30 hover:scale-105 flex items-center justify-center gap-2 shrink-0"
                             >
                                 <Smartphone className="w-4 h-4" />
                                 <span>{lang === 'es' ? 'Pagar con Nequi (301 397 0002)' : 'Pay with Nequi (301 397 0002)'}</span>
@@ -582,9 +584,9 @@ export default function LandingPage() {
                                     'Tarifa según lote',
                                     'Bancolombia / Factura'
                                 )}
-                                className="hidden sm:flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl bg-[#0C3C60]/70 hover:bg-[#0C3C60] border border-[#83DF9C]/40 text-xs font-bold text-white transition-all shrink-0"
+                                className="hidden sm:flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl bg-[#082840]/10 hover:bg-[#082840]/15 border border-[#082840]/20 text-xs font-bold text-[#082840] transition-all shrink-0"
                             >
-                                <Landmark className="w-4 h-4 text-[#83DF9C]" />
+                                <Landmark className="w-4 h-4 text-[#082840]" />
                                 <span>{lang === 'es' ? 'Bancolombia' : 'Bank Transfer'}</span>
                             </button>
                         </div>
@@ -592,33 +594,33 @@ export default function LandingPage() {
 
                     {/* Strip Adicional */}
                     <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="p-4 sm:p-5 rounded-2xl bg-[#082840]/60 border border-[#0C3C60] flex items-center justify-between gap-4">
+                        <div className="p-4 sm:p-5 rounded-2xl bg-white/85 border border-[#082840]/15 flex items-center justify-between gap-4 text-[#082840] shadow-sm">
                             <div className="flex items-center gap-3">
-                                <div className="w-9 h-9 rounded-xl bg-[#83DF9C]/10 border border-[#83DF9C]/20 flex items-center justify-center text-[#83DF9C] shrink-0">
+                                <div className="w-9 h-9 rounded-xl bg-[#082840]/10 border border-[#082840]/15 flex items-center justify-center text-[#082840] shrink-0">
                                     <PlusCircle className="w-4 h-4" />
                                 </div>
                                 <div>
-                                    <h4 className="text-sm font-bold text-white">{t.pricing.addons.extraHa.title}</h4>
-                                    <p className="text-[11px] text-[#FAF2CA]/60">{t.pricing.addons.extraHa.desc}</p>
+                                    <h4 className="text-sm font-bold text-[#082840]">{t.pricing.addons.extraHa.title}</h4>
+                                    <p className="text-[11px] text-[#0C3C60]/75">{t.pricing.addons.extraHa.desc}</p>
                                 </div>
                             </div>
                             <div className="text-right shrink-0">
-                                <div className="text-base font-black text-[#83DF9C]">{t.pricing.addons.extraHa.price}</div>
-                                <div className="text-[10px] text-[#FAF2CA]/50">{t.pricing.addons.extraHa.ref}</div>
+                                <div className="text-base font-black text-[#082840]">{t.pricing.addons.extraHa.price}</div>
+                                <div className="text-[10px] text-[#0C3C60]/70">{t.pricing.addons.extraHa.ref}</div>
                             </div>
                         </div>
 
-                        <div className="p-4 sm:p-5 rounded-2xl bg-[#082840]/60 border border-[#0C3C60] flex items-center justify-between gap-4">
+                        <div className="p-4 sm:p-5 rounded-2xl bg-white/85 border border-[#082840]/15 flex items-center justify-between gap-4 text-[#082840] shadow-sm">
                             <div className="flex items-center gap-3">
-                                <div className="w-9 h-9 rounded-xl bg-[#83DF9C]/10 border border-[#83DF9C]/20 flex items-center justify-center text-[#83DF9C] shrink-0">
+                                <div className="w-9 h-9 rounded-xl bg-[#082840]/10 border border-[#082840]/15 flex items-center justify-center text-[#082840] shrink-0">
                                     <FileText className="w-4 h-4" />
                                 </div>
                                 <div>
-                                    <h4 className="text-sm font-bold text-white">{t.pricing.addons.deliverables.title}</h4>
-                                    <p className="text-[11px] text-[#FAF2CA]/60">{t.pricing.addons.deliverables.desc}</p>
+                                    <h4 className="text-sm font-bold text-[#082840]">{t.pricing.addons.deliverables.title}</h4>
+                                    <p className="text-[11px] text-[#0C3C60]/75">{t.pricing.addons.deliverables.desc}</p>
                                 </div>
                             </div>
-                            <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-[#83DF9C]/15 text-[#83DF9C] border border-[#83DF9C]/30 shrink-0">
+                            <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-[#082840]/10 text-[#082840] border border-[#082840]/20 shrink-0">
                                 {t.pricing.addons.deliverables.badge}
                             </span>
                         </div>
@@ -647,15 +649,15 @@ export default function LandingPage() {
                         <a
                             href={`https://wa.me/573013970002?text=${encodeURIComponent(
                                 lang === 'es'
-                                    ? 'Hola, me gustaría recibir más información y asesoría sobre georreferenciación EUDR con AxisTRACE.'
-                                    : 'Hello, I would like more information and advisory on AxisTRACE EUDR georeferencing.'
+                                    ? 'Hola, me gustaría contactarme para recibir más información y asesoría sobre georreferenciación EUDR con AxisTRACE.'
+                                    : 'Hello, I would like to contact you for more information and advisory on AxisTRACE EUDR georeferencing.'
                             )}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="px-6 py-4 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-white font-extrabold text-sm shadow-xl shadow-[#25D366]/25 hover:scale-105 transition-all flex items-center justify-center gap-2"
+                            className="px-6 py-4 rounded-xl bg-white hover:bg-[#FAF2CA] text-[#040E17] font-black text-sm shadow-xl hover:scale-105 transition-all flex items-center justify-center gap-2 border border-white/40"
                         >
-                            <WhatsAppIcon className="w-5 h-5 fill-current" />
-                            <span>{t.finalCta.whatsappButton || (lang === 'es' ? 'Hablar por WhatsApp (+57 301 397 0002)' : 'Chat on WhatsApp (+57 301 397 0002)')}</span>
+                            <WhatsAppIcon className="w-5 h-5 text-[#040E17] fill-current" />
+                            <span>{lang === 'es' ? 'Contáctame' : 'Contact me'}</span>
                         </a>
                     </div>
                 </div>
