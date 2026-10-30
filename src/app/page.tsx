@@ -359,66 +359,7 @@ export default function LandingPage() {
                         </p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
-                        
-                        {/* Plan 1 */}
-                        <div className="p-6 sm:p-7 rounded-3xl bg-white border border-[#082840]/15 shadow-xl shadow-[#082840]/5 flex flex-col justify-between text-[#082840]">
-                            <div>
-                                <div className="flex items-center justify-between mb-4">
-                                    <div className="w-10 h-10 rounded-xl bg-[#082840]/10 border border-[#082840]/15 flex items-center justify-center text-[#082840]">
-                                        <Satellite className="w-5 h-5" />
-                                    </div>
-                                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-[#082840]/10 text-[#082840] border border-[#082840]/20">
-                                        {t.pricing.plans.audit.badge}
-                                    </span>
-                                </div>
-                                <h3 className="text-lg font-bold text-[#082840] mb-1">{t.pricing.plans.audit.title}</h3>
-                                <p className="text-xs text-[#0C3C60]/75 mb-6">
-                                    {t.pricing.plans.audit.subtitle}
-                                </p>
-                                
-                                <div className="mb-6 pb-6 border-b border-[#082840]/15">
-                                    <div className="flex items-baseline gap-1">
-                                        <span className="text-3xl font-black text-[#082840]">{t.pricing.plans.audit.price}</span>
-                                        <span className="text-xs text-[#0C3C60]/70 font-semibold">{t.pricing.plans.audit.unit}</span>
-                                    </div>
-                                    <div className="text-[11px] text-[#0C6056] font-bold mt-0.5">
-                                        {t.pricing.plans.audit.ref}
-                                    </div>
-                                </div>
-
-                                <ul className="space-y-2.5 text-xs text-[#082840]/85">
-                                    {t.pricing.plans.audit.features.map((f, idx) => (
-                                        <li key={idx} className="flex items-start gap-2">
-                                            <CheckCircle2 className="w-4 h-4 text-[#0C6056] shrink-0 mt-0.5" />
-                                            <span>{f}</span>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-
-                            <div className="mt-8">
-                                <Link
-                                    href="/terminal"
-                                    className="w-full py-3 px-4 rounded-xl bg-[#082840] hover:bg-[#0C3C60] text-xs font-bold text-white text-center transition-all flex items-center justify-center gap-1.5 shadow"
-                                >
-                                    <span>{t.pricing.plans.audit.cta}</span>
-                                    <ArrowRight className="w-3.5 h-3.5" />
-                                </Link>
-
-                                <button
-                                    onClick={() => openPaymentForPlan(
-                                        t.pricing.plans.audit.title,
-                                        t.pricing.plans.audit.price,
-                                        t.pricing.plans.audit.ref
-                                    )}
-                                    className="mt-2.5 w-full py-2.5 px-3 rounded-xl bg-[#0E5A36] hover:bg-[#0A4529] text-white text-xs font-black text-center transition-all shadow flex items-center justify-center gap-1.5 border border-[#83DF9C]/30"
-                                >
-                                    <Smartphone className="w-3.5 h-3.5 text-[#83DF9C]" />
-                                    <span>{lang === 'es' ? 'Pagar con Nequi ($40.000 COP)' : 'Pay via Nequi / Transfer ($10 USD)'}</span>
-                                </button>
-                            </div>
-                        </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto items-stretch">
 
                         {/* Plan 2: Featured (Tarjeta Oscura Destacada para Máximo Contraste) */}
                         <div className="p-6 sm:p-7 rounded-3xl bg-[#082840] text-white border-2 border-[#83DF9C] shadow-2xl shadow-[#082840]/30 flex flex-col justify-between relative scale-[1.02]">
