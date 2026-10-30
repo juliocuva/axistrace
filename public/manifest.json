@@ -1,0 +1,18 @@
+{
+  "name": "AxisTrace - Georreferenciación EUDR",
+  "short_name": "AxisTrace",
+  "description": "Herramienta de caminata digital, georreferenciación y debida diligencia ambiental bajo el Reglamento UE 2023/1115 (EUDR).",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#082840",
+  "theme_color": "#0C3C60",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

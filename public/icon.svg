@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <rect width="512" height="512" rx="128" fill="#082840"/>
+  <circle cx="256" cy="256" r="210" stroke="#0C3C60" stroke-width="8" stroke-dasharray="16 16"/>
+  <!-- Polygon track path -->
+  <polygon points="256,110 380,200 340,380 172,380 132,200" stroke="#83DF9C" stroke-width="12" fill="#0C3C60" fill-opacity="0.5" stroke-linejoin="round"/>
+  <!-- Vertices -->
+  <circle cx="256" cy="110" r="14" fill="#83DF9C"/>
+  <circle cx="380" cy="200" r="14" fill="#83DF9C"/>
+  <circle cx="340" cy="380" r="14" fill="#83DF9C"/>
+  <circle cx="172" cy="380" r="14" fill="#83DF9C"/>
+  <circle cx="132" cy="200" r="14" fill="#83DF9C"/>
+  <!-- Central Pin / Sprout -->
+  <path d="M256 180 C210 180 190 220 190 260 C190 320 256 360 256 360 C256 360 322 320 322 260 C322 220 302 180 256 180 Z" fill="#83DF9C"/>
+  <circle cx="256" cy="250" r="26" fill="#082840"/>
+  <!-- Leaf detail -->
+  <path d="M256 230 C270 215 285 220 285 235 C285 250 270 255 256 250 Z" fill="#FAF2CA"/>
+</svg>

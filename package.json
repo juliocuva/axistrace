@@ -1,0 +1,31 @@
+{
+  "name": "axistrace",
+  "version": "1.0.0",
+  "description": "AxisTrace - Infraestructura Digital de Georreferenciación EUDR y Diligencia Debida",
+  "scripts": {
+    "dev": "next dev -H 0.0.0.0",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@vercel/analytics": "^2.0.1",
+    "html2canvas": "^1.4.1",
+    "leaflet": "^1.9.4",
+    "lucide-react": "^1.29.0",
+    "next": "^16.1.6",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "react-leaflet": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/leaflet": "^1.9.21",
+    "@types/node": "^22.10.1",
+    "@types/react": "^19.0.8",
+    "@types/react-dom": "^19.0.3",
+    "autoprefixer": "^10.4.24",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.19",
+    "typescript": "^5.9.3"
+  }
+}
