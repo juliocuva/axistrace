@@ -415,7 +415,7 @@ export default function LandingPage() {
                                     className="mt-2.5 w-full py-2.5 px-3 rounded-xl bg-[#0E5A36] hover:bg-[#0A4529] text-white text-xs font-black text-center transition-all shadow flex items-center justify-center gap-1.5 border border-[#83DF9C]/30"
                                 >
                                     <Smartphone className="w-3.5 h-3.5 text-[#83DF9C]" />
-                                    <span>{lang === 'es' ? 'Pagar con Nequi ($40.000 COP)' : 'Pay via Nequi / Transfer'}</span>
+                                    <span>{lang === 'es' ? 'Pagar con Nequi ($40.000 COP)' : 'Pay via Nequi / Transfer ($10 USD)'}</span>
                                 </button>
                             </div>
                         </div>
@@ -479,7 +479,7 @@ export default function LandingPage() {
                                     className="mt-2.5 w-full py-2.5 px-3 rounded-xl bg-[#0E5A36] hover:bg-[#0A4529] text-white text-xs font-black text-center transition-all shadow-md flex items-center justify-center gap-1.5 border border-[#83DF9C]/40"
                                 >
                                     <Smartphone className="w-3.5 h-3.5 text-[#83DF9C]" />
-                                    <span>{lang === 'es' ? 'Pagar $100.000 COP con Nequi' : 'Pay $100.000 COP with Nequi'}</span>
+                                    <span>{lang === 'es' ? 'Pagar $100.000 COP con Nequi' : 'Pay with Nequi ($25 USD)'}</span>
                                 </button>
                             </div>
                         </div>
@@ -532,17 +532,21 @@ export default function LandingPage() {
                                     className="w-full py-3.5 px-4 rounded-xl bg-[#082840] hover:bg-[#0C3C60] text-xs font-black text-white text-center transition-all flex items-center justify-center gap-2 group shadow-md"
                                 >
                                     <WhatsAppIcon className="w-4 h-4 text-white fill-current group-hover:scale-110 transition-transform" />
-                                    <span>Contáctame</span>
+                                    <span>{lang === 'es' ? 'Contactar por WhatsApp' : 'Chat on WhatsApp'}</span>
                                 </a>
 
                                 <button
                                     onClick={() => openPaymentForPlan(
                                         t.pricing.plans.corporate.title,
                                         t.pricing.plans.corporate.price,
-                                        t.pricing.plans.corporate.ref
+                                        t.pricing.plans.corporate.ref,
+                                        'bank'
                                     )}
                                     className="mt-2.5 w-full py-2.5 px-3 rounded-xl bg-[#082840]/10 hover:bg-[#082840]/15 border border-[#082840]/20 text-[11px] font-bold text-[#082840] text-center transition-all flex items-center justify-center gap-1.5"
                                 >
+                                    <Landmark className="w-3.5 h-3.5" />
+                                    <span>{lang === 'es' ? 'Transferencia Bancaria / Factura' : 'Bank Wire / Invoice'}</span>
+                                </button>
                                     <Landmark className="w-3.5 h-3.5" />
                                     <span>{lang === 'es' ? 'Transferencia Bancaria / Factura' : 'Bank Wire / Invoice'}</span>
                                 </button>

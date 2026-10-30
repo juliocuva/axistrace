@@ -88,6 +88,7 @@ export const translations = {
                     desc: "Regardless of your commodity or farm size—whether coffee, cocoa, palm, rubber, timber, soy, or livestock—AxisTrace is your digital customs passport guaranteeing zero delays across EU borders.",
                     ctaPrimary: "Launch Field Walk on Smartphone",
                     ctaSecondary: "Talk via WhatsApp (+57 301 397 0002)",
+                    ctaSecondaryText: "Chat on WhatsApp",
                     ctaSecondaryHref: "https://wa.me/573013970002?text=Hello%2C%20I%20would%20like%20advisory%20on%20EUDR%20georeferencing%20for%20my%20crop."
                 }
             }
@@ -157,7 +158,7 @@ export const translations = {
                         "Pocket mode with inertial anti-fraud signature",
                         "Sentinel-2 post-2020 deforestation cross-check",
                         "300 DPI Legal-sized PDF dossier with QR",
-                        "RFC 7946 GeoJSON sealed with SHA-256"
+                        "RFC 7946 GeoJSON with cryptographic seal"
                     ],
                     cta: "Start Field Walk"
                 },
@@ -288,6 +289,7 @@ export const translations = {
                     desc: "No importa tu cultivo ni el tamaño de tu predio. Si produces café, cacao, palma, caucho, madera o ganado, AxisTrace es el pasaporte digital que garantiza que tu cosecha cruce las aduanas europeas sin tropiezos.",
                     ctaPrimary: "Iniciar Caminata en Terreno Ahora",
                     ctaSecondary: "Hablar por WhatsApp (+57 301 397 0002)",
+                    ctaSecondaryText: "Contactar por WhatsApp",
                     ctaSecondaryHref: "https://wa.me/573013970002?text=Hola%2C%20quisiera%20asesor%C3%ADa%20sobre%20georreferenciaci%C3%B3n%20EUDR%20para%20mi%20cultivo."
                 }
             }
@@ -357,7 +359,7 @@ export const translations = {
                         "Modo bolsillo con firma inercial antifraude",
                         "Cruce satelital Sentinel-2 post-2020",
                         "Ficha cartográfica Oficio 300 DPI con QR",
-                        "GeoJSON RFC 7946 sellado SHA-256"
+                        "GeoJSON RFC 7946 con sello criptográfico"
                     ],
                     cta: "Iniciar Caminata"
                 },
