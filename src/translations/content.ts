@@ -8,8 +8,7 @@ export const translations = {
         },
         nav: {
             scope: "Agri Scope",
-            solutions: "Solutions",
-            tech: "Technology",
+            solutions: "Platform",
             pricing: "Plans & Pricing",
             terminal: "Launch Terminal"
         },
@@ -91,56 +90,38 @@ export const translations = {
                 }
             }
         },
-        solutions: {
-            tag: "Precision Solutions",
-            title1: "Digital Traceability for",
-            title2: "Sustainable Growth & EU Market Access",
-            subtitle: "Bridging smallholder farmland reality with strict customs compliance demanded by the European Commission.",
-            cards: {
-                field: {
-                    tag: "Pocket Walk Offline",
+        unifiedPlatform: {
+            tag: "Precision Infrastructure",
+            title1: "Bridging Nature & Data for",
+            title2: "Frictionless European Market Access",
+            subtitle: "From on-site perimeter footpaths to satellite remote sensing and automated customs dossiers.",
+            stats: [
+                { val: "100%", label: "Digital Self-Service", sub: "Operators survey with their own phone" },
+                { val: "0%", label: "Cellular Dependency", sub: "100% offline in remote mountain terrain" },
+                { val: "300 DPI", label: "Legal Dossier Export", sub: "Print-ready with verifiable QR code" },
+                { val: "SHA-256", label: "Cryptographic Seal", sub: "Tamper-proof atomic UTC timestamp" }
+            ],
+            cards: [
+                {
+                    image: "/images/field-technician.jpg",
+                    tag: "01 • Offline Pocket Walk",
                     title: "Digital Field Perimeter Walk",
-                    desc: "Field operators walk parcel boundaries. AxisTrace logs high-fidelity coordinates automatically without cellular coverage or mobile data consumption.",
-                    link: "Launch field terminal"
+                    desc: "Field operators walk parcel boundaries. AxisTrace logs high-fidelity coordinates automatically with deadband kinematic filtering that rejects GNSS multipath bounces.",
+                    bullet: "Automated perimeter closure with zero data usage"
                 },
-                satellite: {
-                    tag: "Sentinel-2 Copernicus",
+                {
+                    image: "/images/satellite-survey.jpg",
+                    tag: "02 • Sentinel-2 Copernicus",
                     title: "Satellite Deforestation Audit",
                     desc: "Cross-checks parcel boundaries against multi-spectral satellite baseline records, strictly auditing zero deforestation after the December 31, 2020 regulatory cutoff.",
-                    link: "Explore technical audit"
+                    bullet: "Topological repair & CRS84 WGS84 validation"
                 },
-                export: {
-                    tag: "Immutable SHA-256 Seal",
+                {
+                    image: "/images/export-compliance.jpg",
+                    tag: "03 • TRACES NT Ready",
                     title: "Due Diligence Dossier (DDS)",
-                    desc: "Instant automated generation of 300 DPI Legal-sized cartographic PDF certificates with QR codes and standardized GeoJSON files ready for bulk TRACES NT ingestion.",
-                    link: "View export deliverables"
-                }
-            }
-        },
-        technology: {
-            tag: "The Frontier Between Nature & Data",
-            title: "Traditional Farming Powered by Satellite Remote Sensing",
-            desc: "Smallholder agriculture has long relied on imprecise perimeter estimates. At AxisTrace, we transform every physical footstep into an immutable, court-admissible regulatory asset accepted across the EU.",
-            stats: {
-                selfServiceVal: "100%",
-                selfServiceLabel: "Digital Self-Service",
-                selfServiceSub: "Zero need for expensive on-site surveyors",
-                offlineVal: "0%",
-                offlineLabel: "Cellular Network Reliance",
-                offlineSub: "Performs in remote mountainous zones"
-            },
-            features: [
-                {
-                    title: "Deadband & Human Gait Kinematic Filter",
-                    sub: "Rejects vegetation GNSS multipath bounces >35m and prevents office-drawn synthetic polygons."
-                },
-                {
-                    title: "SHA-256 Cryptographic Hash Fingerprint",
-                    sub: "Tamper-proof digital seal tying vertex geometry, atomic UTC timestamps, and grower identity."
-                },
-                {
-                    title: "300 DPI Legal-Sized Cartographic Certificate",
-                    sub: "Print-ready high-resolution dossier equipped with auditable QR code for international buyers."
+                    desc: "Instant automated generation of 300 DPI Legal-sized cartographic PDF certificates with QR codes and standardized RFC 7946 GeoJSON files ready for bulk customs ingestion.",
+                    bullet: "Accepted by European port authorities & buyers"
                 }
             ]
         },
@@ -224,8 +205,7 @@ export const translations = {
         },
         nav: {
             scope: "Alcance Agro",
-            solutions: "Solución",
-            tech: "Tecnología",
+            solutions: "Plataforma",
             pricing: "Planes & Precios",
             terminal: "Abrir Terminal"
         },
@@ -307,56 +287,38 @@ export const translations = {
                 }
             }
         },
-        solutions: {
-            tag: "Soluciones de Precisión",
-            title1: "Trazabilidad Digital para",
-            title2: "Crecimiento Sostenible y Exportación",
-            subtitle: "Conectamos la realidad física de la parcela campesina con las exigencias digitales de las aduanas en Europa.",
-            cards: {
-                field: {
-                    tag: "Modo Bolsillo Offline",
+        unifiedPlatform: {
+            tag: "Infraestructura de Precisión",
+            title1: "Conectando la Naturaleza con los Datos",
+            title2: "Acceso Libre al Mercado Europeo",
+            subtitle: "Desde la caminata perimetral en finca hasta la verificación satelital y la emisión de expedientes oficiales.",
+            stats: [
+                { val: "100%", label: "Autoservicio Digital", sub: "El operario mapea con su propio celular" },
+                { val: "0%", label: "Dependencia de Red", sub: "100% offline en zonas montañosas remotas" },
+                { val: "300 DPI", label: "Ficha Cartográfica Oficio", sub: "Lista para imprimir con QR auditable" },
+                { val: "SHA-256", label: "Sello Criptográfico", sub: "Huella inmutable con hora atómica UTC" }
+            ],
+            cards: [
+                {
+                    image: "/images/field-technician.jpg",
+                    tag: "01 • Caminata Offline",
                     title: "Caminata Digital de Campo",
-                    desc: "El operario recorre el perímetro de la parcela. AxisTrace captura coordenadas automáticamente sin requerir señal de telefonía ni internet.",
-                    link: "Ver terminal en acción"
+                    desc: "El operario recorre el perímetro de la parcela. AxisTrace captura coordenadas automáticamente con filtro cinemático deadband que descarta rebotes GNSS.",
+                    bullet: "Cierre perimetral automático sin consumo de datos"
                 },
-                satellite: {
-                    tag: "Sentinel-2 Copernicus",
+                {
+                    image: "/images/satellite-survey.jpg",
+                    tag: "02 • Sentinel-2 Copernicus",
                     title: "Auditoría Satelital de Deforestación",
                     desc: "Cruce de geometrías con series históricas satelitales. Verificación estricta de deforestación cero con fecha de corte oficial del 31 de diciembre de 2020.",
-                    link: "Conocer validación técnica"
-                },
-                export: {
-                    tag: "Sello Inmutable SHA-256",
-                    title: "Expediente de Debida Diligencia (DDS)",
-                    desc: "Emisión instantánea de Fichas Cartográficas Oficio a 300 DPI con QR y archivos GeoJSON estandarizados listos para su carga directa en TRACES NT.",
-                    link: "Ver formato de entregables"
-                }
-            }
-        },
-        technology: {
-            tag: "La Frontera entre la Naturaleza y los Datos",
-            title: "La Tradición Agrícola Impulsada por Precisión Satelital",
-            desc: "La agricultura campesina tradicional ha dependido de estimados aproximados. En AxisTrace transformamos cada paso perimetral en un activo documental con validez jurídica internacional ante la Unión Europea.",
-            stats: {
-                selfServiceVal: "100%",
-                selfServiceLabel: "Autoservicio Digital",
-                selfServiceSub: "Sin necesidad de peritos costosos en finca",
-                offlineVal: "0%",
-                offlineLabel: "Dependencia de Red",
-                offlineSub: "Opera en zonas montañosas remotas"
-            },
-            features: [
-                {
-                    title: "Algoritmo Deadband & Paso Humano",
-                    sub: "Descarta rebotes satelitales >35m y previene polígonos sintéticos de oficina."
+                    bullet: "Reparación topológica y validación WGS84 CRS84"
                 },
                 {
-                    title: "Huella Criptográfica SHA-256",
-                    sub: "Firma digital inalterable con hora UTC atómica e identificación del productor."
-                },
-                {
-                    title: "Ficha Cartográfica Oficio 300 DPI",
-                    sub: "Documento oficial listo para imprimir con código QR auditable por aduanas."
+                    image: "/images/export-compliance.jpg",
+                    tag: "03 • Listo para TRACES NT",
+                    title: "Expediente de Diligencia Debida (DDS)",
+                    desc: "Emisión instantánea de Fichas Cartográficas Oficio a 300 DPI con QR y archivos GeoJSON RFC 7946 listos para su carga masiva en aduanas europeas.",
+                    bullet: "Aprobado por autoridades portuarias y compradores"
                 }
             ]
         },

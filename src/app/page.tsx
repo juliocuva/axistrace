@@ -14,13 +14,13 @@ import {
     Users,
     Smartphone,
     PlusCircle,
-    Activity
+    Activity,
+    Zap
 } from 'lucide-react';
 import { translations, Language } from '@/translations/content';
 import ScopeTimeline from '@/components/ScopeTimeline';
 
 export default function LandingPage() {
-    // English as the primary default language, Spanish as secondary
     const [lang, setLang] = useState<Language>('en');
     const t = translations[lang];
 
@@ -53,8 +53,7 @@ export default function LandingPage() {
                     {/* Nav Links */}
                     <nav className="hidden md:flex items-center gap-7 text-xs font-semibold text-[#FAF2CA]/75">
                         <a href="#alcance" className="hover:text-[#83DF9C] transition-colors">{t.nav.scope}</a>
-                        <a href="#solucion" className="hover:text-[#83DF9C] transition-colors">{t.nav.solutions}</a>
-                        <a href="#tecnologia" className="hover:text-[#83DF9C] transition-colors">{t.nav.tech}</a>
+                        <a href="#plataforma" className="hover:text-[#83DF9C] transition-colors">{t.nav.solutions}</a>
                         <a href="#planes" className="hover:text-[#83DF9C] transition-colors">{t.nav.pricing}</a>
                     </nav>
 
@@ -68,7 +67,7 @@ export default function LandingPage() {
                                         ? 'bg-[#83DF9C] text-[#040E17] shadow-sm'
                                         : 'text-[#FAF2CA]/60 hover:text-white'
                                 }`}
-                                title="English (Primary)"
+                                title="English (Default)"
                             >
                                 EN
                             </button>
@@ -101,7 +100,6 @@ export default function LandingPage() {
             <section className="relative z-10 pt-4 sm:pt-6 pb-12 sm:pb-20 px-3 sm:px-6">
                 <div className="max-w-7xl mx-auto">
                     <div className="relative rounded-3xl sm:rounded-[36px] overflow-hidden border border-[#0C3C60]/80 shadow-2xl bg-[#082840]/90">
-                        {/* Background Photo */}
                         <div className="absolute inset-0 z-0">
                             <Image
                                 src="/images/hero-agritech.jpg"
@@ -114,9 +112,7 @@ export default function LandingPage() {
                             <div className="absolute inset-0 bg-gradient-to-r from-[#040E17]/95 via-[#040E17]/60 to-transparent sm:w-2/3" />
                         </div>
 
-                        {/* Hero Content */}
                         <div className="relative z-10 p-6 sm:p-12 md:p-16 lg:p-20 flex flex-col justify-between min-h-[580px] sm:min-h-[640px]">
-                            {/* Top Rating & Badge */}
                             <div className="flex flex-wrap items-center gap-3 mb-6">
                                 <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#040E17]/70 backdrop-blur-md border border-[#83DF9C]/40 text-[#83DF9C] text-xs font-semibold shadow-lg">
                                     <ShieldCheck className="w-4 h-4 text-[#83DF9C]" />
@@ -127,7 +123,6 @@ export default function LandingPage() {
                                 </span>
                             </div>
 
-                            {/* Main Title & Lead */}
                             <div className="max-w-2xl">
                                 <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-white tracking-tight leading-[1.08] drop-shadow-md">
                                     {t.hero.title1} <br />
@@ -141,7 +136,6 @@ export default function LandingPage() {
                                     {t.hero.description}
                                 </p>
 
-                                {/* Action Buttons */}
                                 <div className="mt-8 flex flex-col sm:flex-row items-center gap-3.5">
                                     <Link
                                         href="/terminal"
@@ -196,7 +190,6 @@ export default function LandingPage() {
                                 </div>
                             </div>
 
-                            {/* Bottom Strip Inside Hero */}
                             <div className="mt-8 pt-6 border-t border-white/10 flex flex-wrap items-center justify-between gap-4 text-xs text-[#FAF2CA]/80">
                                 <div className="flex items-center gap-6">
                                     <span className="flex items-center gap-1.5 font-medium">
@@ -232,170 +225,77 @@ export default function LandingPage() {
                 </div>
             </section>
 
-            {/* SECCIÓN ALCANCE AGRO CON ANIMACIONES FRAMER MOTION Y LÍNEA SOBREPUESTA */}
+            {/* SECCIÓN ALCANCE AGRO CON TRAZO PERIMETRAL EN SCROLL */}
             <ScopeTimeline t={t} />
 
-            {/* SECCIÓN SOLUCIONES */}
-            <section id="solucion" className="relative z-10 py-16 sm:py-24 px-4 border-t border-[#0C3C60]/40">
+            {/* ========================================================================= */}
+            {/* SECCIÓN UNIFICADA Y CONDENSADA (REEMPLAZA LAS 2 SECCIONES ANTERIORES)      */}
+            {/* Combina: 3 Cards Fotográficas + 4 Métricas Clave de Ingeniería en 1 Sola  */}
+            {/* ========================================================================= */}
+            <section id="plataforma" className="relative z-10 py-20 sm:py-28 px-4 border-t border-[#0C3C60]/50 bg-gradient-to-b from-[#040E17] via-[#082840]/30 to-[#040E17]">
                 <div className="max-w-6xl mx-auto">
+                    {/* Header */}
                     <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
                         <div>
                             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#83DF9C]/10 text-[#83DF9C] text-xs font-bold uppercase tracking-wider mb-3 border border-[#83DF9C]/25">
-                                {t.solutions.tag}
+                                <Zap className="w-3.5 h-3.5 text-[#83DF9C]" />
+                                <span>{t.unifiedPlatform.tag}</span>
                             </div>
                             <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
-                                {t.solutions.title1} <br className="hidden sm:inline" />
-                                {t.solutions.title2}
+                                {t.unifiedPlatform.title1} <br className="hidden sm:inline" />
+                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#83DF9C] via-[#FAF2CA] to-[#83DF9C]">
+                                    {t.unifiedPlatform.title2}
+                                </span>
                             </h2>
                         </div>
                         <p className="text-xs sm:text-sm text-[#FAF2CA]/70 max-w-md">
-                            {t.solutions.subtitle}
+                            {t.unifiedPlatform.subtitle}
                         </p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {/* Card 1 */}
-                        <div className="group rounded-3xl overflow-hidden bg-[#082840]/60 border border-[#0C3C60] hover:border-[#83DF9C]/50 transition-all flex flex-col">
-                            <div className="relative h-56 w-full overflow-hidden">
-                                <Image
-                                    src="/images/field-technician.jpg"
-                                    alt="Field technician survey"
-                                    fill
-                                    className="object-cover group-hover:scale-105 transition-transform duration-500"
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-[#082840] via-transparent to-transparent" />
-                                <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-[#040E17]/80 backdrop-blur-md text-[10px] font-bold text-[#83DF9C] border border-[#83DF9C]/30 flex items-center gap-1.5">
-                                    <Smartphone className="w-3 h-3" /> {t.solutions.cards.field.tag}
-                                </div>
+                    {/* Strip de 4 Métricas Clave de Ingeniería (Compacto y Potente) */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-12">
+                        {t.unifiedPlatform.stats.map((stat, idx) => (
+                            <div key={idx} className="p-4 rounded-2xl bg-[#082840]/70 border border-[#0C3C60] text-center">
+                                <div className="text-2xl sm:text-3xl font-black text-[#83DF9C]">{stat.val}</div>
+                                <div className="text-xs font-bold text-white mt-1">{stat.label}</div>
+                                <div className="text-[10px] text-[#FAF2CA]/60 mt-0.5">{stat.sub}</div>
                             </div>
-                            <div className="p-6 flex-1 flex flex-col justify-between">
-                                <div>
-                                    <h3 className="text-lg font-bold text-white mb-2">{t.solutions.cards.field.title}</h3>
-                                    <p className="text-xs text-[#FAF2CA]/70 leading-relaxed">
-                                        {t.solutions.cards.field.desc}
-                                    </p>
-                                </div>
-                                <div className="mt-6 pt-4 border-t border-[#0C3C60]/60 flex items-center justify-between text-xs font-bold text-[#83DF9C]">
-                                    <span>{t.solutions.cards.field.link}</span>
-                                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Card 2 */}
-                        <div className="group rounded-3xl overflow-hidden bg-[#082840]/60 border border-[#0C3C60] hover:border-[#83DF9C]/50 transition-all flex flex-col">
-                            <div className="relative h-56 w-full overflow-hidden">
-                                <Image
-                                    src="/images/satellite-survey.jpg"
-                                    alt="Satellite remote sensing survey"
-                                    fill
-                                    className="object-cover group-hover:scale-105 transition-transform duration-500"
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-[#082840] via-transparent to-transparent" />
-                                <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-[#040E17]/80 backdrop-blur-md text-[10px] font-bold text-[#83DF9C] border border-[#83DF9C]/30 flex items-center gap-1.5">
-                                    <Satellite className="w-3 h-3" /> {t.solutions.cards.satellite.tag}
-                                </div>
-                            </div>
-                            <div className="p-6 flex-1 flex flex-col justify-between">
-                                <div>
-                                    <h3 className="text-lg font-bold text-white mb-2">{t.solutions.cards.satellite.title}</h3>
-                                    <p className="text-xs text-[#FAF2CA]/70 leading-relaxed">
-                                        {t.solutions.cards.satellite.desc}
-                                    </p>
-                                </div>
-                                <div className="mt-6 pt-4 border-t border-[#0C3C60]/60 flex items-center justify-between text-xs font-bold text-[#83DF9C]">
-                                    <span>{t.solutions.cards.satellite.link}</span>
-                                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Card 3 */}
-                        <div className="group rounded-3xl overflow-hidden bg-[#082840]/60 border border-[#0C3C60] hover:border-[#83DF9C]/50 transition-all flex flex-col">
-                            <div className="relative h-56 w-full overflow-hidden">
-                                <Image
-                                    src="/images/export-compliance.jpg"
-                                    alt="European port export compliance"
-                                    fill
-                                    className="object-cover group-hover:scale-105 transition-transform duration-500"
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-[#082840] via-transparent to-transparent" />
-                                <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-[#040E17]/80 backdrop-blur-md text-[10px] font-bold text-[#83DF9C] border border-[#83DF9C]/30 flex items-center gap-1.5">
-                                    <Lock className="w-3 h-3" /> {t.solutions.cards.export.tag}
-                                </div>
-                            </div>
-                            <div className="p-6 flex-1 flex flex-col justify-between">
-                                <div>
-                                    <h3 className="text-lg font-bold text-white mb-2">{t.solutions.cards.export.title}</h3>
-                                    <p className="text-xs text-[#FAF2CA]/70 leading-relaxed">
-                                        {t.solutions.cards.export.desc}
-                                    </p>
-                                </div>
-                                <div className="mt-6 pt-4 border-t border-[#0C3C60]/60 flex items-center justify-between text-xs font-bold text-[#83DF9C]">
-                                    <span>{t.solutions.cards.export.link}</span>
-                                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                                </div>
-                            </div>
-                        </div>
+                        ))}
                     </div>
-                </div>
-            </section>
 
-            {/* SECCIÓN TECNOLOGÍA */}
-            <section id="tecnologia" className="relative z-10 py-16 sm:py-24 px-4 bg-[#082840]/30 border-y border-[#0C3C60]/50">
-                <div className="max-w-6xl mx-auto">
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-                        <div className="lg:col-span-6 space-y-6">
-                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#83DF9C]/10 text-[#83DF9C] text-xs font-bold uppercase tracking-wider border border-[#83DF9C]/25">
-                                {t.technology.tag}
-                            </div>
-                            <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight">
-                                {t.technology.title}
-                            </h2>
-                            <p className="text-sm sm:text-base text-[#FAF2CA]/80 leading-relaxed">
-                                {t.technology.desc}
-                            </p>
-
-                            <div className="grid grid-cols-2 gap-6 pt-4">
-                                <div className="p-4 rounded-2xl bg-[#082840]/80 border border-[#0C3C60]">
-                                    <div className="text-3xl sm:text-4xl font-black text-[#83DF9C]">{t.technology.stats.selfServiceVal}</div>
-                                    <div className="text-xs font-bold text-white mt-1">{t.technology.stats.selfServiceLabel}</div>
-                                    <div className="text-[11px] text-[#FAF2CA]/60 mt-0.5">{t.technology.stats.selfServiceSub}</div>
-                                </div>
-                                <div className="p-4 rounded-2xl bg-[#082840]/80 border border-[#0C3C60]">
-                                    <div className="text-3xl sm:text-4xl font-black text-white">{t.technology.stats.offlineVal}</div>
-                                    <div className="text-xs font-bold text-white mt-1">{t.technology.stats.offlineLabel}</div>
-                                    <div className="text-[11px] text-[#FAF2CA]/60 mt-0.5">{t.technology.stats.offlineSub}</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Interactive Feature Block */}
-                        <div className="lg:col-span-6">
-                            <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-b from-[#0C3C60]/60 to-[#082840]/90 border border-[#83DF9C]/30 shadow-2xl relative overflow-hidden">
-                                <div className="flex items-center justify-between pb-4 border-b border-[#0C3C60]">
-                                    <span className="text-xs font-bold uppercase tracking-wider text-[#83DF9C]">Certificate Validation</span>
-                                    <span className="px-2 py-0.5 rounded bg-[#83DF9C]/20 text-[#83DF9C] text-[10px] font-black">TRACES NT READY</span>
-                                </div>
-
-                                <div className="mt-5 space-y-4">
-                                    {t.technology.features.map((feat, idx) => (
-                                        <div key={idx} className="p-3.5 rounded-xl bg-[#040E17]/60 border border-[#0C3C60] flex items-center justify-between">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-lg bg-[#83DF9C]/15 flex items-center justify-center text-[#83DF9C]">
-                                                    {idx === 0 ? <Compass className="w-4 h-4" /> : idx === 1 ? <Lock className="w-4 h-4" /> : <FileText className="w-4 h-4" />}
-                                                </div>
-                                                <div>
-                                                    <div className="text-xs font-bold text-white">{feat.title}</div>
-                                                    <div className="text-[11px] text-[#FAF2CA]/60">{feat.sub}</div>
-                                                </div>
-                                            </div>
-                                            <CheckCircle2 className="w-4 h-4 text-[#83DF9C]" />
+                    {/* Las 3 Cards Fotográficas Optimizadas */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {t.unifiedPlatform.cards.map((card, idx) => (
+                            <div key={idx} className="group rounded-3xl overflow-hidden bg-[#082840]/60 border border-[#0C3C60] hover:border-[#83DF9C]/50 transition-all flex flex-col justify-between">
+                                <div>
+                                    <div className="relative h-52 w-full overflow-hidden">
+                                        <Image
+                                            src={card.image}
+                                            alt={card.title}
+                                            fill
+                                            className="object-cover group-hover:scale-105 transition-transform duration-500"
+                                        />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-[#082840] via-transparent to-transparent" />
+                                        <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-[#040E17]/85 backdrop-blur-md text-[10px] font-bold text-[#83DF9C] border border-[#83DF9C]/30">
+                                            {card.tag}
                                         </div>
-                                    ))}
+                                    </div>
+                                    <div className="p-6">
+                                        <h3 className="text-base font-bold text-white mb-2">{card.title}</h3>
+                                        <p className="text-xs text-[#FAF2CA]/70 leading-relaxed mb-4">
+                                            {card.desc}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="px-6 pb-6 pt-0 border-t border-[#0C3C60]/40 mt-auto">
+                                    <div className="pt-3 flex items-center gap-2 text-[11px] font-medium text-[#83DF9C]">
+                                        <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                                        <span>{card.bullet}</span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        ))}
                     </div>
                 </div>
             </section>
