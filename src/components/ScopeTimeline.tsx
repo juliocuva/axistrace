@@ -69,40 +69,42 @@ export default function ScopeTimeline({ t }: ScopeTimelineProps) {
                                 </filter>
                             </defs>
 
-                            {/* Guía base tenue del trazo */}
+                            {/* Guía base tenue del trazo con curvas redondeadas */}
                             <path
                                 d="M 120,60 
-                                   L 500,165 
-                                   L 652,625 
-                                   L 1040,710 
-                                   L 500,1095 
-                                   L 110,1180 
-                                   L 652,1565 
-                                   L 1040,1650 
-                                   L 576,2040"
+                                   C 260,95 400,130 500,165 
+                                   C 580,210 570,540 652,625 
+                                   C 740,710 930,670 1040,710 
+                                   C 930,860 590,980 500,1095 
+                                   C 390,1210 210,1140 110,1180 
+                                   C 230,1340 570,1450 652,1565 
+                                   C 740,1700 930,1610 1040,1650 
+                                   C 930,1830 670,1940 576,2040"
                                 stroke="#83DF9C"
                                 strokeWidth="3"
                                 strokeDasharray="8 8"
-                                strokeOpacity="0.15"
+                                strokeOpacity="0.18"
                                 strokeLinecap="round"
+                                strokeLinejoin="round"
                             />
 
-                            {/* Línea animada con el SCROLL (pathLength) */}
+                            {/* Línea animada con el SCROLL (pathLength) con puntas y curvas redondeadas */}
                             <motion.path
                                 d="M 120,60 
-                                   L 500,165 
-                                   L 652,625 
-                                   L 1040,710 
-                                   L 500,1095 
-                                   L 110,1180 
-                                   L 652,1565 
-                                   L 1040,1650 
-                                   L 576,2040"
+                                   C 260,95 400,130 500,165 
+                                   C 580,210 570,540 652,625 
+                                   C 740,710 930,670 1040,710 
+                                   C 930,860 590,980 500,1095 
+                                   C 390,1210 210,1140 110,1180 
+                                   C 230,1340 570,1450 652,1565 
+                                   C 740,1700 930,1610 1040,1650 
+                                   C 930,1830 670,1940 576,2040"
                                 style={{ pathLength }}
                                 stroke="url(#traceGlow)"
                                 strokeWidth="4.5"
                                 strokeDasharray="10 10"
                                 strokeLinecap="round"
+                                strokeLinejoin="round"
                                 filter="url(#glow)"
                             />
                         </svg>
