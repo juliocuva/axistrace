@@ -482,39 +482,7 @@ export default function LandingPage() {
 
 
 
-                    {/* Strip Adicional */}
-                    <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="p-4 sm:p-5 rounded-2xl bg-white/85 border border-[#082840]/15 flex items-center justify-between gap-4 text-[#082840] shadow-sm">
-                            <div className="flex items-center gap-3">
-                                <div className="w-9 h-9 rounded-xl bg-[#082840]/10 border border-[#082840]/15 flex items-center justify-center text-[#082840] shrink-0">
-                                    <PlusCircle className="w-4 h-4" />
-                                </div>
-                                <div>
-                                    <h4 className="text-sm font-bold text-[#082840]">{t.pricing.addons.extraHa.title}</h4>
-                                    <p className="text-[11px] text-[#0C3C60]/75">{t.pricing.addons.extraHa.desc}</p>
-                                </div>
-                            </div>
-                            <div className="text-right shrink-0">
-                                <div className="text-base font-black text-[#082840]">{t.pricing.addons.extraHa.price}</div>
-                                <div className="text-[10px] text-[#0C3C60]/70">{t.pricing.addons.extraHa.ref}</div>
-                            </div>
-                        </div>
 
-                        <div className="p-4 sm:p-5 rounded-2xl bg-white/85 border border-[#082840]/15 flex items-center justify-between gap-4 text-[#082840] shadow-sm">
-                            <div className="flex items-center gap-3">
-                                <div className="w-9 h-9 rounded-xl bg-[#082840]/10 border border-[#082840]/15 flex items-center justify-center text-[#082840] shrink-0">
-                                    <FileText className="w-4 h-4" />
-                                </div>
-                                <div>
-                                    <h4 className="text-sm font-bold text-[#082840]">{t.pricing.addons.deliverables.title}</h4>
-                                    <p className="text-[11px] text-[#0C3C60]/75">{t.pricing.addons.deliverables.desc}</p>
-                                </div>
-                            </div>
-                            <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-[#082840]/10 text-[#082840] border border-[#082840]/20 shrink-0">
-                                {t.pricing.addons.deliverables.badge}
-                            </span>
-                        </div>
-                    </div>
                 </div>
             </section>
 
