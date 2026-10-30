@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { 
@@ -16,22 +16,15 @@ import {
     Layers, 
     Globe, 
     Zap,
-    Download,
-    XCircle,
     FileText,
     Users,
     Smartphone,
     PlusCircle,
     Activity,
-    MapPin,
-    Eye,
-    ChevronRight,
-    Play
+    MapPin
 } from 'lucide-react';
 
 export default function LandingPage() {
-    const [activeTab, setActiveTab] = useState<'walk' | 'satellite' | 'export'>('walk');
-
     return (
         <div className="min-h-screen bg-[#040E17] text-[#FAF2CA] flex flex-col selection:bg-[#83DF9C] selection:text-[#0C3C60] font-sans overflow-x-hidden">
             {/* Top Announcement Bar */}
@@ -60,9 +53,9 @@ export default function LandingPage() {
 
                     {/* Nav Links */}
                     <nav className="hidden md:flex items-center gap-7 text-xs font-semibold text-[#FAF2CA]/75">
+                        <a href="#alcance" className="hover:text-[#83DF9C] transition-colors">Alcance Agro</a>
                         <a href="#solucion" className="hover:text-[#83DF9C] transition-colors">Solución</a>
                         <a href="#tecnologia" className="hover:text-[#83DF9C] transition-colors">Tecnología</a>
-                        <a href="#commodities" className="hover:text-[#83DF9C] transition-colors">Cadenas</a>
                         <a href="#planes" className="hover:text-[#83DF9C] transition-colors">Planes & Precios</a>
                     </nav>
 
@@ -136,11 +129,11 @@ export default function LandingPage() {
                                         <ArrowRight className="w-4 h-4 text-[#040E17]" />
                                     </Link>
                                     <a
-                                        href="#planes"
+                                        href="#alcance"
                                         className="w-full sm:w-auto px-6 py-4 rounded-2xl bg-[#040E17]/70 hover:bg-[#040E17] backdrop-blur-md border border-[#FAF2CA]/30 text-xs font-bold text-white transition-all flex items-center justify-center gap-2"
                                     >
-                                        <FileText className="w-4 h-4 text-[#83DF9C]" />
-                                        <span>Estructura de Planes</span>
+                                        <Layers className="w-4 h-4 text-[#83DF9C]" />
+                                        <span>Explorar Alcance Agro</span>
                                     </a>
                                 </div>
                                 <div className="mt-3 text-[11px] text-[#FAF2CA]/60 flex items-center gap-2">
@@ -217,8 +210,283 @@ export default function LandingPage() {
                 </div>
             </section>
 
-            {/* SECCIÓN INTERACTIVA FOTOGRÁFICA "SOLUCIONES A MEDIDA" (ESTILO AGROCORE) */}
-            <section id="solucion" className="relative z-10 py-16 sm:py-24 px-4">
+            {/* ========================================================================= */}
+            {/* SECCIÓN NUEVA: ALCANCE POR CATEGORÍA CON TRAZO EN SCROLL TIPO MAPA GPS    */}
+            {/* ========================================================================= */}
+            <section id="alcance" className="relative z-10 py-20 sm:py-28 px-4 bg-gradient-to-b from-[#040E17] via-[#061826] to-[#040E17]">
+                <div className="max-w-6xl mx-auto">
+                    {/* Header de Sección */}
+                    <div className="text-center max-w-3xl mx-auto mb-16 sm:mb-20">
+                        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#83DF9C]/10 text-[#83DF9C] text-xs font-bold uppercase tracking-wider mb-4 border border-[#83DF9C]/25 shadow">
+                            <Compass className="w-4 h-4 text-[#83DF9C]" />
+                            <span>Alcance Agrícola & Cadenas Productivas</span>
+                        </div>
+                        <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight">
+                            ¿Hasta Dónde Llega el Sistema? <br />
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#83DF9C] via-[#FAF2CA] to-[#83DF9C]">
+                                Delimitación Precisa para Cada Sector
+                            </span>
+                        </h2>
+                        <p className="mt-4 text-xs sm:text-sm md:text-base text-[#FAF2CA]/70 leading-relaxed">
+                            Sigue el recorrido perimetral de nuestra línea satelital. Cada vértice numerado representa una de las cadenas reguladas que hoy protegemos para el mercado internacional.
+                        </p>
+                    </div>
+
+                    {/* Timeline Container con el Trazo Vectorial */}
+                    <div className="relative">
+                        {/* Línea Central Troncal para Desktop */}
+                        <div className="hidden lg:block absolute left-1/2 top-10 bottom-24 -translate-x-1/2 w-1 border-l-2 border-dashed border-[#83DF9C]/40 z-0 pointer-events-none" />
+
+                        <div className="space-y-16 sm:space-y-24">
+                            
+                            {/* ITEM 1: CAFÉ (Izquierda a Derecha) */}
+                            <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                                {/* Nodo GPS Flotante */}
+                                <div className="hidden lg:flex absolute left-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-[#040E17] border-4 border-[#83DF9C] items-center justify-center text-sm font-black text-[#83DF9C] shadow-lg shadow-[#83DF9C]/30 z-20">
+                                    11
+                                </div>
+
+                                {/* Imagen Izquierda */}
+                                <div className="lg:col-span-6">
+                                    <div className="relative rounded-3xl overflow-hidden border-2 border-[#0C3C60] hover:border-[#83DF9C]/50 transition-all shadow-2xl group h-72 sm:h-80">
+                                        <Image
+                                            src="/images/coffee-plantation.jpg"
+                                            alt="Plantación de café de alta montaña"
+                                            fill
+                                            className="object-cover group-hover:scale-105 transition-transform duration-700"
+                                        />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-[#040E17] via-[#040E17]/30 to-transparent" />
+                                        <div className="absolute top-4 left-4 flex items-center gap-2">
+                                            <span className="w-8 h-8 rounded-full bg-[#83DF9C] text-[#040E17] font-black text-xs flex items-center justify-center shadow">
+                                                11
+                                            </span>
+                                            <span className="px-3 py-1 rounded-full bg-[#040E17]/80 backdrop-blur-md text-xs font-bold text-white border border-[#83DF9C]/30">
+                                                Café de Exportación
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Texto Derecha */}
+                                <div className="lg:col-span-6 lg:pl-10">
+                                    <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#83DF9C] mb-2">
+                                        <Coffee className="w-4 h-4" /> Sector Cafetero
+                                    </div>
+                                    <h3 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+                                        Plantaciones de Café
+                                    </h3>
+                                    <p className="mt-3 text-xs sm:text-sm text-[#FAF2CA]/75 leading-relaxed">
+                                        Delimita microlotes y fincas cafeteras tradicionales o bajo sombra en laderas de alta montaña. Garantiza que cada quintal de café verde o especial exportado a la Unión Europea cuente con su polígono cerrado sin riesgo de deforestación post-2020.
+                                    </p>
+                                    <div className="mt-4 flex flex-wrap gap-2 text-[11px] font-semibold text-[#83DF9C]">
+                                        <span className="px-2.5 py-1 rounded-lg bg-[#0C3C60]/50 border border-[#0C3C60]">Microlotes &gt;4 ha</span>
+                                        <span className="px-2.5 py-1 rounded-lg bg-[#0C3C60]/50 border border-[#0C3C60]">Asociaciones Cafeteras</span>
+                                        <span className="px-2.5 py-1 rounded-lg bg-[#0C3C60]/50 border border-[#0C3C60]">Firma SHA-256</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* ITEM 2: CACAO (Derecha a Izquierda) */}
+                            <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                                {/* Nodo GPS Flotante */}
+                                <div className="hidden lg:flex absolute left-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-[#040E17] border-4 border-[#83DF9C] items-center justify-center text-sm font-black text-[#83DF9C] shadow-lg shadow-[#83DF9C]/30 z-20">
+                                    22
+                                </div>
+
+                                {/* Texto Izquierda (en desktop) */}
+                                <div className="lg:col-span-6 order-2 lg:order-1 lg:pr-10 lg:text-right">
+                                    <div className="flex items-center lg:justify-end gap-2 text-xs font-bold uppercase tracking-wider text-[#83DF9C] mb-2">
+                                        <TreePine className="w-4 h-4" /> Sistemas Agroforestales
+                                    </div>
+                                    <h3 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+                                        Plantaciones de Cacao
+                                    </h3>
+                                    <p className="mt-3 text-xs sm:text-sm text-[#FAF2CA]/75 leading-relaxed">
+                                        Ideal para cacaotales bajo dosel forestal en zonas tropicales húmedas. La app discrimina la cobertura arbórea productiva de la deforestación primaria, blindando a los pequeños cacaocultores ante las exigencias aduaneras de la UE.
+                                    </p>
+                                    <div className="mt-4 flex flex-wrap lg:justify-end gap-2 text-[11px] font-semibold text-[#83DF9C]">
+                                        <span className="px-2.5 py-1 rounded-lg bg-[#0C3C60]/50 border border-[#0C3C60]">Cacao Fino y de Aroma</span>
+                                        <span className="px-2.5 py-1 rounded-lg bg-[#0C3C60]/50 border border-[#0C3C60]">Agroforestería Regenerativa</span>
+                                        <span className="px-2.5 py-1 rounded-lg bg-[#0C3C60]/50 border border-[#0C3C60]">Modo Offline en Selva</span>
+                                    </div>
+                                </div>
+
+                                {/* Imagen Derecha */}
+                                <div className="lg:col-span-6 order-1 lg:order-2">
+                                    <div className="relative rounded-3xl overflow-hidden border-2 border-[#0C3C60] hover:border-[#83DF9C]/50 transition-all shadow-2xl group h-72 sm:h-80">
+                                        <Image
+                                            src="/images/cacao-plantation.jpg"
+                                            alt="Plantación tropical de cacao"
+                                            fill
+                                            className="object-cover group-hover:scale-105 transition-transform duration-700"
+                                        />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-[#040E17] via-[#040E17]/30 to-transparent" />
+                                        <div className="absolute top-4 left-4 flex items-center gap-2">
+                                            <span className="w-8 h-8 rounded-full bg-[#83DF9C] text-[#040E17] font-black text-xs flex items-center justify-center shadow">
+                                                22
+                                            </span>
+                                            <span className="px-3 py-1 rounded-full bg-[#040E17]/80 backdrop-blur-md text-xs font-bold text-white border border-[#83DF9C]/30">
+                                                Cacao & Derivados
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* ITEM 3: PALMA DE ACEITE (Izquierda a Derecha) */}
+                            <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                                {/* Nodo GPS Flotante */}
+                                <div className="hidden lg:flex absolute left-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-[#040E17] border-4 border-[#83DF9C] items-center justify-center text-sm font-black text-[#83DF9C] shadow-lg shadow-[#83DF9C]/30 z-20">
+                                    35
+                                </div>
+
+                                {/* Imagen Izquierda */}
+                                <div className="lg:col-span-6">
+                                    <div className="relative rounded-3xl overflow-hidden border-2 border-[#0C3C60] hover:border-[#83DF9C]/50 transition-all shadow-2xl group h-72 sm:h-80">
+                                        <Image
+                                            src="/images/palm-plantation.jpg"
+                                            alt="Cultivo ordenado de palma aceitera"
+                                            fill
+                                            className="object-cover group-hover:scale-105 transition-transform duration-700"
+                                        />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-[#040E17] via-[#040E17]/30 to-transparent" />
+                                        <div className="absolute top-4 left-4 flex items-center gap-2">
+                                            <span className="w-8 h-8 rounded-full bg-[#83DF9C] text-[#040E17] font-black text-xs flex items-center justify-center shadow">
+                                                35
+                                            </span>
+                                            <span className="px-3 py-1 rounded-full bg-[#040E17]/80 backdrop-blur-md text-xs font-bold text-white border border-[#83DF9C]/30">
+                                                Palma de Aceite
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Texto Derecha */}
+                                <div className="lg:col-span-6 lg:pl-10">
+                                    <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#83DF9C] mb-2">
+                                        <Sparkles className="w-4 h-4" /> Grandes Extensiones
+                                    </div>
+                                    <h3 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+                                        Plantaciones de Palma
+                                    </h3>
+                                    <p className="mt-3 text-xs sm:text-sm text-[#FAF2CA]/75 leading-relaxed">
+                                        Monitoreo perimetral y topológico de macro-parcelas palmicultoras. Aplica a partir de la 6ta hectárea con tarifa escalable de $3 USD/ha, certificando que los racimos de fruta fresca provienen de áreas establecidas legalmente antes de 2020.
+                                    </p>
+                                    <div className="mt-4 flex flex-wrap gap-2 text-[11px] font-semibold text-[#83DF9C]">
+                                        <span className="px-2.5 py-1 rounded-lg bg-[#0C3C60]/50 border border-[#0C3C60]">Escalabilidad &gt;100 ha</span>
+                                        <span className="px-2.5 py-1 rounded-lg bg-[#0C3C60]/50 border border-[#0C3C60]">Línea Base Satelital</span>
+                                        <span className="px-2.5 py-1 rounded-lg bg-[#0C3C60]/50 border border-[#0C3C60]">Trazabilidad Almazaras</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* ITEM 4: GANADERÍA BOVINA (Derecha a Izquierda) */}
+                            <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                                {/* Nodo GPS Flotante */}
+                                <div className="hidden lg:flex absolute left-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-[#040E17] border-4 border-[#83DF9C] items-center justify-center text-sm font-black text-[#83DF9C] shadow-lg shadow-[#83DF9C]/30 z-20">
+                                    48
+                                </div>
+
+                                {/* Texto Izquierda */}
+                                <div className="lg:col-span-6 order-2 lg:order-1 lg:pr-10 lg:text-right">
+                                    <div className="flex items-center lg:justify-end gap-2 text-xs font-bold uppercase tracking-wider text-[#83DF9C] mb-2">
+                                        <ShieldCheck className="w-4 h-4" /> Ganadería Sostenible
+                                    </div>
+                                    <h3 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+                                        Ganadería Bovina & Cueros
+                                    </h3>
+                                    <p className="mt-3 text-xs sm:text-sm text-[#FAF2CA]/75 leading-relaxed">
+                                        Georreferenciación de potreros y rotación silvopastoril. Demuestra de manera fehaciente que los hatos ganaderos pastorean en predios consolidados libres de deforestación para exportación de carne fresca y cueros a curtiembres europeas.
+                                    </p>
+                                    <div className="mt-4 flex flex-wrap lg:justify-end gap-2 text-[11px] font-semibold text-[#83DF9C]">
+                                        <span className="px-2.5 py-1 rounded-lg bg-[#0C3C60]/50 border border-[#0C3C60]">Carne & Cueros EUDR</span>
+                                        <span className="px-2.5 py-1 rounded-lg bg-[#0C3C60]/50 border border-[#0C3C60]">Predios Silvopastoriles</span>
+                                        <span className="px-2.5 py-1 rounded-lg bg-[#0C3C60]/50 border border-[#0C3C60]">Perímetros Cerrados</span>
+                                    </div>
+                                </div>
+
+                                {/* Imagen Derecha */}
+                                <div className="lg:col-span-6 order-1 lg:order-2">
+                                    <div className="relative rounded-3xl overflow-hidden border-2 border-[#0C3C60] hover:border-[#83DF9C]/50 transition-all shadow-2xl group h-72 sm:h-80">
+                                        <Image
+                                            src="/images/cattle-ranching.jpg"
+                                            alt="Ganadería regenerativa en pasturas sostenibles"
+                                            fill
+                                            className="object-cover group-hover:scale-105 transition-transform duration-700"
+                                        />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-[#040E17] via-[#040E17]/30 to-transparent" />
+                                        <div className="absolute top-4 left-4 flex items-center gap-2">
+                                            <span className="w-8 h-8 rounded-full bg-[#83DF9C] text-[#040E17] font-black text-xs flex items-center justify-center shadow">
+                                                48
+                                            </span>
+                                            <span className="px-3 py-1 rounded-full bg-[#040E17]/80 backdrop-blur-md text-xs font-bold text-white border border-[#83DF9C]/30">
+                                                Bovinos & Pastoreo
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* ITEM 5: EL GRAN CIERRE DE LA CAMINATA (CENTRAL CON EL PERSONAJE CAMINANDO) */}
+                            <div className="relative pt-8">
+                                {/* Nodo GPS de Cierre */}
+                                <div className="hidden lg:flex absolute left-1/2 -translate-x-1/2 -top-2 w-14 h-14 rounded-full bg-[#83DF9C] border-4 border-[#040E17] items-center justify-center text-base font-black text-[#040E17] shadow-xl shadow-[#83DF9C]/40 z-20">
+                                    58
+                                </div>
+
+                                {/* Card Gigante de Cierre con el Agrónomo Caminando */}
+                                <div className="relative rounded-3xl sm:rounded-[36px] overflow-hidden border-2 border-[#83DF9C]/60 shadow-2xl bg-[#082840]/90">
+                                    <div className="relative h-[480px] sm:h-[520px] w-full">
+                                        <Image
+                                            src="/images/agronomist-walking.jpg"
+                                            alt="Agrónomo caminando el perímetro de un lote agrícola al amanecer"
+                                            fill
+                                            className="object-cover object-center filter brightness-[0.72] contrast-[1.1]"
+                                        />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-[#040E17] via-[#040E17]/50 to-transparent" />
+                                        
+                                        {/* Contenido Superpuesto */}
+                                        <div className="absolute inset-0 p-6 sm:p-12 md:p-16 flex flex-col justify-end text-center items-center">
+                                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#83DF9C] text-[#040E17] text-xs font-black uppercase tracking-wider mb-4 shadow-lg">
+                                                <span>Punto de Geocierre #58 • Polígono Verificado</span>
+                                            </div>
+
+                                            <h3 className="text-2xl sm:text-4xl md:text-5xl font-black text-white tracking-tight leading-tight max-w-3xl">
+                                                ¿En qué rama del agro necesitas georreferenciar para ingresar a Europa?
+                                            </h3>
+
+                                            <p className="mt-4 text-xs sm:text-sm md:text-base text-[#FAF2CA]/90 font-medium max-w-2xl leading-relaxed">
+                                                No importa tu cultivo ni el tamaño de tu predio. Si produces café, cacao, palma, caucho, madera o ganado, AxisTrace es el pasaporte digital que garantiza que tu cosecha cruce las aduanas europeas sin tropiezos.
+                                            </p>
+
+                                            <div className="mt-8 flex flex-col sm:flex-row items-center gap-4">
+                                                <Link
+                                                    href="/terminal"
+                                                    className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-[#83DF9C] hover:bg-[#9cf0b3] text-[#040E17] font-black text-sm shadow-xl shadow-[#83DF9C]/30 hover:scale-105 transition-all flex items-center justify-center gap-2"
+                                                >
+                                                    <Compass className="w-5 h-5 text-[#040E17]" />
+                                                    <span>Iniciar Caminata en Terreno Ahora</span>
+                                                    <ArrowRight className="w-4 h-4 text-[#040E17]" />
+                                                </Link>
+                                                <a
+                                                    href="#planes"
+                                                    className="w-full sm:w-auto px-6 py-4 rounded-2xl bg-[#040E17]/80 hover:bg-[#040E17] border border-[#83DF9C]/40 text-xs font-bold text-white transition-all flex items-center justify-center"
+                                                >
+                                                    Ver Tarifas por Lote
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* SECCIÓN INTERACTIVA FOTOGRÁFICA "SOLUCIONES A MEDIDA" */}
+            <section id="solucion" className="relative z-10 py-16 sm:py-24 px-4 border-t border-[#0C3C60]/40">
                 <div className="max-w-6xl mx-auto">
                     {/* Section Header */}
                     <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
@@ -622,42 +890,6 @@ export default function LandingPage() {
                                 Incluido
                             </span>
                         </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* COMMODITIES VISUALES */}
-            <section id="commodities" className="relative z-10 py-12 px-4 bg-[#082840]/20 border-t border-[#0C3C60]/50">
-                <div className="max-w-5xl mx-auto text-center">
-                    <h2 className="text-lg sm:text-xl font-bold text-white mb-2">
-                        Las 7 Cadenas Reguladas por el EUDR
-                    </h2>
-                    <p className="text-xs text-[#FAF2CA]/60 mb-6">
-                        Formatos y metadatos adaptados a los estándares de importación europea.
-                    </p>
-
-                    <div className="flex flex-wrap justify-center gap-2.5 max-w-3xl mx-auto">
-                        <span className="px-3.5 py-2 rounded-xl bg-[#0C3C60]/40 border border-[#0C3C60] hover:border-[#83DF9C]/40 text-xs font-semibold text-white flex items-center gap-2 transition-all">
-                            <Coffee className="w-4 h-4 text-[#83DF9C]" /> Café
-                        </span>
-                        <span className="px-3.5 py-2 rounded-xl bg-[#0C3C60]/40 border border-[#0C3C60] hover:border-[#83DF9C]/40 text-xs font-semibold text-white flex items-center gap-2 transition-all">
-                            <TreePine className="w-4 h-4 text-[#83DF9C]" /> Cacao
-                        </span>
-                        <span className="px-3.5 py-2 rounded-xl bg-[#0C3C60]/40 border border-[#0C3C60] hover:border-[#83DF9C]/40 text-xs font-semibold text-white flex items-center gap-2 transition-all">
-                            <Sparkles className="w-4 h-4 text-[#83DF9C]" /> Palma Aceitera
-                        </span>
-                        <span className="px-3.5 py-2 rounded-xl bg-[#0C3C60]/40 border border-[#0C3C60] hover:border-[#83DF9C]/40 text-xs font-semibold text-white flex items-center gap-2 transition-all">
-                            <Layers className="w-4 h-4 text-[#83DF9C]" /> Caucho
-                        </span>
-                        <span className="px-3.5 py-2 rounded-xl bg-[#0C3C60]/40 border border-[#0C3C60] hover:border-[#83DF9C]/40 text-xs font-semibold text-white flex items-center gap-2 transition-all">
-                            <TreePine className="w-4 h-4 text-[#83DF9C]" /> Madera
-                        </span>
-                        <span className="px-3.5 py-2 rounded-xl bg-[#0C3C60]/40 border border-[#0C3C60] hover:border-[#83DF9C]/40 text-xs font-semibold text-white flex items-center gap-2 transition-all">
-                            <Globe className="w-4 h-4 text-[#83DF9C]" /> Soja
-                        </span>
-                        <span className="px-3.5 py-2 rounded-xl bg-[#0C3C60]/40 border border-[#0C3C60] hover:border-[#83DF9C]/40 text-xs font-semibold text-white flex items-center gap-2 transition-all">
-                            <ShieldCheck className="w-4 h-4 text-[#83DF9C]" /> Ganado Bovino
-                        </span>
                     </div>
                 </div>
             </section>
