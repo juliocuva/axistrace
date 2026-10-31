@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import dynamic from 'next/dynamic';
 import {
     Play,
@@ -24,7 +25,8 @@ import {
     X,
     Unlock,
     Smartphone,
-    Leaf
+    Leaf,
+    ArrowRight
 } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import { validateDeforestationWithGFW } from '../actions/eudr';
@@ -39,6 +41,9 @@ interface EUDRGeoreferenceProps {
     lotId?: string;
     initialCommodity?: CommodityType;
 }
+
+// Auto-capture interval for field walking (RFC 7946 perimeter pacing)
+const AUTO_CAPTURE_INTERVAL_SECONDS = 30;
 
 // Haversine distance in meters
 function haversineDistanceMeters(coord1: [number, number], coord2: [number, number]): number {
@@ -145,6 +150,11 @@ export default function EUDRGeoreference({
 }: EUDRGeoreferenceProps) {
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [commodity, setCommodity] = useState<CommodityType>(initialCommodity);
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
 
     // GPS & Capture State
     const [gpsPoints, setGpsPoints] = useState<[number, number][]>([]); // [lng, lat][] standard RFC 7946
@@ -154,7 +164,7 @@ export default function EUDRGeoreference({
     const [altitudeMeters, setAltitudeMeters] = useState<number | null>(null);
     const [distanceToStart, setDistanceToStart] = useState<number | null>(null);
     const [autoClosedNotice, setAutoClosedNotice] = useState<boolean>(false);
-    const [countdownSeconds, setCountdownSeconds] = useState<number>(10);
+    const [countdownSeconds, setCountdownSeconds] = useState<number>(AUTO_CAPTURE_INTERVAL_SECONDS);
     const [immutableHash, setImmutableHash] = useState<string | null>(null);
 
     // Pocket Mode & Wake Lock State
@@ -178,10 +188,21 @@ export default function EUDRGeoreference({
     const [lossHa, setLossHa] = useState<number>(0);
     const [copiedCoords, setCopiedCoords] = useState(false);
 
+    // Track if user is currently stationary (< 3.5m from last recorded vertex)
+    const isStationary = useMemo(() => {
+        if (!currentPosition || gpsPoints.length === 0) return false;
+        const last = gpsPoints[gpsPoints.length - 1];
+        const dist = haversineDistanceMeters(currentPosition, [last[1], last[0]]);
+        return dist < 3.5;
+    }, [currentPosition, gpsPoints]);
+
     // Automatic Screenshot Capture State
     const [isCapturingScreenshot, setIsCapturingScreenshot] = useState<boolean>(false);
     const [capturedScreenshot, setCapturedScreenshot] = useState<string | null>(null);
     const [showScreenshotModal, setShowScreenshotModal] = useState<boolean>(false);
+    const [showCancelModal, setShowCancelModal] = useState<boolean>(false);
+    const [showDirectionArrow, setShowDirectionArrow] = useState<boolean>(false);
+    const arrowTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const [sealedTimestamp, setSealedTimestamp] = useState<string | null>(null);
 
     const currentTimestampDisplay = useMemo(() => {
@@ -212,7 +233,7 @@ export default function EUDRGeoreference({
     const altitudeMetersRef = useRef<number | null>(null);
     const maxDistanceAwayRef = useRef<number>(0);
     const isCapturingRef = useRef<boolean>(false);
-    const countdownRef = useRef<number>(10);
+    const countdownRef = useRef<number>(AUTO_CAPTURE_INTERVAL_SECONDS);
     const handleFinishMappingRef = useRef<(isAutoClosed?: boolean) => void | Promise<void>>(() => {});
     const handleAutoCaptureStepRef = useRef<() => void>(() => {});
     const processGpsUpdateRef = useRef<(lat: number, lng: number, acc: number, alt?: number | null) => void>(() => {});
@@ -508,8 +529,8 @@ export default function EUDRGeoreference({
             isCapturingRef.current = false;
             releaseWakeLock();
             setIsPocketMode(false);
-            countdownRef.current = 10;
-            setCountdownSeconds(10);
+            countdownRef.current = AUTO_CAPTURE_INTERVAL_SECONDS;
+            setCountdownSeconds(AUTO_CAPTURE_INTERVAL_SECONDS);
 
             if (isAutoClosed) {
                 setAutoClosedNotice(true);
@@ -576,7 +597,8 @@ export default function EUDRGeoreference({
         if (currentPoints.length > 0) {
             const last = currentPoints[currentPoints.length - 1];
             const distFromLast = haversineDistanceMeters([currentLat, currentLng], [last[1], last[0]]);
-            if (distFromLast < 0.8) {
+            // Must have walked at least 3.5m away from previous vertex (prevents bogus points while standing still)
+            if (distFromLast < 3.5) {
                 return;
             }
         }
@@ -629,12 +651,13 @@ export default function EUDRGeoreference({
                 if (gpsPointsRef.current.length === 0) {
                     setGpsPoints([[longitude, latitude]]);
                     gpsPointsRef.current = [[longitude, latitude]];
-                    countdownRef.current = 10;
-                    setCountdownSeconds(10);
+                    countdownRef.current = AUTO_CAPTURE_INTERVAL_SECONDS;
+                    setCountdownSeconds(AUTO_CAPTURE_INTERVAL_SECONDS);
                     if (typeof window !== 'undefined' && navigator.vibrate) {
                         navigator.vibrate([100, 50, 100]);
                     }
-                    speakVoiceGuidance('Punto inicial registrado. Camina por el lindero.');
+                    speakVoiceGuidance('Caminata en curso, dirígete a la derecha.');
+                    triggerRightArrowBlink();
                 } else if (gpsPointsRef.current.length >= 3) {
                     checkProximityAndAutoClose(latitude, longitude);
                 }
@@ -661,8 +684,9 @@ export default function EUDRGeoreference({
         maxDistanceAwayRef.current = 0;
         setDistanceToStart(null);
         setGfwStatus('idle');
-        countdownRef.current = 10;
-        setCountdownSeconds(10);
+        countdownRef.current = AUTO_CAPTURE_INTERVAL_SECONDS;
+        setCountdownSeconds(AUTO_CAPTURE_INTERVAL_SECONDS);
+        triggerRightArrowBlink();
 
         if (currentPositionRef.current && gpsPointsRef.current.length === 0) {
             const [lat, lng] = currentPositionRef.current;
@@ -671,9 +695,9 @@ export default function EUDRGeoreference({
             if (typeof window !== 'undefined' && navigator.vibrate) {
                 navigator.vibrate([100, 50, 100]);
             }
-            speakVoiceGuidance('Punto inicial registrado. Inicia tu caminata.');
+            speakVoiceGuidance('Caminata en curso, dirígete a la derecha.');
         } else {
-            speakVoiceGuidance('Caminata automática iniciada. Esperando señal GPS.');
+            speakVoiceGuidance('Caminata en curso, dirígete a la derecha.');
         }
 
         if (typeof DeviceMotionEvent !== 'undefined' && (DeviceMotionEvent as any).requestPermission) {
@@ -697,32 +721,48 @@ export default function EUDRGeoreference({
         isCapturingRef.current = false;
         releaseWakeLock();
         setIsPocketMode(false);
-        countdownRef.current = 10;
-        setCountdownSeconds(10);
+        countdownRef.current = AUTO_CAPTURE_INTERVAL_SECONDS;
+        setCountdownSeconds(AUTO_CAPTURE_INTERVAL_SECONDS);
     };
 
-    // Auto-capture countdown loop: runs every 1000ms countdown for 10-second intervals
+    // Auto-capture countdown loop: runs every 1000ms countdown for 30-second intervals
     useEffect(() => {
         if (!isCapturing) {
             if (captureIntervalId.current) {
                 clearInterval(captureIntervalId.current);
                 captureIntervalId.current = null;
             }
-            countdownRef.current = 10;
-            setCountdownSeconds(10);
+            countdownRef.current = AUTO_CAPTURE_INTERVAL_SECONDS;
+            setCountdownSeconds(AUTO_CAPTURE_INTERVAL_SECONDS);
             return;
         }
 
-        countdownRef.current = 10;
-        setCountdownSeconds(10);
+        countdownRef.current = AUTO_CAPTURE_INTERVAL_SECONDS;
+        setCountdownSeconds(AUTO_CAPTURE_INTERVAL_SECONDS);
 
         captureIntervalId.current = setInterval(() => {
             if (gpsPointsRef.current.length === 0) return;
 
+            // When stationary (< 3.5m from last recorded point), hold countdown and do not capture points
+            const currentPos = currentPositionRef.current;
+            const points = gpsPointsRef.current;
+            if (currentPos && points.length > 0) {
+                const lastPoint = points[points.length - 1];
+                const distFromLast = haversineDistanceMeters(
+                    [currentPos[0], currentPos[1]],
+                    [lastPoint[1], lastPoint[0]]
+                );
+                if (distFromLast < 3.5) {
+                    countdownRef.current = AUTO_CAPTURE_INTERVAL_SECONDS;
+                    setCountdownSeconds(AUTO_CAPTURE_INTERVAL_SECONDS);
+                    return;
+                }
+            }
+
             countdownRef.current -= 1;
             if (countdownRef.current <= 0) {
-                countdownRef.current = 10;
-                setCountdownSeconds(10);
+                countdownRef.current = AUTO_CAPTURE_INTERVAL_SECONDS;
+                setCountdownSeconds(AUTO_CAPTURE_INTERVAL_SECONDS);
                 handleAutoCaptureStepRef.current();
             } else {
                 setCountdownSeconds(countdownRef.current);
@@ -763,8 +803,25 @@ export default function EUDRGeoreference({
         setGpsPoints(prev => prev.slice(0, -1));
     };
 
+    // Trigger 3-blink right directional arrow
+    const triggerRightArrowBlink = () => {
+        if (arrowTimeoutRef.current) {
+            clearTimeout(arrowTimeoutRef.current);
+        }
+        setShowDirectionArrow(true);
+        arrowTimeoutRef.current = setTimeout(() => {
+            setShowDirectionArrow(false);
+            arrowTimeoutRef.current = null;
+        }, 2800);
+    };
+
     // Reset mapping
     const handleClear = () => {
+        if (arrowTimeoutRef.current) {
+            clearTimeout(arrowTimeoutRef.current);
+            arrowTimeoutRef.current = null;
+        }
+        setShowDirectionArrow(false);
         stopTracking();
         setGpsPoints([]);
         gpsPointsRef.current = [];
@@ -776,6 +833,20 @@ export default function EUDRGeoreference({
         setGfwStatus('idle');
         setLossHa(0);
         if (onPolygonChange) onPolygonChange('');
+    };
+
+    // Cancel active walk
+    const handleCancelWalk = () => {
+        if (gpsPoints.length > 0) {
+            setShowCancelModal(true);
+        } else {
+            handleClear();
+        }
+    };
+
+    const confirmCancelWalk = () => {
+        setShowCancelModal(false);
+        handleClear();
     };
 
     // File Upload Handler (KML, GeoJSON)
@@ -1031,6 +1102,7 @@ export default function EUDRGeoreference({
                         markers={markersCoords}
                         currentLocation={currentPosition}
                         recenterKey={recenterKey}
+                        isCompleted={isCompleted}
                     />
 
                     {/* Top Overlay: Live Coordinates & Elevation */}
@@ -1128,6 +1200,25 @@ export default function EUDRGeoreference({
                                         ? `Caminando perímetro...`
                                         : 'Se cerrará solo al volver'}
                                 </p>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Visual 3-Blink Right Arrow Directional Overlay */}
+                    {showDirectionArrow && (
+                        <div className="absolute inset-0 z-30 pointer-events-none flex items-center justify-center p-4">
+                            <div className="animate-blink-3 flex flex-col items-center gap-3 p-6 sm:p-8 rounded-3xl bg-[#082840]/90 backdrop-blur-md border-2 border-[#83DF9C] shadow-[0_0_60px_rgba(131,223,156,0.6)]">
+                                <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full bg-[#83DF9C]/20 border-2 border-[#83DF9C] flex items-center justify-center text-[#83DF9C] shadow-[0_0_30px_rgba(131,223,156,0.4)]">
+                                    <ArrowRight className="w-16 h-16 sm:w-20 sm:h-20 stroke-[3.5] text-[#83DF9C]" />
+                                </div>
+                                <div className="text-center">
+                                    <span className="block text-lg sm:text-2xl font-black uppercase text-[#83DF9C] tracking-wider drop-shadow-md">
+                                        Dirígete a la derecha ➔
+                                    </span>
+                                    <span className="block text-xs font-bold text-[#FAF2CA] uppercase tracking-wider mt-1">
+                                        Inicia la caminata por el lindero
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     )}
@@ -1303,57 +1394,6 @@ export default function EUDRGeoreference({
                         {!isCapturing ? (
                             /* MOMENTO 1: INICIO LIMPIO (ANTES DE CAMINAR) */
                             <div className="space-y-3 p-1">
-                                {/* Commodity Multi-crop Chips Selector */}
-                                <div>
-                                    <span className="text-[10px] font-black uppercase tracking-wider text-white/60 block mb-1.5">
-                                        Selecciona el Cultivo a Mapear:
-                                    </span>
-                                    <div className="flex flex-wrap gap-1.5">
-                                        {COMMODITIES.map(c => (
-                                            <button
-                                                key={c.id}
-                                                onClick={() => setCommodity(c.id)}
-                                                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-                                                    commodity === c.id
-                                                        ? 'bg-[#83DF9C] text-[#0C3C60] shadow-md scale-102 font-black'
-                                                        : 'bg-white/5 hover:bg-white/10 text-white/80 border border-white/10'
-                                                }`}
-                                            >
-                                                <span>{c.icon}</span>
-                                                <span>{c.name}</span>
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                {/* Simple Lot Name & GPS Bar */}
-                                <div className="flex flex-wrap items-center justify-between gap-2 bg-white/5 p-2.5 rounded-2xl border border-white/10">
-                                    <div className="flex items-center gap-2 bg-[#0C3C60] px-3 py-1.5 rounded-xl border border-white/15 shadow-xs flex-1 min-w-[180px]">
-                                        <span className="text-[10px] font-black uppercase text-[#83DF9C] shrink-0">Lote:</span>
-                                        <input
-                                            type="text"
-                                            value={customLotName}
-                                            onChange={e => setCustomLotName(e.target.value)}
-                                            placeholder="Ej: LOTE-01 / La Esperanza"
-                                            className="w-full text-xs font-bold text-[#FAF2CA] outline-none bg-transparent placeholder-white/30"
-                                        />
-                                    </div>
-                                    <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-[#0C3C60] border border-white/15 text-[10px] font-bold text-white">
-                                        <span
-                                            className={`w-2 h-2 rounded-full ${
-                                                !gpsAccuracy
-                                                    ? 'bg-amber-400 animate-pulse'
-                                                    : gpsAccuracy < 10
-                                                    ? 'bg-[#83DF9C] animate-pulse'
-                                                    : 'bg-yellow-400'
-                                            }`}
-                                        />
-                                        <span>
-                                            {!gpsAccuracy ? 'Buscando GPS...' : `GPS Listo (±${gpsAccuracy.toFixed(0)}m)`}
-                                        </span>
-                                    </div>
-                                </div>
-
                                 {/* BIG GREEN START BUTTON */}
                                 <button
                                     onClick={startTracking}
@@ -1371,29 +1411,6 @@ export default function EUDRGeoreference({
                                         </span>
                                     </div>
                                 </button>
-
-                                {/* Discreet secondary actions */}
-                                <div className="flex items-center justify-between text-[11px] text-white/60 px-1 pt-0.5">
-                                    <button
-                                        onClick={() => fileInputRef.current?.click()}
-                                        className="hover:text-[#83DF9C] underline font-bold cursor-pointer"
-                                    >
-                                        📁 Cargar archivo KML o GeoJSON
-                                    </button>
-                                    <input
-                                        type="file"
-                                        ref={fileInputRef}
-                                        onChange={handleFileUpload}
-                                        accept=".json,.geojson,.kml"
-                                        className="hidden"
-                                    />
-                                    <button
-                                        onClick={loadSampleLot}
-                                        className="hover:text-[#83DF9C] underline font-bold cursor-pointer"
-                                    >
-                                        Ver lote de prueba
-                                    </button>
-                                </div>
                             </div>
                         ) : (
                             /* MOMENTO 2: ACTIVELY WALKING */
@@ -1401,15 +1418,21 @@ export default function EUDRGeoreference({
                                 <div className="bg-[#0C3C60] p-2.5 rounded-xl border border-white/15 flex items-center justify-between text-xs">
                                     <div className="flex items-center gap-2.5">
                                         <div className="w-7 h-7 rounded-full bg-[#83DF9C] text-[#0C3C60] flex items-center justify-center font-mono font-black text-xs shadow-sm shrink-0">
-                                            {gpsPoints.length === 0 ? '···' : countdownSeconds}
+                                            {gpsPoints.length === 0 ? '···' : isStationary ? '⏸' : countdownSeconds}
                                         </div>
                                         <div>
                                             <span className="font-black text-[#FAF2CA] uppercase text-[11px] block leading-tight">
-                                                {gpsPoints.length === 0 ? 'Fijando señal GPS...' : 'Caminata en Curso'}
+                                                {gpsPoints.length === 0
+                                                    ? 'Fijando señal GPS...'
+                                                    : isStationary
+                                                    ? 'En espera de avance'
+                                                    : 'Caminata en Curso'}
                                             </span>
                                             <span className="text-[10px] text-white/70 font-semibold block leading-tight mt-0.5">
                                                 {gpsPoints.length === 0
                                                     ? 'Punto 1 se marcará al capturar coordenadas'
+                                                    : isStationary
+                                                    ? 'Dirígete a la derecha para marcar el siguiente punto'
                                                     : `Próximo punto en ${countdownSeconds}s • Se cierra solo al volver`}
                                             </span>
                                         </div>
@@ -1461,9 +1484,18 @@ export default function EUDRGeoreference({
 
                                     <button
                                         onClick={stopTracking}
-                                        className="px-3 py-3.5 bg-white/5 hover:bg-white/10 active:scale-98 text-white/80 rounded-xl font-bold uppercase text-[10px] sm:text-[11px] transition-all cursor-pointer min-h-[48px]"
+                                        className="px-2.5 sm:px-3 py-3.5 bg-white/5 hover:bg-white/10 active:scale-98 text-white/80 rounded-xl font-bold uppercase text-[10px] sm:text-[11px] transition-all cursor-pointer min-h-[48px]"
                                     >
                                         Pausar
+                                    </button>
+
+                                    <button
+                                        onClick={handleCancelWalk}
+                                        className="px-2.5 sm:px-3 py-3.5 bg-red-500/20 hover:bg-red-500/30 active:scale-98 text-red-200 border border-red-500/30 rounded-xl font-bold uppercase text-[10px] sm:text-[11px] transition-all cursor-pointer min-h-[48px] flex items-center gap-1"
+                                        title="Cancelar caminata y descartar puntos"
+                                    >
+                                        <X className="w-3.5 h-3.5 text-red-400" />
+                                        <span>Cancelar</span>
                                     </button>
                                 </div>
                             </div>
@@ -1532,9 +1564,53 @@ export default function EUDRGeoreference({
                 )}
             </div>
 
+            {/* BEAUTIFUL NATIVE CANCEL CONFIRMATION MODAL */}
+            {showCancelModal && isMounted && createPortal(
+                <div className="fixed inset-0 z-[99999] bg-black/80 backdrop-blur-md p-4 flex items-center justify-center animate-in fade-in">
+                    <div className="bg-[#082840] rounded-3xl max-w-sm w-full border border-red-500/40 shadow-[0_0_50px_rgba(0,0,0,0.8)] overflow-hidden flex flex-col text-white animate-in zoom-in-95">
+                        <div className="p-5 sm:p-6 text-center space-y-4">
+                            <div className="w-14 h-14 rounded-2xl bg-red-500/15 border border-red-500/30 flex items-center justify-center text-red-400 mx-auto shadow-inner">
+                                <AlertTriangle className="w-7 h-7" />
+                            </div>
+
+                            <div>
+                                <h3 className="text-lg font-black text-white tracking-wide">
+                                    ¿Cancelar Caminata?
+                                </h3>
+                                <p className="text-xs text-[#FAF2CA]/75 mt-2 leading-relaxed">
+                                    Se detendrá el rastreo GPS y se descartarán los{' '}
+                                    <span className="font-black text-[#83DF9C]">
+                                        {gpsPoints.length} {gpsPoints.length === 1 ? 'punto registrado' : 'puntos registrados'}
+                                    </span>
+                                    . La terminal volverá a su estado inicial.
+                                </p>
+                            </div>
+
+                            <div className="pt-2 space-y-2">
+                                <button
+                                    onClick={confirmCancelWalk}
+                                    className="w-full bg-red-500 hover:bg-red-600 active:scale-98 text-white py-3.5 px-4 rounded-xl font-black uppercase text-xs tracking-wider transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer"
+                                >
+                                    <X className="w-4 h-4" />
+                                    <span>Sí, Cancelar y Descartar</span>
+                                </button>
+                                <button
+                                    onClick={() => setShowCancelModal(false)}
+                                    className="w-full bg-[#0C3C60] hover:bg-[#164e78] active:scale-98 text-[#FAF2CA] py-3.5 px-4 rounded-xl font-bold uppercase text-xs tracking-wider transition-all border border-white/10 flex items-center justify-center gap-2 cursor-pointer"
+                                >
+                                    <Play className="w-4 h-4 text-[#83DF9C] fill-current" />
+                                    <span>Continuar Caminata</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>,
+                document.body
+            )}
+
             {/* AUTOMATIC SCREENSHOT EVIDENCE MODAL */}
-            {showScreenshotModal && (
-                <div className="fixed inset-0 z-[200] bg-black/85 backdrop-blur-sm p-3 sm:p-6 flex items-center justify-center animate-in fade-in">
+            {showScreenshotModal && isMounted && createPortal(
+                <div className="fixed inset-0 z-[99999] bg-black/85 backdrop-blur-md p-3 sm:p-6 flex items-center justify-center animate-in fade-in">
                     <div className="bg-[#082840] rounded-3xl max-w-lg w-full max-h-[92vh] overflow-y-auto border border-white/20 shadow-2xl flex flex-col justify-between text-white">
                         {/* Modal Header */}
                         <div className="p-4 bg-[#0C3C60] text-white rounded-t-3xl flex justify-between items-center border-b border-white/10">
@@ -1648,12 +1724,13 @@ export default function EUDRGeoreference({
                             </button>
                         </div>
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
 
             {/* FULL-SCREEN POCKET MODE OVERLAY (MODO BOLSILLO ANTI-ROCES) */}
-            {isPocketMode && isCapturing && (
-                <div className="fixed inset-0 z-[300] bg-[#05131e] text-white flex flex-col justify-between p-6 select-none animate-in fade-in">
+            {isPocketMode && isCapturing && isMounted && createPortal(
+                <div className="fixed inset-0 z-[99999] bg-[#05131e] text-white flex flex-col justify-between p-6 select-none animate-in fade-in">
                     {/* Header */}
                     <div className="flex items-center justify-between border-b border-white/10 pb-4">
                         <div className="flex items-center gap-2.5">
@@ -1750,7 +1827,8 @@ export default function EUDRGeoreference({
                             Guarda el celular en tu bolsillo y camina libremente con ambas manos seguras.
                         </p>
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
         </div>
     );

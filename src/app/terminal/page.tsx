@@ -3,7 +3,7 @@
 import React, { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import EUDRGeoreference, { CommodityType } from '@/components/EUDRGeoreference';
-import { ShieldCheck, Compass, Satellite, Sparkles, ArrowLeft, Globe } from 'lucide-react';
+import { ShieldCheck, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -91,62 +91,6 @@ function AxisTraceApp() {
                     lotId={lotId}
                     initialCommodity={initialCommodity}
                 />
-
-                {/* Compliance & Technical Foundation Section */}
-                <section id="compliance-info" className="mt-10 mb-8 pt-8 border-t border-[#0C3C60]/60">
-                    <div className="flex items-center justify-between mb-6">
-                        <div>
-                            <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                                <ShieldCheck className="w-6 h-6 text-[#83DF9C]" />
-                                Validez Legal & Especificaciones Técnicas EUDR
-                            </h2>
-                            <p className="text-xs text-[#FAF2CA]/70 mt-1">
-                                Alineado 100% con los estándares de TRACES NT y los requisitos de la Comisión Europea
-                            </p>
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="p-4 rounded-xl bg-[#0C3C60]/30 border border-[#0C3C60]/70 flex flex-col">
-                            <div className="w-8 h-8 rounded-lg bg-[#83DF9C]/10 flex items-center justify-center text-[#83DF9C] mb-3">
-                                <Satellite className="w-5 h-5" />
-                            </div>
-                            <h3 className="font-bold text-sm text-white mb-1.5">Estándar IETF RFC 7946</h3>
-                            <p className="text-xs text-[#FAF2CA]/70 leading-relaxed">
-                                Generación nativa de polígonos GeoJSON con orden estricto de coordenadas <code className="text-[#83DF9C] bg-[#082840] px-1 py-0.5 rounded">[longitud, latitud]</code>, anillo lineal cerrado (<code className="text-[#83DF9C]">primer vértice === último vértice</code>) y proyección WGS84 CRS84.
-                            </p>
-                        </div>
-
-                        <div className="p-4 rounded-xl bg-[#0C3C60]/30 border border-[#0C3C60]/70 flex flex-col">
-                            <div className="w-8 h-8 rounded-lg bg-[#83DF9C]/10 flex items-center justify-center text-[#83DF9C] mb-3">
-                                <Sparkles className="w-5 h-5" />
-                            </div>
-                            <h3 className="font-bold text-sm text-white mb-1.5">Sello Criptográfico SHA-256</h3>
-                            <p className="text-xs text-[#FAF2CA]/70 leading-relaxed">
-                                Cada lote sellado produce un hash criptográfico inmutable basado en la secuencia exacta de vértices, marcas temporales (ISO 8601 UTC) y metadatos de recolección en campo, impidiendo alteraciones posteriores.
-                            </p>
-                        </div>
-
-                        <div className="p-4 rounded-xl bg-[#0C3C60]/30 border border-[#0C3C60]/70 flex flex-col">
-                            <div className="w-8 h-8 rounded-lg bg-[#83DF9C]/10 flex items-center justify-center text-[#83DF9C] mb-3">
-                                <Compass className="w-5 h-5" />
-                            </div>
-                            <h3 className="font-bold text-sm text-white mb-1.5">Filtro de Inercia & Paso Humano</h3>
-                            <p className="text-xs text-[#FAF2CA]/70 leading-relaxed">
-                                Detección de velocidad y aceleración por deadband filtering (&lt;1.2m) y rechazo de rebotes GNSS (&gt;35m), asegurando que el polígono represente una caminata perimetral verídica y no un trazado sintético.
-                            </p>
-                        </div>
-                    </div>
-
-                    <div className="mt-4 p-4 rounded-xl bg-[#0C3C60]/20 border border-[#0C3C60]/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
-                        <div className="text-[#FAF2CA]/80">
-                            <span className="font-bold text-[#83DF9C]">Tolerancia Métrica Oficial:</span> La Comisión Europea y TRACES NT operan con resolución satelital Sentinel-2 (10x10 metros por píxel). AxisTrace entrega precisión submétrica a decamétrica de alta fidelidad para debida diligencia.
-                        </div>
-                        <div className="text-right whitespace-nowrap">
-                            <span className="text-[11px] text-[#FAF2CA]/50">RFC 7946 | OGC:1.3:CRS84</span>
-                        </div>
-                    </div>
-                </section>
             </main>
 
             {/* Footer */}
@@ -159,10 +103,16 @@ function AxisTraceApp() {
                         <span>•</span>
                         <span>Todos los derechos reservados</span>
                     </div>
-                    <div className="flex items-center gap-4">
-                        <Link href="/" className="hover:text-[#83DF9C] transition-colors">Volver a la Portada</Link>
-                        <span>•</span>
-                        <span className="text-[#83DF9C] font-semibold">Diseñado para la Primera Milla Agrícola</span>
+                    <div className="flex items-center gap-1.5">
+                        <span className="text-[#FAF2CA]/70">Diseñado por</span>
+                        <a
+                            href="https://mouselab.dev"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[#83DF9C] font-bold hover:underline transition-colors"
+                        >
+                            mouselab.dev
+                        </a>
                     </div>
                 </div>
             </footer>

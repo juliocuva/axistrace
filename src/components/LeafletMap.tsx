@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo } from 'react';
-import { MapContainer, TileLayer, Polygon, Marker, useMap, CircleMarker } from 'react-leaflet';
+import { MapContainer, TileLayer, Polygon, Polyline, Marker, useMap, CircleMarker } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
@@ -15,27 +15,27 @@ if (typeof window !== 'undefined') {
     });
 }
 
-const getVertexIcon = (num: number, isLast: boolean) => {
+const getVertexIcon = (num: number, isLast: boolean, isStartOnly?: boolean) => {
     if (typeof window === 'undefined') return undefined;
     return L.divIcon({
         className: 'custom-vertex-marker',
         html: `<div style="
-            background: ${isLast ? '#FAF2CA' : '#83DF9C'};
+            background: ${isStartOnly ? '#83DF9C' : isLast ? '#FAF2CA' : '#83DF9C'};
             color: #0C3C60;
-            width: 22px;
-            height: 22px;
+            width: ${isStartOnly ? '26px' : '22px'};
+            height: ${isStartOnly ? '26px' : '22px'};
             border-radius: 50%;
             border: 2px solid #ffffff;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 10px;
+            font-size: ${isStartOnly ? '12px' : '10px'};
             font-weight: 900;
             font-family: system-ui, -apple-system, sans-serif;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.6);
+            box-shadow: 0 3px 12px rgba(0,0,0,0.7);
         ">${num}</div>`,
-        iconSize: [22, 22],
-        iconAnchor: [11, 11]
+        iconSize: isStartOnly ? [26, 26] : [22, 22],
+        iconAnchor: isStartOnly ? [13, 13] : [11, 11]
     });
 };
 
@@ -45,6 +45,7 @@ interface LeafletMapProps {
     markers?: [number, number][]; // [lat, lng][]
     currentLocation?: [number, number] | null;
     recenterKey?: number;
+    isCompleted?: boolean;
 }
 
 function MapUpdater({ center, polygonCoords, markers, currentLocation, recenterKey }: LeafletMapProps) {
@@ -99,9 +100,21 @@ function MapUpdater({ center, polygonCoords, markers, currentLocation, recenterK
     return null;
 }
 
-export default function LeafletMap({ center, polygonCoords, markers, currentLocation, recenterKey }: LeafletMapProps) {
+export default function LeafletMap({ center, polygonCoords, markers, currentLocation, recenterKey, isCompleted }: LeafletMapProps) {
     const markerElements = useMemo(() => {
         if (!markers || markers.length === 0) return null;
+
+        // When mapping is completed: show ONLY Point 1 with its circle + clean perimeter line
+        if (isCompleted) {
+            const startPoint = markers[0];
+            const icon = getVertexIcon(1, false, true);
+            if (!icon) return null;
+            return (
+                <Marker key={`vertex-start-${startPoint[0]}-${startPoint[1]}`} position={startPoint} icon={icon} />
+            );
+        }
+
+        // While actively walking: show numbered vertices to guide the walk
         return markers.map((m, i) => {
             const isLast = i === markers.length - 1;
             const icon = getVertexIcon(i + 1, isLast);
@@ -110,7 +123,7 @@ export default function LeafletMap({ center, polygonCoords, markers, currentLoca
                 <Marker key={`vertex-${i}-${m[0]}-${m[1]}`} position={m} icon={icon} />
             );
         });
-    }, [markers]);
+    }, [markers, isCompleted]);
 
     return (
         <MapContainer
@@ -126,19 +139,29 @@ export default function LeafletMap({ center, polygonCoords, markers, currentLoca
                 crossOrigin="anonymous"
             />
 
-            {polygonCoords && polygonCoords.length > 0 && (
+            {polygonCoords && polygonCoords.length > 0 ? (
                 <Polygon
                     positions={polygonCoords}
                     pathOptions={{ 
                         color: '#83DF9C', 
                         fillColor: '#83DF9C', 
                         fillOpacity: 0.22, 
-                        weight: 3.5,
-                        dashArray: '5, 5',
+                        weight: 2,
+                        dashArray: isCompleted ? undefined : '4, 4',
                         lineJoin: 'round'
                     }}
                 />
-            )}
+            ) : markers && markers.length >= 2 ? (
+                <Polyline
+                    positions={markers}
+                    pathOptions={{
+                        color: '#83DF9C',
+                        weight: 2,
+                        dashArray: '4, 4',
+                        lineJoin: 'round'
+                    }}
+                />
+            ) : null}
 
             {markerElements}
 
