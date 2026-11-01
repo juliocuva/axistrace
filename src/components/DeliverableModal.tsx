@@ -20,6 +20,7 @@ import {
 import { CommodityType } from './EUDRGeoreference';
 import { generateEUDRCertificatePdf, EUDRCertificateData } from '../utils/pdfGenerator';
 import { NequiIcon, BancolombiaIcon } from './PaymentModal';
+import { Language } from '@/translations/content';
 
 export interface DeliverableInitialData {
     lotId: string;
@@ -37,29 +38,52 @@ interface DeliverableModalProps {
     isOpen: boolean;
     onClose: () => void;
     data: DeliverableInitialData;
+    lang?: Language;
 }
 
-const COMMODITY_OPTIONS: { id: CommodityType; name: string; icon: string; hsCode: string }[] = [
-    { id: 'cafe', name: 'Café', icon: '☕', hsCode: '0901' },
-    { id: 'cacao', name: 'Cacao', icon: '🍫', hsCode: '1801' },
-    { id: 'palma', name: 'Palma de Aceite', icon: '🌴', hsCode: '1511' },
-    { id: 'ganaderia', name: 'Ganadería Bovino', icon: '🥩', hsCode: '0102' },
-    { id: 'madera', name: 'Madera / Forestal', icon: '🪵', hsCode: '4403' },
-    { id: 'caucho', name: 'Caucho', icon: '⚪', hsCode: '4001' },
-    { id: 'otro', name: 'Otro Rubro EUDR', icon: '🌿', hsCode: 'GEN' },
+const COMMODITY_OPTIONS: { id: CommodityType; name: string; nameEn: string; icon: string; hsCode: string }[] = [
+    { id: 'cafe', name: 'Café', nameEn: 'Coffee', icon: '☕', hsCode: '0901' },
+    { id: 'cacao', name: 'Cacao', nameEn: 'Cocoa', icon: '🍫', hsCode: '1801' },
+    { id: 'palma', name: 'Palma de Aceite', nameEn: 'Oil Palm', icon: '🌴', hsCode: '1511' },
+    { id: 'ganaderia', name: 'Ganadería Bovino', nameEn: 'Cattle & Beef', icon: '🥩', hsCode: '0102' },
+    { id: 'madera', name: 'Madera / Forestal', nameEn: 'Wood & Timber', icon: '🪵', hsCode: '4403' },
+    { id: 'caucho', name: 'Caucho', nameEn: 'Natural Rubber', icon: '⚪', hsCode: '4001' },
+    { id: 'otro', name: 'Otro Rubro EUDR', nameEn: 'Other EUDR Scope', icon: '🌿', hsCode: 'GEN' },
 ];
 
-const VARIETY_PRESETS: Record<CommodityType, string[]> = {
-    cafe: ['Castillo', 'Caturra', 'Colombia', 'Geisha', 'Borbón', 'Cenicafé 1', 'Típica', 'Tabi', 'Maragogipe', 'Otra'],
-    cacao: ['CCN-51', 'Criollo', 'Trinitario', 'Forastero', 'Clonal', 'Otra'],
-    palma: ['Palma Africana', 'Híbrido OxG', 'Elaeis Guineensis', 'Otra'],
-    ganaderia: ['Ceba / Engorde', 'Cría', 'Doble Propósito', 'Lechería Especializada', 'Brahman', 'Angus', 'Otra'],
-    madera: ['Teca', 'Eucalipto', 'Pino Pátula', 'Cedro', 'Acacia', 'Bosque Nativo', 'Otra'],
-    caucho: ['Clon IAN-710', 'Clon FX-3864', 'Látex Centrifugado', 'TSR-20', 'Otra'],
-    otro: ['Estándar', 'Certificado', 'Otra'],
+const VARIETY_PRESETS: Record<CommodityType, { es: string[]; en: string[] }> = {
+    cafe: {
+        es: ['Castillo', 'Caturra', 'Colombia', 'Geisha', 'Borbón', 'Cenicafé 1', 'Típica', 'Tabi', 'Maragogipe', 'Otra'],
+        en: ['Castillo', 'Caturra', 'Colombia', 'Geisha', 'Bourbon', 'Cenicafe 1', 'Typica', 'Tabi', 'Maragogipe', 'Other']
+    },
+    cacao: {
+        es: ['CCN-51', 'Criollo', 'Trinitario', 'Forastero', 'Clonal', 'Otra'],
+        en: ['CCN-51', 'Criollo', 'Trinitario', 'Forastero', 'Clonal', 'Other']
+    },
+    palma: {
+        es: ['Palma Africana', 'Híbrido OxG', 'Elaeis Guineensis', 'Otra'],
+        en: ['African Palm', 'OxG Hybrid', 'Elaeis Guineensis', 'Other']
+    },
+    ganaderia: {
+        es: ['Ceba / Engorde', 'Cría', 'Doble Propósito', 'Lechería Especializada', 'Brahman', 'Angus', 'Otra'],
+        en: ['Fattening', 'Breeding', 'Dual Purpose', 'Specialized Dairy', 'Brahman', 'Angus', 'Other']
+    },
+    madera: {
+        es: ['Teca', 'Eucalipto', 'Pino Pátula', 'Cedro', 'Acacia', 'Bosque Nativo', 'Otra'],
+        en: ['Teak', 'Eucalyptus', 'Patula Pine', 'Cedar', 'Acacia', 'Native Forest', 'Other']
+    },
+    caucho: {
+        es: ['Clon IAN-710', 'Clon FX-3864', 'Látex Centrifugado', 'TSR-20', 'Otra'],
+        en: ['IAN-710 Clone', 'FX-3864 Clone', 'Centrifuged Latex', 'TSR-20', 'Other']
+    },
+    otro: {
+        es: ['Estándar', 'Certificado', 'Otra'],
+        en: ['Standard', 'Certified', 'Other']
+    }
 };
 
-export default function DeliverableModal({ isOpen, onClose, data }: DeliverableModalProps) {
+export default function DeliverableModal({ isOpen, onClose, data, lang = 'en' }: DeliverableModalProps) {
+    const isEn = lang === 'en';
     const [isMounted, setIsMounted] = useState(false);
     const [step, setStep] = useState<'form' | 'checkout'>('form');
 
@@ -145,7 +169,8 @@ export default function DeliverableModal({ isOpen, onClose, data }: DeliverableM
                 uid: data.uid,
                 timestamp: dateDisplay,
                 mapScreenshotUrl: data.capturedScreenshot,
-                gfwStatus: data.gfwStatus
+                gfwStatus: data.gfwStatus,
+                lang: lang || 'en'
             };
 
             await generateEUDRCertificatePdf(certData);
@@ -235,17 +260,19 @@ export default function DeliverableModal({ isOpen, onClose, data }: DeliverableM
                         </div>
                         <div>
                             <span className="text-[10px] font-black uppercase tracking-wider text-[#83DF9C] block">
-                                Entregable Oficial EUDR 2023/1115
+                                {isEn ? 'Official EUDR 2023/1115 Dossier' : 'Entregable Oficial EUDR 2023/1115'}
                             </span>
                             <h3 className="text-sm sm:text-base font-black text-white">
-                                {step === 'form' ? '1. Datos del Productor & Predio' : '2. Descarga & Activación del Certificado'}
+                                {step === 'form'
+                                    ? (isEn ? '1. Producer & Holding Details' : '1. Datos del Productor & Predio')
+                                    : (isEn ? '2. Certificate Activation & Downloads' : '2. Descarga & Activación del Certificado')}
                             </h3>
                         </div>
                     </div>
                     <button
                         onClick={onClose}
                         className="text-white/60 hover:text-white p-1.5 rounded-full hover:bg-white/10 transition-colors cursor-pointer"
-                        title="Cerrar ventana"
+                        title={isEn ? 'Close modal' : 'Cerrar ventana'}
                     >
                         <X className="w-5 h-5" />
                     </button>
@@ -259,7 +286,7 @@ export default function DeliverableModal({ isOpen, onClose, data }: DeliverableM
                             {/* Commodity Multi-crop Selector */}
                             <div>
                                 <label className="block text-[11px] font-black uppercase tracking-wider text-[#FAF2CA] mb-1.5">
-                                    Rubro o Cultivo a Certificar:
+                                    {isEn ? 'Commodity / Crop to Certify:' : 'Rubro o Cultivo a Certificar:'}
                                 </label>
                                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
                                     {COMMODITY_OPTIONS.map(c => (
@@ -277,7 +304,7 @@ export default function DeliverableModal({ isOpen, onClose, data }: DeliverableM
                                             }`}
                                         >
                                             <span className="text-sm">{c.icon}</span>
-                                            <span className="truncate">{c.name}</span>
+                                            <span className="truncate">{isEn ? c.nameEn : c.name}</span>
                                         </button>
                                     ))}
                                 </div>
@@ -286,10 +313,12 @@ export default function DeliverableModal({ isOpen, onClose, data }: DeliverableM
                             {/* Variety Selector */}
                             <div>
                                 <label className="block text-[11px] font-black uppercase tracking-wider text-[#FAF2CA] mb-1.5">
-                                    Variedad / Varietal / Tipo ({currentComm.name}):
+                                    {isEn
+                                        ? `Variety / Cultivar Spec (${currentComm.nameEn}):`
+                                        : `Variedad / Varietal / Tipo (${currentComm.name}):`}
                                 </label>
                                 <div className="flex flex-wrap gap-1.5 mb-2">
-                                    {VARIETY_PRESETS[selectedCommodity].map(v => (
+                                    {VARIETY_PRESETS[selectedCommodity][isEn ? 'en' : 'es'].map(v => (
                                         <button
                                             key={v}
                                             type="button"
@@ -304,12 +333,12 @@ export default function DeliverableModal({ isOpen, onClose, data }: DeliverableM
                                         </button>
                                     ))}
                                 </div>
-                                {selectedVariety === 'Otra' && (
+                                {(selectedVariety === 'Otra' || selectedVariety === 'Other') && (
                                     <input
                                         type="text"
                                         value={customVariety}
                                         onChange={e => setCustomVariety(e.target.value)}
-                                        placeholder="Escribe la variedad o especie..."
+                                        placeholder={isEn ? 'Type custom variety or species...' : 'Escribe la variedad o especie...'}
                                         className="w-full bg-[#0C3C60] border border-white/20 rounded-xl px-3 py-2 text-xs font-bold text-white outline-none focus:border-[#83DF9C]"
                                     />
                                 )}
@@ -319,104 +348,106 @@ export default function DeliverableModal({ isOpen, onClose, data }: DeliverableM
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-white/10">
                                 <div>
                                     <label className="block text-[10px] font-bold uppercase tracking-wider text-white/70 mb-1">
-                                        Nombre del Productor / Caficultor:
+                                        {isEn ? 'Producer / Farmer Full Name:' : 'Nombre del Productor / Caficultor:'}
                                     </label>
                                     <input
                                         type="text"
                                         value={farmerName}
                                         onChange={e => setFarmerName(e.target.value)}
-                                        placeholder="Ej: Carlos Alberto Gómez"
+                                        placeholder={isEn ? 'e.g., Julio Moiso' : 'Ej: Julio Moiso'}
                                         className="w-full bg-[#0C3C60] border border-white/20 rounded-xl px-3 py-2 text-xs font-bold text-white outline-none focus:border-[#83DF9C]"
                                     />
                                 </div>
 
                                 <div>
                                     <label className="block text-[10px] font-bold uppercase tracking-wider text-white/70 mb-1">
-                                        Cédula / Documento de Identidad:
+                                        {isEn ? 'National ID / Tax Number / Passport:' : 'Cédula / Documento de Identidad:'}
                                     </label>
                                     <input
                                         type="text"
                                         value={farmerId}
                                         onChange={e => setFarmerId(e.target.value)}
-                                        placeholder="Ej: CC 10.987.654"
+                                        placeholder={isEn ? 'e.g., ID 10.987.654' : 'Ej: CC 10.987.654'}
                                         className="w-full bg-[#0C3C60] border border-white/20 rounded-xl px-3 py-2 text-xs font-bold text-white outline-none focus:border-[#83DF9C]"
                                     />
                                 </div>
 
                                 <div>
                                     <label className="block text-[10px] font-bold uppercase tracking-wider text-white/70 mb-1">
-                                        {selectedCommodity === 'cafe' ? 'Código SICA / Registro Cafetero:' : 'Código Predial / ICA / Registro:'}
+                                        {selectedCommodity === 'cafe'
+                                            ? (isEn ? 'SICA Code / Coffee Farm Registry:' : 'Código SICA / Registro Cafetero:')
+                                            : (isEn ? 'Holding / Farm Registry (Optional):' : 'Código Predial / ICA / Registro:')}
                                     </label>
                                     <input
                                         type="text"
                                         value={sicaCode}
                                         onChange={e => setSicaCode(e.target.value)}
-                                        placeholder={selectedCommodity === 'cafe' ? 'Ej: 6617000587' : 'Ej: ICA-987654 (Opcional)'}
+                                        placeholder={selectedCommodity === 'cafe' ? 'Ej: 6617000587' : (isEn ? 'e.g., ICA-987654 (Optional)' : 'Ej: ICA-987654 (Opcional)')}
                                         className="w-full bg-[#0C3C60] border border-white/20 rounded-xl px-3 py-2 text-xs font-bold text-white outline-none focus:border-[#83DF9C]"
                                     />
                                 </div>
 
                                 <div>
                                     <label className="block text-[10px] font-bold uppercase tracking-wider text-white/70 mb-1">
-                                        Nombre de la Finca / Predio:
+                                        {isEn ? 'Farm / Holding Name:' : 'Nombre de la Finca / Predio:'}
                                     </label>
                                     <input
                                         type="text"
                                         value={farmName}
                                         onChange={e => setFarmName(e.target.value)}
-                                        placeholder="Ej: Finca La Esperanza"
+                                        placeholder={isEn ? 'e.g., Finca Don Moiso' : 'Ej: Finca Don Moiso'}
                                         className="w-full bg-[#0C3C60] border border-white/20 rounded-xl px-3 py-2 text-xs font-bold text-white outline-none focus:border-[#83DF9C]"
                                     />
                                 </div>
 
                                 <div>
                                     <label className="block text-[10px] font-bold uppercase tracking-wider text-white/70 mb-1">
-                                        Nombre del Lote / Parcela:
+                                        {isEn ? 'Lot / Parcel Identifier:' : 'Nombre del Lote / Parcela:'}
                                     </label>
                                     <input
                                         type="text"
                                         value={lotName}
                                         onChange={e => setLotName(e.target.value)}
-                                        placeholder="Ej: LOTE-01 / El Mirador"
+                                        placeholder={isEn ? 'e.g., LOT-MOISO-01' : 'Ej: LOT-MOISO-01'}
                                         className="w-full bg-[#0C3C60] border border-white/20 rounded-xl px-3 py-2 text-xs font-bold text-white outline-none focus:border-[#83DF9C]"
                                     />
                                 </div>
 
                                 <div>
                                     <label className="block text-[10px] font-bold uppercase tracking-wider text-white/70 mb-1">
-                                        Municipio:
+                                        {isEn ? 'Municipality / County:' : 'Municipio:'}
                                     </label>
                                     <input
                                         type="text"
                                         value={municipality}
                                         onChange={e => setMunicipality(e.target.value)}
-                                        placeholder="Ej: Pitalito / Chinchiná"
+                                        placeholder={isEn ? 'e.g., Pereira / Chinchina' : 'Ej: Pereira / Chinchiná'}
                                         className="w-full bg-[#0C3C60] border border-white/20 rounded-xl px-3 py-2 text-xs font-bold text-white outline-none focus:border-[#83DF9C]"
                                     />
                                 </div>
 
                                 <div>
                                     <label className="block text-[10px] font-bold uppercase tracking-wider text-white/70 mb-1">
-                                        Departamento / Región:
+                                        {isEn ? 'Department / State / Region:' : 'Departamento / Región:'}
                                     </label>
                                     <input
                                         type="text"
                                         value={department}
                                         onChange={e => setDepartment(e.target.value)}
-                                        placeholder="Ej: Huila / Caldas"
+                                        placeholder={isEn ? 'e.g., Risaralda / Caldas' : 'Ej: Risaralda / Caldas'}
                                         className="w-full bg-[#0C3C60] border border-white/20 rounded-xl px-3 py-2 text-xs font-bold text-white outline-none focus:border-[#83DF9C]"
                                     />
                                 </div>
 
                                 <div className="sm:col-span-2">
                                     <label className="block text-[10px] font-bold uppercase tracking-wider text-white/70 mb-1">
-                                        Teléfono / WhatsApp de Contacto:
+                                        {isEn ? 'Contact Phone / WhatsApp:' : 'Teléfono / WhatsApp de Contacto:'}
                                     </label>
                                     <input
                                         type="text"
                                         value={farmerPhone}
                                         onChange={e => setFarmerPhone(e.target.value)}
-                                        placeholder="Ej: +57 310 123 4567"
+                                        placeholder={isEn ? 'e.g., +57 310 123 4567' : 'Ej: +57 310 123 4567'}
                                         className="w-full bg-[#0C3C60] border border-white/20 rounded-xl px-3 py-2 text-xs font-bold text-white outline-none focus:border-[#83DF9C]"
                                     />
                                 </div>
@@ -428,7 +459,7 @@ export default function DeliverableModal({ isOpen, onClose, data }: DeliverableM
                                 onClick={() => setStep('checkout')}
                                 className="w-full bg-[#83DF9C] hover:bg-[#6fd48b] active:scale-98 text-[#0C3C60] py-3.5 px-4 rounded-xl font-black uppercase text-xs tracking-wider transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer mt-4"
                             >
-                                <span>Continuar a Generación & Pago</span>
+                                <span>{isEn ? 'Continue to Activation & Download' : 'Continuar a Generación & Pago'}</span>
                                 <ArrowRight className="w-4 h-4" />
                             </button>
                         </div>
@@ -440,43 +471,43 @@ export default function DeliverableModal({ isOpen, onClose, data }: DeliverableM
                                 <div className="flex items-center justify-between pb-2 border-b border-white/10">
                                     <div>
                                         <span className="font-black text-[#83DF9C] uppercase text-sm block">
-                                            {currentComm.icon} {currentComm.name} • {finalVariety}
+                                            {currentComm.icon} {isEn ? currentComm.nameEn : currentComm.name} • {finalVariety}
                                         </span>
                                         <span className="text-[11px] text-white/70 font-bold">
-                                            {farmName || 'Finca'} • {lotName || 'Lote 01'} ({municipality || 'Municipio'})
+                                            {farmName || (isEn ? 'Farm' : 'Finca')} • {lotName || 'Lote 01'} ({municipality || (isEn ? 'Municipality' : 'Municipio')})
                                         </span>
                                     </div>
                                     <button
                                         onClick={() => setStep('form')}
                                         className="text-[10px] text-[#FAF2CA] underline font-bold cursor-pointer hover:text-white"
                                     >
-                                        Editar Datos
+                                        {isEn ? 'Edit Details' : 'Editar Datos'}
                                     </button>
                                 </div>
 
                                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 text-[11px]">
                                     <div>
-                                        <span className="text-white/50 block text-[9px] uppercase font-bold">Área:</span>
-                                        <span className="font-mono font-black text-[#83DF9C]">{data.areaHa} ha ({Math.round(data.areaHa * 10000).toLocaleString('es-CO')} m²)</span>
+                                        <span className="text-white/50 block text-[9px] uppercase font-bold">{isEn ? 'Area:' : 'Área:'}</span>
+                                        <span className="font-mono font-black text-[#83DF9C]">{data.areaHa} ha ({Math.round(data.areaHa * 10000).toLocaleString(isEn ? 'en-US' : 'es-CO')} m²)</span>
                                     </div>
                                     <div>
-                                        <span className="text-white/50 block text-[9px] uppercase font-bold">Perímetro:</span>
+                                        <span className="text-white/50 block text-[9px] uppercase font-bold">{isEn ? 'Perimeter:' : 'Perímetro:'}</span>
                                         <span className="font-mono font-bold text-white">{data.perimeterMeters} m</span>
                                     </div>
                                     <div>
-                                        <span className="text-white/50 block text-[9px] uppercase font-bold">Vértices:</span>
-                                        <span className="font-mono font-bold text-white">{data.vertices.length} puntos</span>
+                                        <span className="text-white/50 block text-[9px] uppercase font-bold">{isEn ? 'Vertices:' : 'Vértices:'}</span>
+                                        <span className="font-mono font-bold text-white">{data.vertices.length} {isEn ? 'points' : 'puntos'}</span>
                                     </div>
                                     <div>
-                                        <span className="text-white/50 block text-[9px] uppercase font-bold">{sicaCode ? 'Productor / SICA:' : 'Productor:'}</span>
-                                        <span className="font-bold text-white truncate block">{farmerName || 'Sin Registrar'}{sicaCode ? ` (${sicaCode})` : ''}</span>
+                                        <span className="text-white/50 block text-[9px] uppercase font-bold">{sicaCode ? (isEn ? 'Producer / SICA:' : 'Productor / SICA:') : (isEn ? 'Producer:' : 'Productor:')}</span>
+                                        <span className="font-bold text-white truncate block">{farmerName || (isEn ? 'Unregistered' : 'Sin Registrar')}{sicaCode ? ` (${sicaCode})` : ''}</span>
                                     </div>
                                 </div>
 
                                 {/* Identificador Único Verificable (UID) */}
                                 <div className="bg-black/30 p-2 rounded-xl border border-white/10 mt-2">
                                     <span className="text-[9px] uppercase font-bold text-[#83DF9C] block">
-                                        Identificador Único Verificable (UID):
+                                        {isEn ? 'Unique Identifier (UID):' : 'Identificador Único Verificable (UID):'}
                                     </span>
                                     <span className="font-mono text-[10px] text-white/80 break-all select-all">
                                         {data.uid}
@@ -492,7 +523,7 @@ export default function DeliverableModal({ isOpen, onClose, data }: DeliverableM
                                     className="w-full bg-[#83DF9C] hover:bg-[#6fd48b] active:scale-98 text-[#0C3C60] py-4 px-4 rounded-2xl font-black uppercase text-xs sm:text-sm tracking-wider transition-all shadow-xl flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-60"
                                 >
                                     <Download className="w-5 h-5" />
-                                    <span>{isGeneratingPdf ? 'Generando Certificado...' : 'Descargar Certificado PDF Oficial'}</span>
+                                    <span>{isGeneratingPdf ? (isEn ? 'Generating Certificate...' : 'Generando Certificado...') : (isEn ? 'Download Official PDF Certificate' : 'Descargar Certificado PDF Oficial')}</span>
                                 </button>
 
                                 <div className="grid grid-cols-2 gap-2">
@@ -501,7 +532,7 @@ export default function DeliverableModal({ isOpen, onClose, data }: DeliverableM
                                         className="w-full bg-[#0C3C60] hover:bg-[#164e78] active:scale-98 text-white py-3 px-3 rounded-xl font-bold uppercase text-[10px] sm:text-[11px] tracking-wider transition-all border border-white/10 flex items-center justify-center gap-1.5 cursor-pointer"
                                     >
                                         <FileText className="w-4 h-4 text-[#83DF9C]" />
-                                        <span>GeoJSON TRACES NT</span>
+                                        <span>TRACES NT GeoJSON</span>
                                     </button>
 
                                     <button
@@ -509,7 +540,7 @@ export default function DeliverableModal({ isOpen, onClose, data }: DeliverableM
                                         className="w-full bg-[#25D366] hover:bg-[#20ba5a] active:scale-98 text-white py-3 px-3 rounded-xl font-bold uppercase text-[10px] sm:text-[11px] tracking-wider transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer"
                                     >
                                         <Share2 className="w-4 h-4" />
-                                        <span>Compartir WhatsApp</span>
+                                        <span>{isEn ? 'Share on WhatsApp' : 'Compartir WhatsApp'}</span>
                                     </button>
                                 </div>
                             </div>

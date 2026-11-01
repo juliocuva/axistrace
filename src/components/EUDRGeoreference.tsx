@@ -33,6 +33,8 @@ import html2canvas from 'html2canvas';
 import { validateDeforestationWithGFW } from '../actions/eudr';
 import DeliverableModal from './DeliverableModal';
 
+import { Language } from '@/translations/content';
+
 const DynamicLeafletMap = dynamic(() => import('./LeafletMap'), { ssr: false });
 
 export type CommodityType = 'cafe' | 'cacao' | 'palma' | 'caucho' | 'madera' | 'ganaderia' | 'otro';
@@ -42,6 +44,8 @@ interface EUDRGeoreferenceProps {
     initialPolygon?: string;
     lotId?: string;
     initialCommodity?: CommodityType;
+    lang?: Language;
+    onLanguageChange?: (lang: Language) => void;
 }
 
 // Auto-capture interval for field walking (RFC 7946 perimeter pacing)
@@ -98,12 +102,12 @@ function calculatePerimeterMeters(coords: [number, number][]): number {
     return Math.round(total);
 }
 
-// Text-to-speech voice guidance
-function speakVoiceGuidance(text: string) {
+// Text-to-speech voice guidance supporting English and Spanish
+function speakVoiceGuidance(text: string, lang: Language = 'en') {
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
         window.speechSynthesis.cancel();
         const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'es-CO';
+        utterance.lang = lang === 'es' ? 'es-CO' : 'en-US';
         utterance.rate = 1.05;
         window.speechSynthesis.speak(utterance);
     }
@@ -134,22 +138,25 @@ const calculatePolygonSha256 = async (data: string): Promise<string> => {
     return (hex + hex + hex + hex).slice(0, 64);
 };
 
-const COMMODITIES: { id: CommodityType; name: string; icon: string; eudrCode: string }[] = [
-    { id: 'cafe', name: 'Café', icon: '☕', eudrCode: '0901' },
-    { id: 'cacao', name: 'Cacao', icon: '🍫', eudrCode: '1801' },
-    { id: 'palma', name: 'Palma de Aceite', icon: '🌴', eudrCode: '1511' },
-    { id: 'caucho', name: 'Caucho Natural', icon: '🌳', eudrCode: '4001' },
-    { id: 'madera', name: 'Madera', icon: '🪵', eudrCode: '4403' },
-    { id: 'ganaderia', name: 'Ganadería', icon: '🐄', eudrCode: '0102' },
-    { id: 'otro', name: 'Otro', icon: '🌱', eudrCode: 'GEN' }
+export const COMMODITIES: { id: CommodityType; name: string; nameEn: string; icon: string; eudrCode: string }[] = [
+    { id: 'cafe', name: 'Café', nameEn: 'Coffee', icon: '☕', eudrCode: '0901' },
+    { id: 'cacao', name: 'Cacao', nameEn: 'Cocoa', icon: '🍫', eudrCode: '1801' },
+    { id: 'palma', name: 'Palma de Aceite', nameEn: 'Oil Palm', icon: '🌴', eudrCode: '1511' },
+    { id: 'caucho', name: 'Caucho Natural', nameEn: 'Natural Rubber', icon: '🌳', eudrCode: '4001' },
+    { id: 'madera', name: 'Madera', nameEn: 'Wood & Timber', icon: '🪵', eudrCode: '4403' },
+    { id: 'ganaderia', name: 'Ganadería', nameEn: 'Cattle & Beef', icon: '🐄', eudrCode: '0102' },
+    { id: 'otro', name: 'Otro', nameEn: 'Other Scope', icon: '🌱', eudrCode: 'GEN' }
 ];
 
 export default function EUDRGeoreference({
     onPolygonChange,
     initialPolygon,
     lotId = 'LOTE-01',
-    initialCommodity = 'cafe'
+    initialCommodity = 'cafe',
+    lang = 'en',
+    onLanguageChange
 }: EUDRGeoreferenceProps) {
+    const isEn = lang === 'en';
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [commodity, setCommodity] = useState<CommodityType>(initialCommodity);
     const [isMounted, setIsMounted] = useState(false);
@@ -537,9 +544,15 @@ export default function EUDRGeoreference({
 
             if (isAutoClosed) {
                 setAutoClosedNotice(true);
-                speakVoiceGuidance('Lote cerrado y verificado con éxito. Capturando evidencia.');
+                speakVoiceGuidance(
+                    isEn ? 'Boundary closed and verified successfully. Capturing evidence.' : 'Lote cerrado y verificado con éxito. Capturando evidencia.',
+                    lang
+                );
             } else {
-                speakVoiceGuidance('Lote cerrado y verificado con éxito. Generando evidencia fotográfica.');
+                speakVoiceGuidance(
+                    isEn ? 'Boundary closed and verified successfully. Generating photographic evidence.' : 'Lote cerrado y verificado con éxito. Generando evidencia fotográfica.',
+                    lang
+                );
             }
 
             setTimeout(() => {
@@ -612,7 +625,10 @@ export default function EUDRGeoreference({
 
         const newPoint: [number, number] = [currentLng, currentLat];
         setGpsPoints(prev => [...prev, newPoint]);
-        speakVoiceGuidance(`Punto ${currentPoints.length + 1}`);
+        speakVoiceGuidance(
+            isEn ? `Vertex ${currentPoints.length + 1}` : `Punto ${currentPoints.length + 1}`,
+            lang
+        );
     }, [checkProximityAndAutoClose]);
 
     handleAutoCaptureStepRef.current = handleAutoCaptureStep;
@@ -659,14 +675,17 @@ export default function EUDRGeoreference({
                     if (typeof window !== 'undefined' && navigator.vibrate) {
                         navigator.vibrate([100, 50, 100]);
                     }
-                    speakVoiceGuidance('Caminata en curso, dirígete a la derecha.');
+                    speakVoiceGuidance(
+                        isEn ? 'Walking survey in progress, keep right.' : 'Caminata en curso, dirígete a la derecha.',
+                        lang
+                    );
                     triggerRightArrowBlink();
                 } else if (gpsPointsRef.current.length >= 3) {
                     checkProximityAndAutoClose(latitude, longitude);
                 }
             }
         },
-        [checkProximityAndAutoClose]
+        [checkProximityAndAutoClose, isEn, lang]
     );
 
     useEffect(() => {
@@ -676,7 +695,7 @@ export default function EUDRGeoreference({
     // Start GPS & Sensor Tracking (Hands-Free)
     const startTracking = () => {
         if (!navigator.geolocation) {
-            alert('Geolocalización no soportada en este navegador móvil.');
+            alert(isEn ? 'Geolocation not supported in this mobile browser.' : 'Geolocalización no soportada en este navegador móvil.');
             return;
         }
 
@@ -698,9 +717,15 @@ export default function EUDRGeoreference({
             if (typeof window !== 'undefined' && navigator.vibrate) {
                 navigator.vibrate([100, 50, 100]);
             }
-            speakVoiceGuidance('Caminata en curso, dirígete a la derecha.');
+            speakVoiceGuidance(
+                isEn ? 'Walking survey in progress, keep right.' : 'Caminata en curso, dirígete a la derecha.',
+                lang
+            );
         } else {
-            speakVoiceGuidance('Caminata en curso, dirígete a la derecha.');
+            speakVoiceGuidance(
+                isEn ? 'Walking survey in progress, keep right.' : 'Caminata en curso, dirígete a la derecha.',
+                lang
+            );
         }
 
         if (typeof DeviceMotionEvent !== 'undefined' && (DeviceMotionEvent as any).requestPermission) {
@@ -798,7 +823,10 @@ export default function EUDRGeoreference({
         }
 
         setGpsPoints(prev => [...prev, [currentLng, currentLat]]);
-        speakVoiceGuidance(`Vértice ${gpsPoints.length + 1} manual`);
+        speakVoiceGuidance(
+            isEn ? `Manual vertex ${gpsPoints.length + 1}` : `Vértice ${gpsPoints.length + 1} manual`,
+            lang
+        );
     };
 
     // Undo last point
@@ -910,7 +938,7 @@ export default function EUDRGeoreference({
                     }
                 });
             } catch (err: any) {
-                alert(`Error cargando archivo: ${err.message}`);
+                alert(isEn ? `Error loading file: ${err.message}` : `Error cargando archivo: ${err.message}`);
             }
         };
         reader.readAsText(file);
@@ -1010,22 +1038,39 @@ export default function EUDRGeoreference({
     // One-tap WhatsApp Share
     const shareViaWhatsApp = () => {
         const currentComm = COMMODITIES.find(c => c.id === commodity) || COMMODITIES[0];
-        const text =
-            `*AXISTRACE - Certificado de Georreferenciación EUDR*%0A` +
-            `🌾 *Cultivo:* ${currentComm.icon} ${currentComm.name} (HS: ${currentComm.eudrCode})%0A` +
-            `🏷️ *Lote:* ${currentLotId}%0A` +
-            `⏰ *Fecha y Hora:* ${currentTimestampDisplay}%0A` +
-            (altitudeMeters ? `⛰️ *Altitud:* ${altitudeMeters.toLocaleString('es-CO')} m.s.n.m.%0A` : '') +
-            `📐 *Área:* ${areaHa > 0 ? `${areaHa} ha (≈ ${Math.round(areaHa * 10000).toLocaleString('es-CO')} m²)` : 'En proceso'}%0A` +
-            `📏 *Perímetro:* ${perimeterMeters} m%0A` +
-            `🌐 *Vértices Registrados:* ${markersCoords.length}%0A` +
-            `🛡️ *Cumplimiento EUDR:* ${gfwStatus === 'secure' ? '0.00 ha Deforestación (Línea Base 31-Dic-2020 CLEARED)' : gfwStatus === 'warning' ? 'ALERTA: Deforestación detectada' : 'Línea Base 2020 (Pendiente Validación)'}%0A` +
-            (immutableHash ? `🔑 *Identificador Único Verificable (UID):* AXIS-UID-${immutableHash.slice(0, 16)}...${immutableHash.slice(-8)}%0A` : '') +
-            `🔐 *Integridad:* Registro inalterable para TRACES NT (Unión Europea).%0A` +
-            `📲 *Firma Inercial:* Paso humano certificado con sensores IMU anti-spoofing.%0A` +
-            (currentPosition
-                ? `🗺️ *Ubicación en Google Maps:* https://www.google.com/maps?q=${currentPosition[0]},${currentPosition[1]}`
-                : '');
+        const commName = isEn && currentComm.nameEn ? currentComm.nameEn : currentComm.name;
+        const eudrStatusText = isEn
+            ? (gfwStatus === 'secure' ? '0.00 ha Deforestation (Dec 31, 2020 Baseline CLEARED)' : gfwStatus === 'warning' ? 'ALERT: Deforestation Detected' : '2020 Baseline (Pending Validation)')
+            : (gfwStatus === 'secure' ? '0.00 ha Deforestación (Línea Base 31-Dic-2020 CLEARED)' : gfwStatus === 'warning' ? 'ALERTA: Deforestación detectada' : 'Línea Base 2020 (Pendiente Validación)');
+
+        const text = isEn
+            ? `*AXISTRACE - EUDR Georeferencing Certificate*%0A` +
+              `🌾 *Crop:* ${currentComm.icon} ${commName} (HS: ${currentComm.eudrCode})%0A` +
+              `🏷️ *Lot ID:* ${currentLotId}%0A` +
+              `⏰ *Date & Time:* ${currentTimestampDisplay}%0A` +
+              (altitudeMeters ? `⛰️ *Altitude:* ${altitudeMeters.toLocaleString('en-US')} masl%0A` : '') +
+              `📐 *Area:* ${areaHa > 0 ? `${areaHa} ha (≈ ${Math.round(areaHa * 10000).toLocaleString('en-US')} m²)` : 'In progress'}%0A` +
+              `📏 *Perimeter:* ${perimeterMeters} m%0A` +
+              `🌐 *Recorded Vertices:* ${markersCoords.length}%0A` +
+              `🛡️ *EUDR Compliance:* ${eudrStatusText}%0A` +
+              (immutableHash ? `🔑 *Unique Identifier (UID):* AXIS-UID-${immutableHash.slice(0, 16)}...${immutableHash.slice(-8)}%0A` : '') +
+              `🔐 *Integrity:* Tamper-proof audit record for EU TRACES NT.%0A` +
+              `📲 *Inertial Signature:* Human walking path certified with IMU anti-spoofing.%0A` +
+              (currentPosition ? `🗺️ *Location on Google Maps:* https://www.google.com/maps?q=${currentPosition[0]},${currentPosition[1]}` : '')
+            : `*AXISTRACE - Certificado de Georreferenciación EUDR*%0A` +
+              `🌾 *Cultivo:* ${currentComm.icon} ${commName} (HS: ${currentComm.eudrCode})%0A` +
+              `🏷️ *Lote:* ${currentLotId}%0A` +
+              `⏰ *Fecha y Hora:* ${currentTimestampDisplay}%0A` +
+              (altitudeMeters ? `⛰️ *Altitud:* ${altitudeMeters.toLocaleString('es-CO')} m.s.n.m.%0A` : '') +
+              `📐 *Área:* ${areaHa > 0 ? `${areaHa} ha (≈ ${Math.round(areaHa * 10000).toLocaleString('es-CO')} m²)` : 'En proceso'}%0A` +
+              `📏 *Perímetro:* ${perimeterMeters} m%0A` +
+              `🌐 *Vértices Registrados:* ${markersCoords.length}%0A` +
+              `🛡️ *Cumplimiento EUDR:* ${eudrStatusText}%0A` +
+              (immutableHash ? `🔑 *Identificador Único Verificable (UID):* AXIS-UID-${immutableHash.slice(0, 16)}...${immutableHash.slice(-8)}%0A` : '') +
+              `🔐 *Integridad:* Registro inalterable para TRACES NT (Unión Europea).%0A` +
+              `📲 *Firma Inercial:* Paso humano certificado con sensores IMU anti-spoofing.%0A` +
+              (currentPosition ? `🗺️ *Ubicación en Google Maps:* https://www.google.com/maps?q=${currentPosition[0]},${currentPosition[1]}` : '');
+
         window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
     };
 
@@ -1115,13 +1160,13 @@ export default function EUDRGeoreference({
                             <span className="text-[10px] sm:text-[11px] font-mono font-bold text-[#FAF2CA] truncate">
                                 {currentPosition
                                     ? `${currentPosition[0].toFixed(5)}°N, ${Math.abs(currentPosition[1]).toFixed(5)}°W`
-                                    : 'Conectando satélite...'}
+                                    : (isEn ? 'Connecting satellite...' : 'Conectando satélite...')}
                             </span>
                             {altitudeMeters && (
                                 <>
                                     <span className="text-white/30 text-[9px]">•</span>
                                     <span className="text-[10px] font-mono font-black text-[#83DF9C] shrink-0">
-                                        {altitudeMeters.toLocaleString('es-CO')} msnm
+                                        {altitudeMeters.toLocaleString(isEn ? 'en-US' : 'es-CO')} {isEn ? 'masl' : 'msnm'}
                                     </span>
                                 </>
                             )}
@@ -1129,7 +1174,7 @@ export default function EUDRGeoreference({
                                 <button
                                     onClick={copyCoordinates}
                                     className="text-white/70 hover:text-white p-0.5 cursor-pointer"
-                                    title="Copiar coordenadas"
+                                    title={isEn ? 'Copy coordinates' : 'Copiar coordenadas'}
                                 >
                                     <Copy className="w-3 h-3" />
                                 </button>
@@ -1148,8 +1193,8 @@ export default function EUDRGeoreference({
                                 <Compass className="w-3 h-3 text-[#83DF9C]" />
                                 <span>
                                     {distanceToStart <= 3.5
-                                        ? `¡A ${distanceToStart}m del inicio! Cerrando automáticamente...`
-                                        : `Distancia al inicio: ${distanceToStart}m`}
+                                        ? (isEn ? `${distanceToStart}m to start! Closing automatically...` : `¡A ${distanceToStart}m del inicio! Cerrando automáticamente...`)
+                                        : (isEn ? `Distance to start: ${distanceToStart}m` : `Distancia al inicio: ${distanceToStart}m`)}
                                 </span>
                             </div>
                         )}
@@ -1160,20 +1205,20 @@ export default function EUDRGeoreference({
                         <button
                             onClick={handleRecenterLocation}
                             className="bg-[#0C3C60]/95 hover:bg-[#83DF9C] hover:text-[#0C3C60] active:scale-95 text-[#FAF2CA] px-2.5 sm:px-3 py-1.5 rounded-xl border border-white/20 shadow-lg text-[10px] sm:text-[11px] font-bold uppercase tracking-wider flex items-center gap-1 transition-all cursor-pointer"
-                            title="Centrar mapa en mi ubicación activa"
+                            title={isEn ? 'Center map on current position' : 'Centrar mapa en mi ubicación activa'}
                         >
                             <Navigation className="w-3 h-3 fill-current text-[#83DF9C]" />
-                            <span className="hidden sm:inline">Mi Ubicación</span>
+                            <span className="hidden sm:inline">{isEn ? 'My Location' : 'Mi Ubicación'}</span>
                         </button>
 
                         {gpsPoints.length > 0 && !geoJsonData && (
                             <button
                                 onClick={handleUndoPoint}
                                 className="bg-[#0C3C60]/90 hover:bg-[#0C3C60] active:scale-95 text-[#FAF2CA] px-2.5 sm:px-3 py-1.5 rounded-xl border border-white/20 shadow-lg text-[10px] sm:text-[11px] font-bold uppercase tracking-wider flex items-center gap-1 transition-all cursor-pointer"
-                                title="Deshacer último vértice"
+                                title={isEn ? 'Undo last vertex' : 'Deshacer último vértice'}
                             >
                                 <RotateCcw className="w-3 h-3" />
-                                <span className="hidden sm:inline">Deshacer</span>
+                                <span className="hidden sm:inline">{isEn ? 'Undo' : 'Deshacer'}</span>
                             </button>
                         )}
 
@@ -1181,9 +1226,9 @@ export default function EUDRGeoreference({
                             <button
                                 onClick={handleClear}
                                 className="bg-[#FF7E7E]/90 hover:bg-[#FF7E7E] active:scale-95 text-white px-2.5 sm:px-3 py-1.5 rounded-xl shadow-lg text-[10px] sm:text-[11px] font-bold uppercase tracking-wider transition-all cursor-pointer"
-                                title="Reiniciar mapeo"
+                                title={isEn ? 'Reset mapping' : 'Reiniciar mapeo'}
                             >
-                                Limpiar
+                                {isEn ? 'Reset' : 'Limpiar'}
                             </button>
                         )}
                     </div>
@@ -1196,12 +1241,12 @@ export default function EUDRGeoreference({
                             </span>
                             <div className="leading-tight">
                                 <p className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-[#FAF2CA]">
-                                    Vértices
+                                    {isEn ? 'Vertices' : 'Vértices'}
                                 </p>
                                 <p className="text-[8px] sm:text-[9px] text-white/60">
                                     {gpsPoints.length < 4
-                                        ? `Caminando perímetro...`
-                                        : 'Se cerrará solo al volver'}
+                                        ? (isEn ? 'Walking perimeter...' : 'Caminando perímetro...')
+                                        : (isEn ? 'Auto-closes upon return' : 'Se cerrará solo al volver')}
                                 </p>
                             </div>
                         </div>
@@ -1216,10 +1261,10 @@ export default function EUDRGeoreference({
                                 </div>
                                 <div className="text-center">
                                     <span className="block text-lg sm:text-2xl font-black uppercase text-[#83DF9C] tracking-wider drop-shadow-md">
-                                        Dirígete a la derecha ➔
+                                        {isEn ? 'Head to the right ➔' : 'Dirígete a la derecha ➔'}
                                     </span>
                                     <span className="block text-xs font-bold text-[#FAF2CA] uppercase tracking-wider mt-1">
-                                        Inicia la caminata por el lindero
+                                        {isEn ? 'Start walking along the parcel boundary' : 'Inicia la caminata por el lindero'}
                                     </span>
                                 </div>
                             </div>
@@ -1234,59 +1279,69 @@ export default function EUDRGeoreference({
                             {/* 1. Área */}
                             <div className="bg-white/5 p-2.5 sm:p-3 rounded-xl border border-white/10 shadow-sm">
                                 <p className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-white/60">
-                                    Área Parcela
+                                    {isEn ? 'Parcel Area' : 'Área Parcela'}
                                 </p>
                                 <p className="text-lg sm:text-xl font-black text-[#83DF9C] font-mono mt-0.5">
                                     {areaHa > 0 ? `${areaHa} ha` : '--'}
                                 </p>
                                 <p className="text-[8px] sm:text-[9px] font-medium text-white/60 truncate">
-                                    {areaHa > 0 ? `≈ ${Math.round(areaHa * 10000).toLocaleString('es-CO')} m²` : 'Caminando lindero'}
+                                    {areaHa > 0
+                                        ? `≈ ${Math.round(areaHa * 10000).toLocaleString(isEn ? 'en-US' : 'es-CO')} m²`
+                                        : (isEn ? 'Pacing perimeter' : 'Caminando lindero')}
                                 </p>
                             </div>
 
                             {/* 2. Perímetro */}
                             <div className="bg-white/5 p-2.5 sm:p-3 rounded-xl border border-white/10 shadow-sm">
                                 <p className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-white/60">
-                                    Perímetro
+                                    {isEn ? 'Perimeter' : 'Perímetro'}
                                 </p>
                                 <p className="text-lg sm:text-xl font-black text-[#FAF2CA] font-mono mt-0.5">
                                     {perimeterMeters > 0 ? `${perimeterMeters} m` : '--'}
                                 </p>
                                 <p className="text-[8px] sm:text-[9px] font-medium text-white/60 truncate">
-                                    {perimeterMeters > 0 ? `${(perimeterMeters / 1000).toFixed(2)} km recorridos` : 'Midiendo paso'}
+                                    {perimeterMeters > 0
+                                        ? `${(perimeterMeters / 1000).toFixed(2)} ${isEn ? 'km surveyed' : 'km recorridos'}`
+                                        : (isEn ? 'Logging steps' : 'Midiendo paso')}
                                 </p>
                             </div>
 
                             {/* 3. Altitud / Elevación */}
                             <div className="bg-white/5 p-2.5 sm:p-3 rounded-xl border border-white/10 shadow-sm">
                                 <p className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-white/60">
-                                    Altitud Promedio
+                                    {isEn ? 'Avg Altitude' : 'Altitud Promedio'}
                                 </p>
                                 <p className="text-lg sm:text-xl font-black text-white font-mono mt-0.5">
-                                    {altitudeMeters ? `${altitudeMeters.toLocaleString('es-CO')} m` : '--'}
+                                    {altitudeMeters ? `${altitudeMeters.toLocaleString(isEn ? 'en-US' : 'es-CO')} m` : '--'}
                                 </p>
                                 <p className="text-[8px] sm:text-[9px] font-medium text-white/60 truncate">
-                                    {altitudeMeters ? `${altitudeMeters.toLocaleString('es-CO')} m.s.n.m.` : 'Midiendo elevación'}
+                                    {altitudeMeters
+                                        ? `${altitudeMeters.toLocaleString(isEn ? 'en-US' : 'es-CO')} ${isEn ? 'masl' : 'm.s.n.m.'}`
+                                        : (isEn ? 'Logging elevation' : 'Midiendo elevación')}
                                 </p>
                             </div>
 
                             {/* 4. Normativa EUDR */}
                             <div className="bg-white/5 p-2.5 sm:p-3 rounded-xl border border-white/10 shadow-sm">
                                 <p className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-white/60">
-                                    Normativa EUDR
+                                    {isEn ? 'EUDR Standard' : 'Normativa EUDR'}
                                 </p>
                                 <p className="text-[11px] sm:text-xs font-black text-[#83DF9C] mt-1 uppercase truncate">
-                                    {areaHa >= 4 ? 'Polígono Obligatorio' : 'Punto o Polígono'}
+                                    {areaHa >= 4
+                                        ? (isEn ? 'Mandatory Polygon' : 'Polígono Obligatorio')
+                                        : (isEn ? 'Point or Polygon' : 'Punto o Polígono')}
                                 </p>
                                 <p className="text-[8px] sm:text-[9px] font-medium text-white/60 truncate">
-                                    {areaHa >= 4 ? '≥ 4 ha (Art. 9.1.d)' : '< 4 ha Conforme'}
+                                    {areaHa >= 4
+                                        ? '≥ 4 ha (Art. 9.1.d)'
+                                        : (isEn ? '< 4 ha Compliant' : '< 4 ha Conforme')}
                                 </p>
                             </div>
 
                             {/* 5. Deforestación Dinámica */}
                             <div className="bg-white/5 p-2.5 sm:p-3 rounded-xl border border-white/10 shadow-sm col-span-2 sm:col-span-1">
                                 <p className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-white/60">
-                                    Línea Base 2020
+                                    {isEn ? '2020 Baseline' : 'Línea Base 2020'}
                                 </p>
                                 <p className="text-[11px] sm:text-xs font-black mt-1 uppercase flex items-center gap-1">
                                     <span
@@ -1300,10 +1355,10 @@ export default function EUDRGeoreference({
                                     ></span>
                                     <span className="truncate text-white">
                                         {gfwStatus === 'secure'
-                                            ? '0.00 ha Deforestación'
+                                            ? (isEn ? '0.00 ha Deforestation' : '0.00 ha Deforestación')
                                             : gfwStatus === 'warning'
-                                            ? `${lossHa.toFixed(2)} ha Pérdida Bosque`
-                                            : 'Validando Satélite...'}
+                                            ? `${lossHa.toFixed(2)} ha ${isEn ? 'Forest Loss' : 'Pérdida Bosque'}`
+                                            : (isEn ? 'Satellite Audit...' : 'Validando Satélite...')}
                                     </span>
                                 </p>
                                 <p
@@ -1316,10 +1371,10 @@ export default function EUDRGeoreference({
                                     }`}
                                 >
                                     {gfwStatus === 'secure'
-                                        ? 'CLEARED / APROBADO'
+                                        ? (isEn ? 'CLEARED / COMPLIANT' : 'CLEARED / APROBADO')
                                         : gfwStatus === 'warning'
-                                        ? 'ALERTA DEFORESTACIÓN'
-                                        : 'ANALIZANDO SENTINEL-2'}
+                                        ? (isEn ? 'DEFORESTATION ALERT' : 'ALERTA DEFORESTACIÓN')
+                                        : (isEn ? 'ANALYZING SENTINEL-2' : 'ANALIZANDO SENTINEL-2')}
                                 </p>
                             </div>
                         </div>
@@ -1329,12 +1384,12 @@ export default function EUDRGeoreference({
                             <div className="flex items-center gap-1.5 min-w-0">
                                 <Lock className="w-3.5 h-3.5 text-[#83DF9C] shrink-0" />
                                 <span className="font-black text-[#83DF9C] uppercase tracking-wider shrink-0">
-                                    Identificador Único (UID):
+                                    {isEn ? 'Unique ID (UID):' : 'Identificador Único (UID):'}
                                 </span>
                                 <span className="font-mono text-white/95 truncate">
                                     {immutableHash
                                         ? `AXIS-UID-${immutableHash.slice(0, 16)}...${immutableHash.slice(-8)}`
-                                        : 'Generando identificador único...'}
+                                        : (isEn ? 'Generating unique ID...' : 'Generando identificador único...')}
                                 </span>
                             </div>
                             <div className="flex items-center gap-1.5 text-[8.5px] sm:text-[9px] text-[#FAF2CA]/90">
@@ -1346,28 +1401,31 @@ export default function EUDRGeoreference({
                         {/* Identification Footer Bar for the Screenshot */}
                         <div className="bg-[#0C3C60] text-[#FAF2CA] px-3 sm:px-4 py-2 flex flex-wrap items-center justify-between gap-1 text-[10px] border-t border-white/10">
                             <div className="flex items-center gap-1.5 sm:gap-2">
-                                <span className="font-bold">Lote:</span>
+                                <span className="font-bold">{isEn ? 'Lot:' : 'Lote:'}</span>
                                 <span className="font-mono text-white font-bold">{currentLotId}</span>
                                 <span className="text-white/40">•</span>
                                 <span className="font-bold text-[#83DF9C]">
-                                    {COMMODITIES.find(c => c.id === commodity)?.icon} {COMMODITIES.find(c => c.id === commodity)?.name}
+                                    {COMMODITIES.find(c => c.id === commodity)?.icon}{' '}
+                                    {isEn
+                                        ? COMMODITIES.find(c => c.id === commodity)?.nameEn
+                                        : COMMODITIES.find(c => c.id === commodity)?.name}
                                 </span>
                                 {altitudeMeters && (
                                     <>
                                         <span className="text-white/40">•</span>
                                         <span className="text-[#83DF9C] font-mono font-bold">
-                                            {altitudeMeters.toLocaleString('es-CO')} msnm
+                                            {altitudeMeters.toLocaleString(isEn ? 'en-US' : 'es-CO')} {isEn ? 'masl' : 'msnm'}
                                         </span>
                                     </>
                                 )}
                             </div>
                             <div className="flex items-center gap-1.5 sm:gap-2">
-                                <span className="font-bold text-white/80">Fecha y Hora:</span>
+                                <span className="font-bold text-white/80">{isEn ? 'Timestamp:' : 'Fecha y Hora:'}</span>
                                 <span className="font-mono font-bold text-white bg-white/10 px-2 py-0.5 rounded text-[10px]">
                                     {currentTimestampDisplay}
                                 </span>
                                 <span className="text-white/40">•</span>
-                                <span className="text-[#83DF9C] font-black">CERTIFICADO AXISTRACE</span>
+                                <span className="text-[#83DF9C] font-black">{isEn ? 'AXISTRACE CERTIFICATE' : 'CERTIFICADO AXISTRACE'}</span>
                             </div>
                         </div>
                     </>
@@ -1379,17 +1437,20 @@ export default function EUDRGeoreference({
                 <div className="bg-[#83DF9C] text-[#0C3C60] p-3 text-xs font-black flex items-center justify-between animate-in slide-in-from-top">
                     <span className="flex items-center gap-2">
                         <CheckCircle2 className="w-4 h-4" />
-                        <span>¡Excelente! Regresaste al punto de inicio. Lote cerrado y fotografiado automáticamente.</span>
+                        <span>
+                            {isEn
+                                ? 'Success! Returned to start point. Perimeter closed and parcel evidence captured.'
+                                : '¡Excelente! Regresaste al punto de inicio. Lote cerrado y fotografiado automáticamente.'}
+                        </span>
                     </span>
                     <button
                         onClick={() => setShowScreenshotModal(true)}
                         className="underline text-[11px] uppercase cursor-pointer"
                     >
-                        Ver Foto
+                        {isEn ? 'View Photo' : 'Ver Foto'}
                     </button>
                 </div>
             )}
-
             {/* THUMB-ZONE FIELD CONTROLS */}
             <div className="sticky bottom-0 z-30 p-3 sm:p-4 bg-[#082840]/95 backdrop-blur-md border-t border-white/10 shadow-2xl space-y-2">
                 {!geoJsonData ? (
@@ -1407,10 +1468,10 @@ export default function EUDRGeoreference({
                                     </div>
                                     <div className="text-left">
                                         <span className="block text-sm sm:text-base font-black leading-tight">
-                                            INICIAR CAMINATA
+                                            {isEn ? 'START DIGITAL WALK' : 'INICIAR CAMINATA'}
                                         </span>
                                         <span className="block text-[10px] text-[#0C3C60]/80 font-bold leading-tight lowercase">
-                                            camina el lindero • se cierra solo al volver
+                                            {isEn ? 'walk perimeter • auto-closes upon return' : 'camina el lindero • se cierra solo al volver'}
                                         </span>
                                     </div>
                                 </button>
@@ -1426,27 +1487,27 @@ export default function EUDRGeoreference({
                                         <div>
                                             <span className="font-black text-[#FAF2CA] uppercase text-[11px] block leading-tight">
                                                 {gpsPoints.length === 0
-                                                    ? 'Fijando señal GPS...'
+                                                    ? (isEn ? 'Fixing GPS signal...' : 'Fijando señal GPS...')
                                                     : isStationary
-                                                    ? 'En espera de avance'
-                                                    : 'Caminata en Curso'}
+                                                    ? (isEn ? 'Waiting for movement' : 'En espera de avance')
+                                                    : (isEn ? 'Walk in Progress' : 'Caminata en Curso')}
                                             </span>
                                             <span className="text-[10px] text-white/70 font-semibold block leading-tight mt-0.5">
                                                 {gpsPoints.length === 0
-                                                    ? 'Punto 1 se marcará al capturar coordenadas'
+                                                    ? (isEn ? 'Point 1 logs upon coordinates capture' : 'Punto 1 se marcará al capturar coordenadas')
                                                     : isStationary
-                                                    ? 'Dirígete a la derecha para marcar el siguiente punto'
-                                                    : `Próximo punto en ${countdownSeconds}s • Se cierra solo al volver`}
+                                                    ? (isEn ? 'Head right to log next point' : 'Dirígete a la derecha para marcar el siguiente punto')
+                                                    : (isEn ? `Next point in ${countdownSeconds}s • Auto-closes on return` : `Próximo punto en ${countdownSeconds}s • Se cierra solo al volver`)}
                                             </span>
                                         </div>
                                     </div>
                                     <div className="text-right shrink-0">
                                         <span className="text-[11px] text-[#0C3C60] font-black bg-[#83DF9C] px-2 py-0.5 rounded-lg inline-block shadow-xs">
-                                            {gpsPoints.length} {gpsPoints.length === 1 ? 'punto' : 'puntos'}
+                                            {gpsPoints.length} {gpsPoints.length === 1 ? (isEn ? 'point' : 'punto') : (isEn ? 'points' : 'puntos')}
                                         </span>
                                         {distanceToStart !== null && gpsPoints.length >= 3 && (
                                             <p className="text-[9px] text-[#FAF2CA] font-bold mt-0.5">
-                                                {distanceToStart}m al inicio
+                                                {distanceToStart}m {isEn ? 'to start' : 'al inicio'}
                                             </p>
                                         )}
                                     </div>
@@ -1460,7 +1521,7 @@ export default function EUDRGeoreference({
                                         className="flex-1 bg-[#83DF9C] disabled:bg-gray-600 disabled:text-gray-400 hover:bg-[#6fd48b] active:scale-98 text-[#0C3C60] py-3.5 rounded-xl font-black uppercase text-[11px] sm:text-xs tracking-wider transition-all shadow-md flex items-center justify-center gap-1.5 cursor-pointer min-h-[48px]"
                                     >
                                         <ShieldCheck className="w-4 h-4" />
-                                        <span>Cerrar Lote ({gpsPoints.length}/3+)</span>
+                                        <span>{isEn ? 'Close Perimeter' : 'Cerrar Lote'} ({gpsPoints.length}/3+)</span>
                                     </button>
 
                                     <button
@@ -1471,34 +1532,34 @@ export default function EUDRGeoreference({
                                             }
                                         }}
                                         className="px-3.5 py-3.5 bg-[#0C3C60] hover:bg-[#164e78] active:scale-98 text-[#FAF2CA] rounded-xl font-bold uppercase text-[10px] sm:text-[11px] transition-all cursor-pointer min-h-[48px] flex items-center gap-1.5 shadow-sm border border-white/10"
-                                        title="Modo Bolsillo: Bloquear pantalla táctil mientras caminas seguro"
+                                        title={isEn ? 'Pocket Mode: lock touch screen while walking' : 'Modo Bolsillo: Bloquear pantalla táctil mientras caminas seguro'}
                                     >
                                         <Lock className="w-3.5 h-3.5 text-[#83DF9C]" />
-                                        <span>Bolsillo</span>
+                                        <span>{isEn ? 'Pocket' : 'Bolsillo'}</span>
                                     </button>
 
                                     <button
                                         onClick={handleManualCapturePoint}
                                         className="px-3.5 py-3.5 bg-white/10 border border-white/20 hover:bg-white/20 active:scale-98 text-white rounded-xl font-bold uppercase text-[10px] sm:text-[11px] transition-all cursor-pointer min-h-[48px]"
-                                        title="Marcar vértice manual"
+                                        title={isEn ? 'Record manual vertex' : 'Marcar vértice manual'}
                                     >
-                                        + Punto
+                                        {isEn ? '+ Point' : '+ Punto'}
                                     </button>
 
                                     <button
                                         onClick={stopTracking}
                                         className="px-2.5 sm:px-3 py-3.5 bg-white/5 hover:bg-white/10 active:scale-98 text-white/80 rounded-xl font-bold uppercase text-[10px] sm:text-[11px] transition-all cursor-pointer min-h-[48px]"
                                     >
-                                        Pausar
+                                        {isEn ? 'Pause' : 'Pausar'}
                                     </button>
 
                                     <button
                                         onClick={handleCancelWalk}
                                         className="px-2.5 sm:px-3 py-3.5 bg-red-500/20 hover:bg-red-500/30 active:scale-98 text-red-200 border border-red-500/30 rounded-xl font-bold uppercase text-[10px] sm:text-[11px] transition-all cursor-pointer min-h-[48px] flex items-center gap-1"
-                                        title="Cancelar caminata y descartar puntos"
+                                        title={isEn ? 'Cancel walk and discard points' : 'Cancelar caminata y descartar puntos'}
                                     >
                                         <X className="w-3.5 h-3.5 text-red-400" />
-                                        <span>Cancelar</span>
+                                        <span>{isEn ? 'Cancel' : 'Cancelar'}</span>
                                     </button>
                                 </div>
                             </div>
@@ -1514,10 +1575,10 @@ export default function EUDRGeoreference({
                                 </div>
                                 <div className="min-w-0">
                                     <h4 className="text-xs font-black uppercase text-[#83DF9C] tracking-wider truncate">
-                                        ¡Lote Mapeado con Éxito!
+                                        {isEn ? 'Parcel Successfully Mapped!' : '¡Lote Mapeado con Éxito!'}
                                     </h4>
                                     <p className="text-[10px] text-white/80 font-bold truncate">
-                                        {areaHa > 0 ? `${areaHa} ha` : ''} • {perimeterMeters}m recorrido {altitudeMeters ? `• ${altitudeMeters.toLocaleString('es-CO')} msnm` : ''}
+                                        {areaHa > 0 ? `${areaHa} ha` : ''} • {perimeterMeters}m {isEn ? 'perimeter' : 'recorrido'} {altitudeMeters ? `• ${altitudeMeters.toLocaleString(isEn ? 'en-US' : 'es-CO')} ${isEn ? 'masl' : 'msnm'}` : ''}
                                     </p>
                                 </div>
                             </div>
@@ -1525,7 +1586,7 @@ export default function EUDRGeoreference({
                                 onClick={handleClear}
                                 className="text-[10px] font-black uppercase text-[#0C3C60] bg-[#83DF9C] hover:bg-[#6fd48b] px-2.5 py-1.5 rounded-xl shadow-xs shrink-0 cursor-pointer transition-colors"
                             >
-                                Mapear Otro
+                                {isEn ? 'Map Another' : 'Mapear Otro'}
                             </button>
                         </div>
 
@@ -1535,7 +1596,7 @@ export default function EUDRGeoreference({
                             className="w-full bg-[#83DF9C] hover:bg-[#6fd48b] active:scale-98 text-[#0C3C60] py-4 px-5 rounded-2xl font-black uppercase text-xs sm:text-sm tracking-wider transition-all shadow-xl hover:shadow-2xl flex items-center justify-center gap-2.5 cursor-pointer min-h-[56px]"
                         >
                             <FileText className="w-5 h-5 text-[#0C3C60] shrink-0" />
-                            <span>Completar Datos &amp; Generar Certificado PDF</span>
+                            <span>{isEn ? 'Complete Data & Generate Official PDF' : 'Completar Datos & Generar Certificado PDF'}</span>
                         </button>
 
                         <div className="grid grid-cols-2 gap-2">
@@ -1551,7 +1612,7 @@ export default function EUDRGeoreference({
                                 className="w-full bg-[#0C3C60] hover:bg-[#164e78] active:scale-98 text-[#FAF2CA] py-3 rounded-xl font-bold uppercase text-[10px] sm:text-[11px] tracking-wider transition-all shadow-md flex items-center justify-center gap-1.5 cursor-pointer min-h-[44px] border border-white/10"
                             >
                                 <Camera className="w-4 h-4 text-[#83DF9C]" />
-                                <span>{isCapturingScreenshot ? 'Generando Foto...' : 'Ver Foto del Lote'}</span>
+                                <span>{isCapturingScreenshot ? (isEn ? 'Generating Photo...' : 'Generando Foto...') : (isEn ? 'View Parcel Photo' : 'Ver Foto del Lote')}</span>
                             </button>
 
                             {/* Download GeoJSON for TRACES NT */}
@@ -1570,7 +1631,7 @@ export default function EUDRGeoreference({
                             className="w-full bg-[#25D366] hover:bg-[#20ba5a] active:scale-98 text-white py-3 rounded-xl font-bold uppercase text-[10px] sm:text-[11px] tracking-wider transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer"
                         >
                             <Share2 className="w-4 h-4" />
-                            <span>Enviar Reporte Rápido por WhatsApp</span>
+                            <span>{isEn ? 'Send Quick Summary on WhatsApp' : 'Enviar Reporte Rápido por WhatsApp'}</span>
                         </button>
                     </div>
                 )}
@@ -1587,14 +1648,12 @@ export default function EUDRGeoreference({
 
                             <div>
                                 <h3 className="text-lg font-black text-white tracking-wide">
-                                    ¿Cancelar Caminata?
+                                    {isEn ? 'Cancel Field Walk?' : '¿Cancelar Caminata?'}
                                 </h3>
                                 <p className="text-xs text-[#FAF2CA]/75 mt-2 leading-relaxed">
-                                    Se detendrá el rastreo GPS y se descartarán los{' '}
-                                    <span className="font-black text-[#83DF9C]">
-                                        {gpsPoints.length} {gpsPoints.length === 1 ? 'punto registrado' : 'puntos registrados'}
-                                    </span>
-                                    . La terminal volverá a su estado inicial.
+                                    {isEn
+                                        ? `GPS tracking will stop and the ${gpsPoints.length} recorded ${gpsPoints.length === 1 ? 'vertex' : 'vertices'} will be discarded. The terminal will reset to its initial state.`
+                                        : `Se detendrá el rastreo GPS y se descartarán los ${gpsPoints.length} ${gpsPoints.length === 1 ? 'punto registrado' : 'puntos registrados'}. La terminal volverá a su estado inicial.`}
                                 </p>
                             </div>
 
@@ -1604,14 +1663,14 @@ export default function EUDRGeoreference({
                                     className="w-full bg-red-500 hover:bg-red-600 active:scale-98 text-white py-3.5 px-4 rounded-xl font-black uppercase text-xs tracking-wider transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer"
                                 >
                                     <X className="w-4 h-4" />
-                                    <span>Sí, Cancelar y Descartar</span>
+                                    <span>{isEn ? 'Yes, Cancel & Discard' : 'Sí, Cancelar y Descartar'}</span>
                                 </button>
                                 <button
                                     onClick={() => setShowCancelModal(false)}
                                     className="w-full bg-[#0C3C60] hover:bg-[#164e78] active:scale-98 text-[#FAF2CA] py-3.5 px-4 rounded-xl font-bold uppercase text-xs tracking-wider transition-all border border-white/10 flex items-center justify-center gap-2 cursor-pointer"
                                 >
                                     <Play className="w-4 h-4 text-[#83DF9C] fill-current" />
-                                    <span>Continuar Caminata</span>
+                                    <span>{isEn ? 'Keep Walking' : 'Continuar Caminata'}</span>
                                 </button>
                             </div>
                         </div>
@@ -1625,6 +1684,7 @@ export default function EUDRGeoreference({
                 <DeliverableModal
                     isOpen={showDeliverableModal}
                     onClose={() => setShowDeliverableModal(false)}
+                    lang={lang}
                     data={{
                         lotId: currentLotId,
                         commodity,
@@ -1649,10 +1709,10 @@ export default function EUDRGeoreference({
                                 <Camera className="w-5 h-5 text-[#83DF9C]" />
                                 <div>
                                     <h3 className="text-xs font-black uppercase tracking-wider text-[#FAF2CA]">
-                                        Evidencia Fotográfica AxisTrace
+                                        {isEn ? 'AxisTrace Photographic Evidence' : 'Evidencia Fotográfica AxisTrace'}
                                     </h3>
                                     <p className="text-[10px] text-white/60">
-                                        Capturado automáticamente al cerrar el lote
+                                        {isEn ? 'Captured automatically upon closing boundary' : 'Capturado automáticamente al cerrar el lote'}
                                     </p>
                                 </div>
                             </div>
@@ -1669,12 +1729,12 @@ export default function EUDRGeoreference({
                             {capturedScreenshot ? (
                                 <img
                                     src={capturedScreenshot}
-                                    alt="Pantallazo de la caminata satelital"
+                                    alt={isEn ? 'Satellite walking survey screenshot' : 'Pantallazo de la caminata satelital'}
                                     className="w-full rounded-2xl shadow-md border border-white/20 object-contain max-h-[48vh]"
                                 />
                             ) : (
                                 <div className="py-12 text-center text-xs text-white/50">
-                                    Generando imagen de alta resolución...
+                                    {isEn ? 'Generating high-resolution image...' : 'Generando imagen de alta resolución...'}
                                 </div>
                             )}
 
@@ -1683,8 +1743,9 @@ export default function EUDRGeoreference({
                                     <p className="font-bold flex items-center gap-1.5 text-[#83DF9C]">
                                         <CheckCircle2 className="w-4 h-4 shrink-0" />
                                         <span>
-                                            Lote verificado: {areaHa} ha (≈ {Math.round(areaHa * 10000).toLocaleString('es-CO')} m²)
-                                            {altitudeMeters && ` • ${altitudeMeters.toLocaleString('es-CO')} msnm`}
+                                            {isEn ? 'Verified boundary: ' : 'Lote verificado: '}
+                                            {areaHa} ha (≈ {Math.round(areaHa * 10000).toLocaleString(isEn ? 'en-US' : 'es-CO')} m²)
+                                            {altitudeMeters && ` • ${altitudeMeters.toLocaleString(isEn ? 'en-US' : 'es-CO')} ${isEn ? 'masl' : 'msnm'}`}
                                         </span>
                                     </p>
                                     <span className="font-mono text-[10px] bg-[#0C3C60] text-[#FAF2CA] px-2 py-0.5 rounded font-bold w-fit">
@@ -1692,7 +1753,7 @@ export default function EUDRGeoreference({
                                     </span>
                                 </div>
                                 <p className="text-[10px] text-white/70">
-                                    Identificador: {currentLotId} • {COMMODITIES.find(c => c.id === commodity)?.name} • Coordenadas WGS84 RFC 7946
+                                    {isEn ? 'Identifier' : 'Identificador'}: {currentLotId} • {isEn && COMMODITIES.find(c => c.id === commodity)?.nameEn ? COMMODITIES.find(c => c.id === commodity)?.nameEn : COMMODITIES.find(c => c.id === commodity)?.name} • {isEn ? 'WGS84 RFC 7946 Coordinates' : 'Coordenadas WGS84 RFC 7946'}
                                 </p>
 
                                 {/* Immutability Certificate Seal in Modal */}
@@ -1701,24 +1762,24 @@ export default function EUDRGeoreference({
                                         <div className="flex items-center gap-1.5">
                                             <Lock className="w-3.5 h-3.5 text-[#83DF9C]" />
                                             <span className="font-black text-[#FAF2CA] uppercase text-[10px] tracking-wider">
-                                                Identificador Único Verificable (UID)
+                                                {isEn ? 'Unique Identifier (UID)' : 'Identificador Único Verificable (UID)'}
                                             </span>
                                         </div>
                                         <span className="text-[8.5px] bg-[#83DF9C] text-[#0C3C60] font-black px-1.5 py-0.2 rounded uppercase">
-                                            Inalterable
+                                            {isEn ? 'Tamper-Proof' : 'Inalterable'}
                                         </span>
                                     </div>
                                     <div className="bg-[#082840] p-1.5 rounded font-mono text-[9px] text-[#83DF9C] break-all border border-white/10 flex items-center justify-between gap-2">
-                                        <span className="truncate">{immutableHash ? `AXIS-UID-${immutableHash}` : 'GENERANDO UID...'}</span>
+                                        <span className="truncate">{immutableHash ? `AXIS-UID-${immutableHash}` : (isEn ? 'GENERATING UID...' : 'GENERANDO UID...')}</span>
                                         {immutableHash && (
                                             <button
                                                 onClick={() => {
                                                     navigator.clipboard.writeText(`AXIS-UID-${immutableHash}`);
-                                                    alert('Identificador UID copiado al portapapeles');
+                                                    alert(isEn ? 'UID Identifier copied to clipboard' : 'Identificador UID copiado al portapapeles');
                                                 }}
                                                 className="text-[9px] text-white/60 hover:text-white underline shrink-0 cursor-pointer"
                                             >
-                                                Copiar
+                                                {isEn ? 'Copy' : 'Copiar'}
                                             </button>
                                         )}
                                     </div>
@@ -1733,7 +1794,7 @@ export default function EUDRGeoreference({
                                 className="w-full bg-[#83DF9C] hover:bg-[#6fd48b] text-[#0C3C60] py-3.5 rounded-xl font-black uppercase text-xs tracking-wider transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
                             >
                                 <Download className="w-4 h-4" />
-                                <span>Guardar Foto en el Celular / Galería</span>
+                                <span>{isEn ? 'Save Photo to Device / Gallery' : 'Guardar Foto en el Celular / Galería'}</span>
                             </button>
 
                             <button
@@ -1744,14 +1805,14 @@ export default function EUDRGeoreference({
                                 className="w-full bg-[#25D366] hover:bg-[#20ba5a] text-white py-3.5 rounded-xl font-black uppercase text-xs tracking-wider transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer"
                             >
                                 <Share2 className="w-4 h-4" />
-                                <span>Compartir por WhatsApp</span>
+                                <span>{isEn ? 'Share via WhatsApp' : 'Compartir por WhatsApp'}</span>
                             </button>
 
                             <button
                                 onClick={() => setShowScreenshotModal(false)}
                                 className="w-full py-2.5 text-center text-xs font-bold text-white/60 hover:text-white uppercase cursor-pointer"
                             >
-                                Cerrar y volver al mapa
+                                {isEn ? 'Close and return to map' : 'Cerrar y volver al mapa'}
                             </button>
                         </div>
                     </div>
@@ -1770,16 +1831,16 @@ export default function EUDRGeoreference({
                             </div>
                             <div>
                                 <h3 className="text-xs font-black uppercase tracking-wider text-[#FAF2CA]">
-                                    Modo Bolsillo Activo
+                                    {isEn ? 'Pocket Mode Active' : 'Modo Bolsillo Activo'}
                                 </h3>
                                 <p className="text-[10px] text-white/60">
-                                    Pantalla táctil protegida contra toques de tela
+                                    {isEn ? 'Touch screen protected against fabric touches' : 'Pantalla táctil protegida contra toques de tela'}
                                 </p>
                             </div>
                         </div>
                         <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#83DF9C]/20 text-[#83DF9C] text-[10px] font-mono font-bold border border-[#83DF9C]/30">
                             <span className="w-2 h-2 rounded-full bg-[#83DF9C] animate-ping" />
-                            <span>GPS Grabando</span>
+                            <span>{isEn ? 'GPS Logging' : 'GPS Grabando'}</span>
                         </div>
                     </div>
 
@@ -1787,7 +1848,7 @@ export default function EUDRGeoreference({
                     <div className="flex flex-col items-center justify-center text-center my-auto space-y-6">
                         <div>
                             <span className="text-[11px] font-bold text-white/50 uppercase tracking-widest block mb-1">
-                                Vértices Registrados
+                                {isEn ? 'Recorded Vertices' : 'Vértices Registrados'}
                             </span>
                             <div className="text-7xl font-black font-mono text-[#83DF9C]">
                                 {gpsPoints.length}
@@ -1797,7 +1858,7 @@ export default function EUDRGeoreference({
                         <div className="grid grid-cols-2 gap-3 w-full max-w-xs">
                             <div className="bg-white/5 border border-white/10 rounded-2xl p-3 text-center">
                                 <span className="text-[9px] uppercase tracking-wider text-white/50 block font-bold">
-                                    Próximo Punto
+                                    {isEn ? 'Next Point' : 'Próximo Punto'}
                                 </span>
                                 <span className="text-2xl font-black font-mono text-[#FAF2CA]">
                                     {countdownSeconds}s
@@ -1805,29 +1866,31 @@ export default function EUDRGeoreference({
                             </div>
                             <div className="bg-white/5 border border-white/10 rounded-2xl p-3 text-center">
                                 <span className="text-[9px] uppercase tracking-wider text-white/50 block font-bold">
-                                    Altitud
+                                    {isEn ? 'Altitude' : 'Altitud'}
                                 </span>
                                 <span className="text-2xl font-black font-mono text-white">
-                                    {altitudeMeters ? altitudeMeters.toLocaleString('es-CO') : '--'}
+                                    {altitudeMeters ? altitudeMeters.toLocaleString(isEn ? 'en-US' : 'es-CO') : '--'}
                                 </span>
-                                <span className="text-[9px] text-white/40 block">msnm</span>
+                                <span className="text-[9px] text-white/40 block">{isEn ? 'masl' : 'msnm'}</span>
                             </div>
                         </div>
 
                         {distanceToStart !== null && gpsPoints.length >= 3 && (
                             <div className="bg-[#83DF9C]/15 border border-[#83DF9C]/30 rounded-2xl p-3 max-w-xs w-full text-center">
                                 <span className="text-[10px] font-bold text-[#83DF9C] block uppercase tracking-wider">
-                                    {distanceToStart <= 5 ? '🎯 ¡Llegaste al punto de partida!' : `Distancia al inicio: ${distanceToStart}m`}
+                                    {distanceToStart <= 5
+                                        ? (isEn ? '🎯 Starting point reached!' : '🎯 ¡Llegaste al punto de partida!')
+                                        : (isEn ? `Distance to start: ${distanceToStart}m` : `Distancia al inicio: ${distanceToStart}m`)}
                                 </span>
                                 <span className="text-[9px] text-white/60 block mt-0.5">
-                                    Se cerrará automáticamente al volver
+                                    {isEn ? 'Will auto-close upon arrival' : 'Se cerrará automáticamente al volver'}
                                 </span>
                             </div>
                         )}
 
                         <div className="flex items-center gap-2 text-[10px] text-white/50 bg-white/5 px-3 py-1.5 rounded-full">
                             <Smartphone className="w-3.5 h-3.5 text-[#83DF9C]" />
-                            <span>Vibra suave en tu bolsillo en cada punto capturado</span>
+                            <span>{isEn ? 'Gently vibrates in your pocket at every captured point' : 'Vibra suave en tu bolsillo en cada punto capturado'}</span>
                         </div>
                     </div>
 
@@ -1849,13 +1912,13 @@ export default function EUDRGeoreference({
                                 <Unlock className="w-4 h-4 text-[#FAF2CA]" />
                                 <span>
                                     {holdProgress > 0
-                                        ? `Soltando en ${Math.max(1, Math.round((100 - holdProgress) / 10))}...`
-                                        : 'Mantén presionado para desbloquear'}
+                                        ? (isEn ? `Releasing in ${Math.max(1, Math.round((100 - holdProgress) / 10))}...` : `Soltando en ${Math.max(1, Math.round((100 - holdProgress) / 10))}...`)
+                                        : (isEn ? 'Hold to unlock' : 'Mantén presionado para desbloquear')}
                                 </span>
                             </button>
                         </div>
                         <p className="text-[10px] text-center text-white/50">
-                            Guarda el celular en tu bolsillo y camina libremente con ambas manos seguras.
+                            {isEn ? 'Place your phone in your pocket and walk freely with both hands safe.' : 'Guarda el celular en tu bolsillo y camina libremente con ambas manos seguras.'}
                         </p>
                     </div>
                 </div>,
