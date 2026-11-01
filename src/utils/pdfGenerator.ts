@@ -85,24 +85,24 @@ export async function generateEUDRCertificatePdf(data: EUDRCertificateData) {
     }
 
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(7.5);
+    doc.setFontSize(7);
     doc.setTextColor(250, 242, 202);
-    doc.text(isEn ? 'DIGITAL DUE DILIGENCE INFRASTRUCTURE' : 'INFRAESTRUCTURA DIGITAL DE DILIGENCIA DEBIDA', textStartX, 11);
-    doc.text('REGULATION (EU) 2023/1115 • TRACES NT', textStartX, 15.5);
+    doc.text('DIGITAL DUE DILIGENCE INFRASTRUCTURE • INFRAESTRUCTURA DE DILIGENCIA DEBIDA', textStartX, 11);
+    doc.text('REGULATION (EU) 2023/1115 • TRACES NT COMPLIANT', textStartX, 15.5);
     doc.setTextColor(131, 223, 156);
-    doc.text(isEn ? 'CERTIFIED GROUND GEOREFERENCING' : 'GEORREFERENCIACIÓN TERRESTRE CERTIFICADA', textStartX, 20);
+    doc.text('CERTIFIED GROUND GEOREFERENCING • GEORREFERENCIACIÓN TERRESTRE CERTIFICADA', textStartX, 20);
 
     // Right Badge on Header
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(8.5);
+    doc.setFontSize(8);
     doc.setTextColor(255, 255, 255);
-    doc.text(isEn ? 'EUDR CARTOGRAPHIC CERTIFICATE' : 'CERTIFICADO CARTOGRÁFICO EUDR', pageWidth - margin, 12, { align: 'right' });
+    doc.text('EUDR CARTOGRAPHIC CERTIFICATE / CERTIFICADO EUDR', pageWidth - margin, 11, { align: 'right' });
 
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(7.5);
+    doc.setFontSize(7);
     doc.setTextColor(200, 225, 240);
-    doc.text(`${isEn ? 'ISSUED' : 'EMISIÓN'}: ${data.timestamp}`, pageWidth - margin, 17, { align: 'right' });
-    doc.text(isEn ? 'IETF RFC 7946 / WGS84 STANDARD' : 'NORMATIVA IETF RFC 7946 / WGS84', pageWidth - margin, 21, { align: 'right' });
+    doc.text(`ISSUED / EMISIÓN: ${data.timestamp}`, pageWidth - margin, 15.5, { align: 'right' });
+    doc.text('IETF RFC 7946 / WGS84 STANDARD', pageWidth - margin, 20, { align: 'right' });
 
     let currentY = 36;
 
@@ -115,23 +115,21 @@ export async function generateEUDRCertificatePdf(data: EUDRCertificateData) {
     doc.roundedRect(margin, currentY, contentWidth, 14, 2, 2, 'FD');
 
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(8.5);
+    doc.setFontSize(8);
     doc.setTextColor(...primaryNavy);
-    doc.text(isEn ? 'UNIQUE IDENTIFIER (UID):' : 'IDENTIFICADOR ÚNICO VERIFICABLE (UID):', margin + 3, currentY + 5.5);
+    doc.text('UNIQUE IDENTIFIER (UID) / IDENTIFICADOR ÚNICO (UID):', margin + 3, currentY + 5.5);
 
     doc.setFont('courier', 'bold');
-    doc.setFontSize(8.5);
+    doc.setFontSize(8);
     doc.setTextColor(...accentGreen);
-    const uidDisplay = data.uid.length > 40 ? `${data.uid.slice(0, 22)}...${data.uid.slice(-18)}` : data.uid;
-    doc.text(uidDisplay, margin + (isEn ? 50 : 74), currentY + 5.5);
+    const uidDisplay = data.uid.length > 38 ? `${data.uid.slice(0, 20)}...${data.uid.slice(-16)}` : data.uid;
+    doc.text(uidDisplay, margin + 92, currentY + 5.5);
 
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(7.5);
+    doc.setFontSize(6.8);
     doc.setTextColor(...mutedText);
     doc.text(
-        isEn
-            ? 'This official document certifies the geodetic perimeter delimitation of the production holding for EU import due diligence.'
-            : 'Este documento acredita la geolocalización perimetral de la parcela para fines de debida diligencia de exportación e importación.',
+        'Official geodetic perimeter certificate for EU import due diligence • Documento oficial de geolocalización perimetral para debida diligencia de importación UE.',
         margin + 3,
         currentY + 10.5
     );
@@ -154,38 +152,43 @@ export async function generateEUDRCertificatePdf(data: EUDRCertificateData) {
     doc.roundedRect(margin, currentY, colWidth, 7, 2, 2, 'F');
     doc.rect(margin, currentY + 4, colWidth, 3, 'F'); // square bottom corners
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(8);
+    doc.setFontSize(7.5);
     doc.setTextColor(255, 255, 255);
-    doc.text(isEn ? '1. PRODUCER & HOLDING IDENTIFICATION' : '1. INFORMACIÓN DEL PRODUCTOR Y PREDIO', margin + 3, currentY + 5);
+    doc.text('1. PRODUCER & HOLDING / PRODUCTOR Y PREDIO', margin + 3, currentY + 5);
 
-    doc.setFontSize(8);
     let boxY = currentY + 12;
 
-    const printField = (label: string, val: string, x: number, y: number, maxW: number = 80) => {
+    const printField = (labelEn: string, labelEs: string, val: string, x: number, y: number, maxW: number = 48) => {
         doc.setFont('helvetica', 'bold');
+        doc.setFontSize(6.5);
         doc.setTextColor(...mutedText);
-        doc.text(label, x, y);
+        doc.text(`${labelEn} /`, x, y);
+        const enW = doc.getTextWidth(`${labelEn} / `);
+        doc.setFont('helvetica', 'normal');
+        doc.text(labelEs, x + enW, y);
+
         doc.setFont('helvetica', 'bold');
+        doc.setFontSize(7.5);
         doc.setTextColor(...charcoalText);
-        const truncated = doc.splitTextToSize(val || (isEn ? 'Unspecified' : 'No especificado'), maxW);
-        doc.text(truncated[0], x + 30, y);
+        const truncated = doc.splitTextToSize(val || 'Unspecified / No especificado', maxW);
+        doc.text(truncated[0], x + 38, y);
     };
 
-    printField(isEn ? 'Producer:' : 'Productor:', data.farmerName || (isEn ? 'Unregistered' : 'Sin Registrar'), margin + 3, boxY);
+    printField('Producer', 'Productor:', data.farmerName || 'Unregistered / Sin Registrar', margin + 3, boxY);
     boxY += 6;
-    printField(isEn ? 'ID / Tax ID:' : 'Doc. / Cédula:', data.farmerId || (isEn ? 'Not registered' : 'No registrada'), margin + 3, boxY);
+    printField('Tax ID', 'Cédula:', data.farmerId || 'Not registered / No registrada', margin + 3, boxY);
     boxY += 6;
     if (data.sicaCode) {
-        printField(isEn ? 'SICA Registry:' : 'Registro SICA:', data.sicaCode, margin + 3, boxY);
+        printField('SICA Code', 'Reg. SICA:', data.sicaCode, margin + 3, boxY);
     } else {
-        printField(isEn ? 'Phone / WA:' : 'Teléfono / WA:', data.farmerPhone || (isEn ? 'Not registered' : 'No registrado'), margin + 3, boxY);
+        printField('Phone', 'Tel / WA:', data.farmerPhone || 'Not registered / No registrado', margin + 3, boxY);
     }
     boxY += 6;
-    printField(isEn ? 'Farm / Holding:' : 'Finca / Predio:', data.farmName || (isEn ? 'Main Holding' : 'Predio Principal'), margin + 3, boxY);
+    printField('Holding', 'Predio:', data.farmName || 'Main Holding / Predio Principal', margin + 3, boxY);
     boxY += 6;
-    printField(isEn ? 'Lot / Parcel:' : 'Lote / Parcela:', data.lotName || 'Lote 01', margin + 3, boxY);
+    printField('Parcel', 'Lote:', data.lotName || 'Lote 01', margin + 3, boxY);
     boxY += 6;
-    printField(isEn ? 'Location:' : 'Ubicación:', `${data.municipality || 'Municipality'}, ${data.department || 'Region'} - ${data.country || 'Colombia'}`, margin + 3, boxY);
+    printField('Location', 'Ubicación:', `${data.municipality || 'Municipality'}, ${data.department || 'Region'} - ${data.country || 'CO'}`, margin + 3, boxY);
 
     // BOX RIGHT: DATOS DEL CULTIVO Y MÉTRICAS EUDR
     const rightColX = margin + colWidth + 4;
@@ -198,24 +201,24 @@ export async function generateEUDRCertificatePdf(data: EUDRCertificateData) {
     doc.roundedRect(rightColX, currentY, colWidth, 7, 2, 2, 'F');
     doc.rect(rightColX, currentY + 4, colWidth, 3, 'F');
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(8);
+    doc.setFontSize(7.5);
     doc.setTextColor(255, 255, 255);
-    doc.text(isEn ? '2. AGRONOMIC & GEODETIC METRICS' : '2. PARÁMETROS AGRONÓMICOS & MÉTRICOS', rightColX + 3, currentY + 5);
+    doc.text('2. AGRONOMIC & METRICS / PARÁMETROS AGRONÓMICOS', rightColX + 3, currentY + 5);
 
     boxY = currentY + 12;
-    printField(isEn ? 'Scope / Crop:' : 'Rubro / Cultivo:', `${data.commodityName.toUpperCase()} (HS: ${data.commodityCode})`, rightColX + 3, boxY);
+    printField('Scope / Crop', 'Cultivo:', `${data.commodityName.toUpperCase()} (HS: ${data.commodityCode})`, rightColX + 3, boxY);
     boxY += 6;
-    printField(isEn ? 'Variety / Type:' : 'Variedad / Tipo:', data.variety || (isEn ? 'Standard Variety' : 'Variedad Estándar'), rightColX + 3, boxY);
+    printField('Variety', 'Variedad:', data.variety || 'Standard Variety / Estándar', rightColX + 3, boxY);
     boxY += 6;
 
     const areaM2 = Math.round(data.areaHa * 10000);
-    printField(isEn ? 'Parcel Area:' : 'Área Parcela:', `${data.areaHa.toFixed(2)} ha (${areaM2.toLocaleString(isEn ? 'en-US' : 'es-CO')} m²)`, rightColX + 3, boxY);
+    printField('Total Area', 'Área:', `${data.areaHa.toFixed(2)} ha (${areaM2.toLocaleString('en-US')} m²)`, rightColX + 3, boxY);
     boxY += 6;
-    printField(isEn ? 'Perimeter:' : 'Perímetro:', `${data.perimeterMeters.toLocaleString(isEn ? 'en-US' : 'es-CO')} ${isEn ? 'linear meters' : 'metros lineales'}`, rightColX + 3, boxY);
+    printField('Perimeter', 'Perímetro:', `${data.perimeterMeters.toLocaleString('en-US')} m`, rightColX + 3, boxY);
     boxY += 6;
-    printField(isEn ? 'Avg Altitude:' : 'Altitud Media:', data.altitudeMeters ? `${data.altitudeMeters.toLocaleString(isEn ? 'en-US' : 'es-CO')} ${isEn ? 'masl' : 'msnm'}` : (isEn ? 'Logged by GNSS' : 'Registrada por GPS'), rightColX + 3, boxY);
+    printField('Elevation', 'Altitud:', data.altitudeMeters ? `${data.altitudeMeters.toLocaleString('en-US')} masl / msnm` : 'GNSS Logged / GPS', rightColX + 3, boxY);
     boxY += 6;
-    printField(isEn ? '2020 Baseline:' : 'Línea Base 2020:', isEn ? '0.00 ha Deforestation (Verified)' : '0.00 ha Deforestación (Verificada)', rightColX + 3, boxY);
+    printField('2020 Baseline', 'Línea 2020:', '0.00 ha Deforestation / CLEARED', rightColX + 3, boxY);
 
     currentY += boxHeight + 5;
 
@@ -232,16 +235,10 @@ export async function generateEUDRCertificatePdf(data: EUDRCertificateData) {
     doc.roundedRect(margin, currentY, contentWidth, 7, 2, 2, 'F');
     doc.rect(margin, currentY + 4, contentWidth, 3, 'F');
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(8);
+    doc.setFontSize(7.5);
     doc.setTextColor(255, 255, 255);
-    doc.text(
-        isEn
-            ? '3. GEODETIC COORDINATE PLAN (WHITE CADASTRAL MAP)'
-            : '3. LEVANTAMIENTO CARTOGRÁFICO DE COORDENADAS (PLANO CADASTRAL SOBRE BLANCO)',
-        margin + 3,
-        currentY + 5
-    );
-    doc.text(`${isEn ? 'TOTAL VERTICES' : 'TOTAL VÉRTICES'}: ${data.vertices.length}`, pageWidth - margin - 3, currentY + 5, { align: 'right' });
+    doc.text('3. CADASTRAL COORDINATE PLAN / LEVANTAMIENTO CARTOGRÁFICO CATASTRAL', margin + 3, currentY + 5);
+    doc.text(`TOTAL VERTICES / VÉRTICES: ${data.vertices.length}`, pageWidth - margin - 3, currentY + 5, { align: 'right' });
 
     // Render Clean White Cartographic Cadastral Vector Map
     drawCadastralVectorMap(doc, margin + 2, currentY + 8, contentWidth - 4, mapSectionHeight - 10, data.vertices, data.lotName, isEn);
@@ -267,26 +264,20 @@ export async function generateEUDRCertificatePdf(data: EUDRCertificateData) {
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(7.5);
     doc.setTextColor(255, 255, 255);
-    doc.text(
-        isEn
-            ? '4. GEODETIC VERTEX COORDINATES (WGS84 EPSG:4326)'
-            : '4. COORDENADAS GEODÉSICAS DE VÉRTICES (WGS84 EPSG:4326)',
-        margin + 3,
-        currentY + 4.5
-    );
+    doc.text('4. GEODETIC VERTEX COORDINATES / COORDENADAS GEODÉSICAS (WGS84)', margin + 3, currentY + 4.5);
 
     // Table Columns
     const tHeadY = currentY + 10;
     doc.setFillColor(...lightBg);
     doc.rect(margin + 1, currentY + 6.5, tableWidth - 2, 4.5, 'F');
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(6.5);
+    doc.setFontSize(6);
     doc.setTextColor(...mutedText);
-    doc.text(isEn ? 'VERTEX' : 'VÉRTICE', margin + 3, tHeadY);
-    doc.text(isEn ? 'LATITUDE (N)' : 'LATITUD (N)', margin + 22, tHeadY);
-    doc.text(isEn ? 'LONGITUDE (W)' : 'LONGITUD (W)', margin + 50, tHeadY);
-    doc.text(isEn ? 'TOLERANCE' : 'TOLERANCIA', margin + 82, tHeadY);
-    doc.text(isEn ? 'STATUS' : 'ESTADO', margin + 112, tHeadY);
+    doc.text('VERTEX / VÉRTICE', margin + 3, tHeadY);
+    doc.text('LATITUDE / LAT (N)', margin + 24, tHeadY);
+    doc.text('LONGITUDE / LNG (W)', margin + 50, tHeadY);
+    doc.text('TOLERANCE / TOL', margin + 78, tHeadY);
+    doc.text('STATUS / ESTADO', margin + 104, tHeadY);
 
     // Table Rows (render up to first 8 vertices, + summary if more)
     let rowY = tHeadY + 4.5;
@@ -303,26 +294,22 @@ export async function generateEUDRCertificatePdf(data: EUDRCertificateData) {
         } else {
             doc.setTextColor(...charcoalText);
         }
-        const vLabel = isEn ? `V-${idx + 1} ${isStart ? '(Start)' : ''}` : `V-${idx + 1} ${isStart ? '(Inicio)' : ''}`;
-        const vStatus = isStart
-            ? (isEn ? 'Closed / Verified' : 'Cerrado / Validado')
-            : (isEn ? 'Compliant' : 'Conforme');
+        const vLabel = `V-${idx + 1} ${isStart ? '(Start/Inicio)' : ''}`;
+        const vStatus = isStart ? 'Verified / Validado' : 'Compliant / Conforme';
 
         doc.text(vLabel, margin + 3, rowY);
-        doc.text(v[0].toFixed(6), margin + 22, rowY);
+        doc.text(v[0].toFixed(6), margin + 24, rowY);
         doc.text(v[1].toFixed(6), margin + 50, rowY);
-        doc.text('± 3.0 m (GNSS)', margin + 82, rowY);
-        doc.text(vStatus, margin + 112, rowY);
+        doc.text('± 3.0 m (GNSS)', margin + 78, rowY);
+        doc.text(vStatus, margin + 104, rowY);
         rowY += 4.5;
     });
 
     if (data.vertices.length > 8) {
         doc.setFont('helvetica', 'italic');
-        doc.setFontSize(6.5);
+        doc.setFontSize(6);
         doc.setTextColor(...mutedText);
-        const extraNote = isEn
-            ? `[ ... and ${data.vertices.length - 8} additional vertices embedded in the attached GeoJSON file ]`
-            : `[ ... y ${data.vertices.length - 8} vértices adicionales conformados en el archivo GeoJSON adjunto ]`;
+        const extraNote = `[ ... and ${data.vertices.length - 8} additional vertices in GeoJSON / vértices adicionales en archivo GeoJSON ]`;
         doc.text(extraNote, margin + 3, rowY + 1);
     }
 
@@ -339,7 +326,7 @@ export async function generateEUDRCertificatePdf(data: EUDRCertificateData) {
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(7);
     doc.setTextColor(255, 255, 255);
-    doc.text(isEn ? '5. DIGITAL AUDIT' : '5. AUDITORÍA DIGITAL', qrBoxX + 3, currentY + 4.5);
+    doc.text('5. AUDIT / AUDITORÍA', qrBoxX + 3, currentY + 4.5);
 
     // Generate real QR code image
     try {
@@ -360,13 +347,13 @@ export async function generateEUDRCertificatePdf(data: EUDRCertificateData) {
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(6);
     doc.setTextColor(...primaryNavy);
-    doc.text(isEn ? 'SCAN FOR AUDIT' : 'ESCANEAR PARA AUDITORÍA', qrBoxX + qrWidth / 2, currentY + 43, { align: 'center' });
+    doc.text('SCAN FOR AUDIT / ESCANEAR', qrBoxX + qrWidth / 2, currentY + 43, { align: 'center' });
 
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(5.5);
     doc.setTextColor(...mutedText);
-    doc.text(isEn ? 'Due Diligence Compliant' : 'Diligencia Debida Conforme', qrBoxX + qrWidth / 2, currentY + 47, { align: 'center' });
-    doc.text(isEn ? 'European Commission 2023/1115' : 'Comisión Europea 2023/1115', qrBoxX + qrWidth / 2, currentY + 50, { align: 'center' });
+    doc.text('Due Diligence / Diligencia Debida', qrBoxX + qrWidth / 2, currentY + 47, { align: 'center' });
+    doc.text('European Commission 2023/1115', qrBoxX + qrWidth / 2, currentY + 50, { align: 'center' });
     doc.text('TRACES NT Ingestion Ready', qrBoxX + qrWidth / 2, currentY + 53, { align: 'center' });
 
     // ==========================================
@@ -378,25 +365,13 @@ export async function generateEUDRCertificatePdf(data: EUDRCertificateData) {
     doc.line(margin, footerY, pageWidth - margin, footerY);
 
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(6.5);
+    doc.setFontSize(6);
     doc.setTextColor(...charcoalText);
-    doc.text(
-        isEn
-            ? 'AxisTrace • Territorial Intelligence & Supply Chain Traceability'
-            : 'AxisTrace • Sistema de Trazabilidad e Inteligencia Territorial',
-        margin,
-        footerY + 4
-    );
+    doc.text('AxisTrace • Due Diligence & Traceability / Diligencia Debida y Trazabilidad', margin, footerY + 4);
 
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(...mutedText);
-    doc.text(
-        isEn
-            ? 'European Union Validity • Standard IETF RFC 7946 • CRS84 Projection'
-            : 'Validez para Unión Europea • Estándar IETF RFC 7946 • Proyección CRS84',
-        margin,
-        footerY + 7.5
-    );
+    doc.text('EU Validity / Validez Unión Europea • Standard IETF RFC 7946 • CRS84', margin, footerY + 7.5);
 
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(...accentGreen);
@@ -404,12 +379,7 @@ export async function generateEUDRCertificatePdf(data: EUDRCertificateData) {
 
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(...mutedText);
-    doc.text(
-        isEn ? 'Page 1 of 1 • Official Field Document' : 'Página 1 de 1 • Documento Oficial de Campo',
-        pageWidth - margin,
-        footerY + 7.5,
-        { align: 'right' }
-    );
+    doc.text('Page 1 of 1 / Página 1 de 1 • Official Certificate', pageWidth - margin, footerY + 7.5, { align: 'right' });
 
     // Save and download the PDF
     const filename = `CERTIFICADO_EUDR_${data.commodityName.toUpperCase()}_${data.lotName.replace(/\s+/g, '_')}.pdf`;
@@ -439,7 +409,7 @@ function drawCadastralVectorMap(
         doc.setFontSize(8.5);
         doc.setTextColor(100, 116, 139);
         doc.text(
-            isEn ? 'Geodetic perimeter delineation in progress' : 'Polígono en proceso de delimitación geodésica',
+            'Geodetic delineation in progress / Delimitación en proceso',
             x + w / 2,
             y + h / 2,
             { align: 'center' }
@@ -549,12 +519,12 @@ function drawCadastralVectorMap(
 
             // Start label badge
             doc.setFillColor(12, 60, 96); // navy pill
-            const pillW = isEn ? 22 : 24;
+            const pillW = 25;
             doc.roundedRect(px + 2.5, py - 3, pillW, 4.5, 1, 1, 'F');
             doc.setFont('helvetica', 'bold');
-            doc.setFontSize(5);
+            doc.setFontSize(4.8);
             doc.setTextColor(255, 255, 255);
-            doc.text(isEn ? 'P-01 (START/CLOSE)' : 'P-01 (INICIO/CIERRE)', px + 3.5, py);
+            doc.text('P-01 (START / INICIO)', px + 3.5, py);
         } else {
             // Other vertices
             doc.setFillColor(12, 60, 96);
@@ -612,7 +582,7 @@ function drawCadastralVectorMap(
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(4);
     doc.setTextColor(148, 163, 184);
-    doc.text(isEn ? 'Graphic Scale' : 'Escala Gráfica', scaleX + 1, scaleY + 3.2);
+    doc.text('Graphic Scale / Escala', scaleX + 0.5, scaleY + 3.2);
 
     // 8. Cadastral Metadata Pill - Bottom Left
     doc.setFillColor(248, 250, 252);
@@ -621,11 +591,11 @@ function drawCadastralVectorMap(
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(4.5);
     doc.setTextColor(12, 60, 96);
-    doc.text(isEn ? 'GEODETIC CADASTRAL PLAN' : 'PLANO CARTOGRÁFICO DE COORDENADAS', x + 4, y + h - 4.2);
+    doc.text('CADASTRAL PLAN / PLANO CATASTRAL', x + 4, y + h - 4.2);
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(3.8);
     doc.setTextColor(100, 116, 139);
-    doc.text(isEn ? 'WGS84 • RFC 7946 • Submetric GNSS Tolerance' : 'WGS84 • RFC 7946 • Tolerancia Submétrica GNSS', x + 4, y + h - 2.4);
+    doc.text('WGS84 • RFC 7946 • Submetric GNSS / Submétrico', x + 4, y + h - 2.4);
 }
 
 /**
