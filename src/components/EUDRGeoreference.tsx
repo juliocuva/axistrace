@@ -7,7 +7,6 @@ import {
     Play,
     Pause,
     CheckCircle2,
-    MapPin,
     RotateCcw,
     Download,
     UploadCloud,
@@ -28,8 +27,7 @@ import {
     Leaf,
     ArrowRight,
     FileText,
-    Sparkles,
-    Mic
+    Sparkles
 } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import { validateDeforestationWithGFW } from '../actions/eudr';
@@ -298,6 +296,19 @@ export default function EUDRGeoreference({
     const [gfwStatus, setGfwStatus] = useState<'idle' | 'secure' | 'warning' | 'error' | 'unverified'>('idle');
     const [lossHa, setLossHa] = useState<number>(0);
     const [copiedCoords, setCopiedCoords] = useState(false);
+    const [exportFileName, setExportFileName] = useState<string>('');
+
+    // Unique default file name based on current date & time
+    const defaultExportName = useMemo(() => {
+        const d = new Date();
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        const h = String(d.getHours()).padStart(2, '0');
+        const min = String(d.getMinutes()).padStart(2, '0');
+        const s = String(d.getSeconds()).padStart(2, '0');
+        return `AxisTrace_Mapa_${y}${m}${day}_${h}${min}${s}`;
+    }, [isCompleted]);
 
     // Detect if polygon edges self-intersect (invalid for TRACES NT)
     const hasSelfIntersection = useMemo(() => {
@@ -366,10 +377,8 @@ export default function EUDRGeoreference({
     const countdownRef = useRef<number>(AUTO_CAPTURE_INTERVAL_SECONDS);
     const handleFinishMappingRef = useRef<(isAutoClosed?: boolean) => void | Promise<void>>(() => {});
     const handleAutoCaptureStepRef = useRef<() => void>(() => {});
-    const handleManualCapturePointRef = useRef<() => void>(() => {});
     const processGpsUpdateRef = useRef<(lat: number, lng: number, acc: number, alt?: number | null) => void>(() => {});
-    const speechRecognitionRef = useRef<any>(null);
-    const [isListeningForVoicePin, setIsListeningForVoicePin] = useState(false);
+    const lastGpsTimestampRef = useRef<number>(Date.now());
 
     // Sync refs
     useEffect(() => {
@@ -751,6 +760,11 @@ export default function EUDRGeoreference({
             if (distFromLast < 3.5) {
                 return;
             }
+            // Discard candidate step if it jumped > 18m in 10s (exceeds physical human walking limit)
+            if (distFromLast > 18) {
+                console.warn(`[AutoCapture] Rejected step jump of ${distFromLast.toFixed(1)}m`);
+                return;
+            }
         }
 
         const candidatePoint: [number, number] = [currentLng, currentLat];
@@ -786,37 +800,61 @@ export default function EUDRGeoreference({
 
     handleAutoCaptureStepRef.current = handleAutoCaptureStep;
 
-    // GPS Filter & Deadband Smoothing: eliminates wild jumps and stationary GNSS jitter
+    // GPS Filter & Deadband Smoothing: eliminates wild jumps, sidewalk drift, and stationary GNSS jitter
     const processGpsUpdate = useCallback(
         (latitude: number, longitude: number, accuracy: number, altitude?: number | null) => {
             setGpsAccuracy(accuracy);
 
-            // Filter 1: Accuracy filter — ignore degraded fixes (> 18m during walk, > 28m overall)
-            if (isCapturingRef.current && accuracy > 18) {
+            // Filter 1: Accuracy filter — ignore degraded fixes (> 12m during active walk, > 24m overall)
+            // Multipath satellite bounces behind buildings / blocks typically exhibit degraded accuracy (14m-28m)
+            if (isCapturingRef.current && accuracy > 12) {
                 return;
-            } else if (accuracyRef.current !== null && accuracyRef.current < 20 && accuracy > 28) {
+            } else if (accuracyRef.current !== null && accuracyRef.current < 15 && accuracy > 22) {
                 return;
             }
 
             accuracyRef.current = accuracy;
 
-            // Filter 2: Deadband & GNSS bounce filter
+            // Filter 2: Deadband & Velocity Jump Filter (Strict Anti-Multipath Sidewalk Bounces)
             const prev = currentPositionRef.current;
+            const now = Date.now();
             if (prev) {
                 const dist = haversineDistanceMeters([latitude, longitude], prev);
+
                 // Ignore stationary micro-jitter (< 1.0m)
                 if (dist < 1.0) {
                     return;
                 }
-                // Ignore sudden teleportation jump (> 25m) caused by multi-path satellite bounce
-                if (isCapturingRef.current && dist > 25) {
-                    return;
+
+                // While actively recording a walk:
+                if (isCapturingRef.current) {
+                    const dt = Math.max(0.6, (now - lastGpsTimestampRef.current) / 1000);
+                    const speed = dist / dt; // in meters per second
+
+                    // Human walking speed rarely exceeds 2.2 m/s (~8 km/h).
+                    // Any sudden displacement > 11 meters or speed > 2.5 m/s is an urban multipath reflection
+                    // that jumps across the street to the opposite sidewalk! Block it immediately.
+                    if (dist > 11 || speed > 2.5) {
+                        return;
+                    }
                 }
             }
 
+            lastGpsTimestampRef.current = now;
+
+            // Coordinate Smoothing: apply Exponential Moving Average (EMA) during walk
+            // Anchors trajectory along the walker's true sidewalk path without bouncing
+            let targetLat = latitude;
+            let targetLng = longitude;
+            if (prev && isCapturingRef.current) {
+                const alpha = Math.max(0.35, Math.min(0.70, 1 - (accuracy / 22)));
+                targetLat = prev[0] + alpha * (latitude - prev[0]);
+                targetLng = prev[1] + alpha * (longitude - prev[1]);
+            }
+
             const isFirstPosition = currentPositionRef.current === null;
-            setCurrentPosition([latitude, longitude]);
-            currentPositionRef.current = [latitude, longitude];
+            setCurrentPosition([targetLat, targetLng]);
+            currentPositionRef.current = [targetLat, targetLng];
 
             // Trigger immediate map recentering upon receiving the first GPS fix
             if (isFirstPosition) {
@@ -828,14 +866,14 @@ export default function EUDRGeoreference({
                 setAltitudeMeters(alt);
                 altitudeMetersRef.current = alt;
             } else if (altitudeMetersRef.current === null) {
-                fetchElevation(latitude, longitude);
+                fetchElevation(targetLat, targetLng);
             }
 
             // Real-time walk events: Point 1 capture & proximity auto-close
             if (isCapturingRef.current) {
                 if (gpsPointsRef.current.length === 0) {
-                    setGpsPoints([[longitude, latitude]]);
-                    gpsPointsRef.current = [[longitude, latitude]];
+                    setGpsPoints([[targetLng, targetLat]]);
+                    gpsPointsRef.current = [[targetLng, targetLat]];
                     countdownRef.current = AUTO_CAPTURE_INTERVAL_SECONDS;
                     setCountdownSeconds(AUTO_CAPTURE_INTERVAL_SECONDS);
                     if (typeof window !== 'undefined' && navigator.vibrate) {
@@ -847,7 +885,7 @@ export default function EUDRGeoreference({
                     );
                     triggerRightArrowBlink();
                 } else if (gpsPointsRef.current.length >= 3) {
-                    checkProximityAndAutoClose(latitude, longitude);
+                    checkProximityAndAutoClose(targetLat, targetLng);
                 }
             }
         },
@@ -857,71 +895,6 @@ export default function EUDRGeoreference({
     useEffect(() => {
         processGpsUpdateRef.current = processGpsUpdate;
     }, [processGpsUpdate]);
-
-    // Voice-activated "PIN" listener: enables hands-free corner tagging simply by saying "PIN" or "esquina"
-    const startVoicePinListener = useCallback(() => {
-        if (typeof window === 'undefined') return;
-        const SpeechRecognitionClass = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-        if (!SpeechRecognitionClass) {
-            return;
-        }
-
-        try {
-            const recognition = new SpeechRecognitionClass();
-            recognition.continuous = true;
-            recognition.interimResults = false;
-            recognition.lang = lang === 'en' ? 'en-US' : 'es-CO';
-
-            recognition.onresult = (event: any) => {
-                const results = event.results;
-                if (!results || results.length === 0) return;
-                const lastResult = results[results.length - 1];
-                const text = lastResult[0]?.transcript?.trim().toLowerCase() || '';
-
-                // If walker says "pin", "pín", "esquina", "punto", "corner", "mark"
-                if (
-                    text.includes('pin') ||
-                    text.includes('pín') ||
-                    text.includes('esquina') ||
-                    text.includes('punto') ||
-                    text.includes('corner') ||
-                    text.includes('mark')
-                ) {
-                    handleManualCapturePointRef.current();
-                }
-            };
-
-            recognition.onerror = (e: any) => {
-                if (e.error !== 'no-speech' && e.error !== 'aborted') {
-                    console.warn('Voice command notice:', e.error);
-                }
-            };
-
-            recognition.onend = () => {
-                if (isCapturingRef.current && speechRecognitionRef.current) {
-                    try {
-                        recognition.start();
-                    } catch (err) {}
-                }
-            };
-
-            recognition.start();
-            speechRecognitionRef.current = recognition;
-            setIsListeningForVoicePin(true);
-        } catch (e) {
-            console.warn('Speech recognition notice:', e);
-        }
-    }, [lang]);
-
-    const stopVoicePinListener = useCallback(() => {
-        if (speechRecognitionRef.current) {
-            try {
-                speechRecognitionRef.current.stop();
-            } catch (e) {}
-            speechRecognitionRef.current = null;
-        }
-        setIsListeningForVoicePin(false);
-    }, []);
 
     // Start GPS & Sensor Tracking (Hands-Free)
     const startTracking = () => {
@@ -942,7 +915,6 @@ export default function EUDRGeoreference({
         countdownRef.current = AUTO_CAPTURE_INTERVAL_SECONDS;
         setCountdownSeconds(AUTO_CAPTURE_INTERVAL_SECONDS);
         triggerRightArrowBlink();
-        startVoicePinListener();
 
         if (currentPositionRef.current && gpsPointsRef.current.length === 0) {
             const [lat, lng] = currentPositionRef.current;
@@ -981,7 +953,6 @@ export default function EUDRGeoreference({
         }
         setIsCapturing(false);
         isCapturingRef.current = false;
-        stopVoicePinListener();
         releaseWakeLock();
         setIsPocketMode(false);
         countdownRef.current = AUTO_CAPTURE_INTERVAL_SECONDS;
@@ -1040,67 +1011,6 @@ export default function EUDRGeoreference({
         };
     }, [isCapturing]);
 
-    // Manual & Voice PIN capture with auto-pruning (specifically designed for sharp corners & non-beveled turns)
-    const handleManualCapturePoint = useCallback(() => {
-        const currentPos = currentPositionRef.current;
-        if (!currentPos) return;
-
-        const currentLat = currentPos[0];
-        const currentLng = currentPos[1];
-
-        if (gpsPointsRef.current.length >= 3) {
-            const closed = checkProximityAndAutoClose(currentLat, currentLng);
-            if (closed) return;
-        }
-
-        const currentPoints = gpsPointsRef.current;
-        if (currentPoints.length > 0) {
-            const last = currentPoints[currentPoints.length - 1];
-            const dist = haversineDistanceMeters([currentLat, currentLng], [last[1], last[0]]);
-            if (dist < 1.0) {
-                // Ignore redundant taps or voice echo if standing in the exact same spot
-                return;
-            }
-        }
-
-        const candidatePoint: [number, number] = [currentLng, currentLat];
-        const { cleanedPoints, prunedCount } = pruneLoopOrDetour(currentPoints, candidatePoint);
-
-        if (prunedCount > 0) {
-            setGpsPoints(cleanedPoints);
-            gpsPointsRef.current = cleanedPoints;
-            if (typeof window !== 'undefined' && navigator.vibrate) {
-                navigator.vibrate([120, 60, 120]);
-            }
-            const notice = isEn
-                ? `Auto-corrected: ${prunedCount} detour ${prunedCount === 1 ? 'point' : 'points'} pruned`
-                : `Auto-corrección: ${prunedCount} ${prunedCount === 1 ? 'punto' : 'puntos'} de desvío podados`;
-            triggerPrunedNotice(notice);
-            speakVoiceGuidance(
-                isEn ? 'Detour pruned. Straight line restored.' : 'Desvío corregido. Línea recta restaurada.',
-                lang
-            );
-        } else {
-            if (typeof window !== 'undefined' && navigator.vibrate) {
-                navigator.vibrate([100, 50, 100]);
-            }
-
-            setGpsPoints(cleanedPoints);
-            gpsPointsRef.current = cleanedPoints;
-            triggerPrunedNotice(
-                isEn ? `📍 PIN ${cleanedPoints.length} logged (sharp corner)` : `📍 ¡PIN ${cleanedPoints.length} fijado en esquina!`
-            );
-            speakVoiceGuidance(
-                isEn ? `Corner PIN ${cleanedPoints.length} logged` : `Pin ${cleanedPoints.length} de esquina marcado`,
-                lang
-            );
-        }
-    }, [checkProximityAndAutoClose, isEn, lang, triggerPrunedNotice]);
-
-    useEffect(() => {
-        handleManualCapturePointRef.current = handleManualCapturePoint;
-    }, [handleManualCapturePoint]);
-
     // Undo last point
     const handleUndoPoint = () => {
         setGpsPoints(prev => prev.slice(0, -1));
@@ -1136,6 +1046,7 @@ export default function EUDRGeoreference({
         setCapturedScreenshot(null);
         setGfwStatus('idle');
         setLossHa(0);
+        setExportFileName('');
         if (onPolygonChange) onPolygonChange('');
     };
 
@@ -1287,26 +1198,28 @@ export default function EUDRGeoreference({
         };
     }, [currentPosition, geoJsonData, gpsPoints]);
 
-    // Download GeoJSON
+    // Download GeoJSON with customizable file name
     const downloadGeoJsonFile = () => {
         if (!geoJsonData) return;
+        const cleanName = (exportFileName.trim() || defaultExportName).replace(/[/\\?%*:|"<>]/g, '_');
         const blob = new Blob([geoJsonData], { type: 'application/geo+json' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `AXISTRACE_${commodity.toUpperCase()}_${currentLotId}.geojson`;
+        a.download = `${cleanName}.geojson`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
     };
 
-    // Download Captured Screenshot
+    // Download Captured Screenshot with customizable file name
     const downloadScreenshotImage = () => {
         if (!capturedScreenshot) return;
+        const cleanName = (exportFileName.trim() || defaultExportName).replace(/[/\\?%*:|"<>]/g, '_');
         const a = document.createElement('a');
         a.href = capturedScreenshot;
-        a.download = `Informe_AxisTrace_${currentLotId}.jpg`;
+        a.download = `${cleanName}.jpg`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -1322,17 +1235,13 @@ export default function EUDRGeoreference({
 
     // One-tap WhatsApp Share
     const shareViaWhatsApp = () => {
-        const currentComm = COMMODITIES.find(c => c.id === commodity) || COMMODITIES[0];
-        const commName = isEn && currentComm.nameEn ? currentComm.nameEn : currentComm.name;
         const eudrStatusText = isEn
             ? (gfwStatus === 'secure' ? 'No forest loss detected (Dec 31, 2020 Baseline)' : gfwStatus === 'warning' ? 'ALERT: Deforestation Detected' : '2020 Baseline (Unverified / Pending)')
             : (gfwStatus === 'secure' ? 'Sin pérdida detectada (Línea Base 31-Dic-2020)' : gfwStatus === 'warning' ? 'ALERTA: Deforestación detectada' : 'Línea Base 2020 (No verificada / Pendiente)');
 
         const text = isEn
             ? `*AXISTRACE - EUDR Georeferencing Pre-validation Report*%0A` +
-              `🌾 *Crop:* ${currentComm.icon} ${commName} (HS: ${currentComm.eudrCode})%0A` +
-              `🏷️ *Lot ID:* ${currentLotId}%0A` +
-              `⏰ *Date & Time:* ${currentTimestampDisplay}%0A` +
+              `⏰ *Date & Time (Timestamp):* ${currentTimestampDisplay}%0A` +
               (altitudeMeters ? `⛰️ *Altitude:* ${altitudeMeters.toLocaleString('en-US')} masl%0A` : '') +
               `📐 *Area:* ${areaHa > 0 ? `${areaHa} ha (≈ ${Math.round(areaHa * 10000).toLocaleString('en-US')} m²)` : 'In progress'}%0A` +
               `📏 *Perimeter:* ${perimeterMeters} m%0A` +
@@ -1344,13 +1253,17 @@ export default function EUDRGeoreference({
               `⚠️ *Notice:* First-mile pre-validation. Does not replace official institutional registries (SICA).%0A` +
               (currentPosition ? `🗺️ *Location on Google Maps:* https://www.google.com/maps?q=${currentPosition[0]},${currentPosition[1]}` : '')
             : `*AXISTRACE - Informe de Georreferenciación Previa EUDR*%0A` +
-              `🌾 *Cultivo:* ${currentComm.icon} ${commName} (HS: ${currentComm.eudrCode})%0A` +
-              `🏷️ *Lote:* ${currentLotId}%0A` +
-              `⏰ *Fecha y Hora:* ${currentTimestampDisplay}%0A` +
+              `⏰ *Fecha y Hora (Timestamp):* ${currentTimestampDisplay}%0A` +
               (altitudeMeters ? `⛰️ *Altitud:* ${altitudeMeters.toLocaleString('es-CO')} m.s.n.m.%0A` : '') +
               `📐 *Área:* ${areaHa > 0 ? `${areaHa} ha (≈ ${Math.round(areaHa * 10000).toLocaleString('es-CO')} m²)` : 'En proceso'}%0A` +
               `📏 *Perímetro:* ${perimeterMeters} m%0A` +
               `🌐 *Vértices Registrados:* ${markersCoords.length}%0A` +
+              `🛡️ *Consulta Línea 2020:* ${eudrStatusText}%0A` +
+              (immutableHash ? `🔑 *Identificador de Integridad (UID):* AXIS-UID-${immutableHash.slice(0, 16)}...${immutableHash.slice(-8)}%0A` : '') +
+              `🔐 *Integridad:* Sello Digital de Seguridad (UID) para expediente preliminar en formato TRACES NT.%0A` +
+              `📲 *Telemetría:* Sensores inerciales (IMU) registrados para mitigar manipulación.%0A` +
+              `⚠️ *Aviso:* Herramienta de primera milla. No reemplaza el registro oficial del SICA (FNC).%0A` +
+              (currentPosition ? `🗺️ *Ubicación en Google Maps:* https://www.google.com/maps?q=${currentPosition[0]},${currentPosition[1]}` : '');
               `🛡️ *Consulta Línea 2020:* ${eudrStatusText}%0A` +
               (immutableHash ? `🔑 *Identificador de Integridad (UID):* AXIS-UID-${immutableHash.slice(0, 16)}...${immutableHash.slice(-8)}%0A` : '') +
               `🔐 *Integridad:* Sello Digital de Seguridad (UID) para expediente preliminar en formato TRACES NT.%0A` +
@@ -1732,31 +1645,23 @@ export default function EUDRGeoreference({
                         {/* Identification Footer Bar for the Screenshot */}
                         <div className="bg-[#0C3C60] text-[#FAF2CA] px-3 sm:px-4 py-2 flex flex-wrap items-center justify-between gap-1 text-[10px] border-t border-white/10">
                             <div className="flex items-center gap-1.5 sm:gap-2">
-                                <span className="font-bold">{isEn ? 'Lot:' : 'Lote:'}</span>
-                                <span className="font-mono text-white font-bold">{currentLotId}</span>
-                                <span className="text-white/40">•</span>
-                                <span className="font-bold text-[#83DF9C]">
-                                    {COMMODITIES.find(c => c.id === commodity)?.icon}{' '}
-                                    {isEn
-                                        ? COMMODITIES.find(c => c.id === commodity)?.nameEn
-                                        : COMMODITIES.find(c => c.id === commodity)?.name}
-                                </span>
                                 {altitudeMeters && (
-                                    <>
-                                        <span className="text-white/40">•</span>
-                                        <span className="text-[#83DF9C] font-mono font-bold">
-                                            {altitudeMeters.toLocaleString(isEn ? 'en-US' : 'es-CO')} {isEn ? 'masl' : 'msnm'}
-                                        </span>
-                                    </>
+                                    <span className="text-[#83DF9C] font-mono font-bold flex items-center gap-1">
+                                        <span>⛰️</span>
+                                        <span>{altitudeMeters.toLocaleString(isEn ? 'en-US' : 'es-CO')} {isEn ? 'masl' : 'msnm'}</span>
+                                    </span>
                                 )}
+                                <span className="text-white/70 font-mono text-[9px] sm:text-[10px]">
+                                    {isEn ? 'WGS84 RFC 7946 Standard' : 'Norma WGS84 RFC 7946'}
+                                </span>
                             </div>
                             <div className="flex items-center gap-1.5 sm:gap-2">
                                 <span className="font-bold text-white/80">{isEn ? 'Timestamp:' : 'Fecha y Hora:'}</span>
-                                <span className="font-mono font-bold text-white bg-white/10 px-2 py-0.5 rounded text-[10px]">
+                                <span className="font-mono font-bold text-[#83DF9C] bg-white/10 px-2.5 py-0.5 rounded text-[10px] border border-[#83DF9C]/30 shadow-sm">
                                     {currentTimestampDisplay}
                                 </span>
                                 <span className="text-white/40">•</span>
-                                <span className="text-[#83DF9C] font-black">{isEn ? 'AXISTRACE CERTIFICATE' : 'CERTIFICADO AXISTRACE'}</span>
+                                <span className="text-[#FAF2CA] font-black">{isEn ? 'AXISTRACE' : 'AXISTRACE'}</span>
                             </div>
                         </div>
                     </>
@@ -1893,7 +1798,7 @@ export default function EUDRGeoreference({
                                                     ? (isEn ? 'Point 1 logs upon coordinates capture' : 'Punto 1 se marcará al capturar coordenadas')
                                                     : isStationary
                                                     ? (isEn ? 'Head right to log next point' : 'Dirígete a la derecha para marcar el siguiente punto')
-                                                    : (isEn ? `Next point in ${countdownSeconds}s • Say "PIN" at corners` : `Próximo punto en ${countdownSeconds}s • Di "PIN" en esquinas`)}
+                                                    : (isEn ? `Next automatic point in ${countdownSeconds}s` : `Próximo punto automático en ${countdownSeconds}s`)}
                                             </span>
                                         </div>
                                     </div>
@@ -1922,28 +1827,13 @@ export default function EUDRGeoreference({
                                         </button>
 
                                         <button
-                                            onClick={handleManualCapturePoint}
-                                            className="px-3 sm:px-4 py-3.5 bg-[#83DF9C]/20 hover:bg-[#83DF9C]/35 border border-[#83DF9C]/50 active:scale-98 text-white rounded-xl font-bold uppercase text-[10px] sm:text-[11px] transition-all flex items-center justify-center gap-1.5 cursor-pointer min-h-[48px] shadow-sm"
-                                            title={isEn ? 'Record sharp corner (tap or say "PIN")' : 'Marcar esquina afilada (toca o di "PIN")'}
-                                        >
-                                            <MapPin className="w-4 h-4 text-[#83DF9C]" />
-                                            <div className="flex flex-col text-left leading-none">
-                                                <span className="font-black text-[#83DF9C] text-xs">PIN</span>
-                                                <span className="text-[7.5px] text-white/70 font-semibold lowercase">o di &quot;pin&quot;</span>
-                                            </div>
-                                            {isListeningForVoicePin && (
-                                                <Mic className="w-3.5 h-3.5 text-[#83DF9C] animate-pulse ml-0.5" />
-                                            )}
-                                        </button>
-
-                                        <button
                                             onClick={() => {
                                                 setIsPocketMode(true);
                                                 if (typeof window !== 'undefined' && navigator.vibrate) {
                                                     navigator.vibrate([60, 40, 60]);
                                                 }
                                             }}
-                                            className="px-3 py-3.5 bg-[#0C3C60] hover:bg-[#164e78] active:scale-98 text-[#FAF2CA] rounded-xl font-bold uppercase text-[10px] sm:text-[11px] transition-all cursor-pointer min-h-[48px] flex items-center gap-1 shadow-sm border border-white/10"
+                                            className="px-3.5 py-3.5 bg-[#0C3C60] hover:bg-[#164e78] active:scale-98 text-[#FAF2CA] rounded-xl font-bold uppercase text-[10px] sm:text-[11px] transition-all cursor-pointer min-h-[48px] flex items-center gap-1 shadow-sm border border-white/10"
                                             title={isEn ? 'Pocket Mode: lock touch screen while walking' : 'Modo Bolsillo: Bloquear pantalla táctil'}
                                         >
                                             <Lock className="w-3.5 h-3.5 text-[#83DF9C]" />
@@ -1952,7 +1842,7 @@ export default function EUDRGeoreference({
 
                                         <button
                                             onClick={stopTracking}
-                                            className="px-3 py-3.5 bg-amber-500/20 hover:bg-amber-500/30 active:scale-98 text-amber-200 border border-amber-500/40 rounded-xl font-bold uppercase text-[10px] sm:text-[11px] transition-all cursor-pointer min-h-[48px] flex items-center gap-1"
+                                            className="px-3.5 py-3.5 bg-amber-500/20 hover:bg-amber-500/30 active:scale-98 text-amber-200 border border-amber-500/40 rounded-xl font-bold uppercase text-[10px] sm:text-[11px] transition-all cursor-pointer min-h-[48px] flex items-center gap-1"
                                             title={isEn ? 'Pause to walk around ravines, dogs or obstacles' : 'Pausar para esquivar cañadas, perros u obstáculos'}
                                         >
                                             <span>⏸</span>
@@ -2004,6 +1894,24 @@ export default function EUDRGeoreference({
                             <FileText className="w-5 h-5 text-[#0C3C60] shrink-0" />
                             <span>{isEn ? 'Complete Data & Generate Georeferencing Report' : 'Completar Datos & Generar Informe PDF'}</span>
                         </button>
+
+                        {/* Editable File / Map Name before saving or downloading one after another */}
+                        <div className="bg-white/5 p-2.5 sm:p-3 rounded-xl border border-white/10 space-y-1 text-left">
+                            <div className="flex items-center justify-between">
+                                <label className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-[#FAF2CA] flex items-center gap-1.5">
+                                    <FileText className="w-3.5 h-3.5 text-[#83DF9C]" />
+                                    <span>{isEn ? 'File / Map Name:' : 'Nombre del Archivo / Mapa:'}</span>
+                                </label>
+                                <span className="text-[9px] text-white/50">{isEn ? 'Editable before saving' : 'Cámbialo antes de guardar'}</span>
+                            </div>
+                            <input
+                                type="text"
+                                value={exportFileName}
+                                onChange={(e) => setExportFileName(e.target.value)}
+                                placeholder={defaultExportName}
+                                className="w-full bg-[#051726] border border-white/20 focus:border-[#83DF9C] rounded-lg px-3 py-2 text-xs text-white placeholder-white/40 outline-none font-mono transition-all"
+                            />
+                        </div>
 
                         <div className="grid grid-cols-2 gap-2">
                             {/* View / Download Screenshot Photo */}
@@ -2159,7 +2067,7 @@ export default function EUDRGeoreference({
                                     </span>
                                 </div>
                                 <p className="text-[10px] text-white/70">
-                                    {isEn ? 'Identifier' : 'Identificador'}: {currentLotId} • {isEn && COMMODITIES.find(c => c.id === commodity)?.nameEn ? COMMODITIES.find(c => c.id === commodity)?.nameEn : COMMODITIES.find(c => c.id === commodity)?.name} • {isEn ? 'WGS84 RFC 7946 Coordinates' : 'Coordenadas WGS84 RFC 7946'}
+                                    {isEn ? 'WGS84 RFC 7946 Geodetic Standards' : 'Estándares Geodésicos WGS84 RFC 7946'}
                                 </p>
 
                                 {/* Immutability Certificate Seal in Modal */}
@@ -2299,15 +2207,6 @@ export default function EUDRGeoreference({
                         <div className="flex items-center gap-2 text-[10px] text-white/50 bg-white/5 px-3 py-1.5 rounded-full">
                             <Smartphone className="w-3.5 h-3.5 text-[#83DF9C]" />
                             <span>{isEn ? 'Gently vibrates in your pocket at every captured point' : 'Vibra suave en tu bolsillo en cada punto capturado'}</span>
-                        </div>
-
-                        <div className="flex items-center gap-2 text-[10.5px] text-emerald-300 bg-emerald-500/15 border border-emerald-500/30 px-3.5 py-2 rounded-2xl max-w-xs text-left">
-                            <Mic className="w-4 h-4 text-emerald-400 shrink-0 animate-pulse" />
-                            <span>
-                                {isEn
-                                    ? 'Voice Command: Say "PIN" out loud at corners to log sharp vertices hands-free.'
-                                    : 'Comando de Voz: Di "PIN" en voz alta en las esquinas para marcar vértices exactos sin biselar.'}
-                            </span>
                         </div>
                     </div>
 
