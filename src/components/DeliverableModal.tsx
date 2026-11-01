@@ -15,12 +15,14 @@ import {
     Sparkles,
     Copy,
     Check,
-    Coffee
+    Coffee,
+    AlertTriangle
 } from 'lucide-react';
 import { CommodityType } from './EUDRGeoreference';
 import { generateEUDRCertificatePdf, EUDRCertificateData } from '../utils/pdfGenerator';
 import { NequiIcon, BancolombiaIcon } from './PaymentModal';
 import { Language } from '@/translations/content';
+import PrivacyPolicyModal from './PrivacyPolicyModal';
 
 export interface DeliverableInitialData {
     lotId: string;
@@ -31,7 +33,7 @@ export interface DeliverableInitialData {
     vertices: [number, number][]; // [lat, lng]
     uid: string; // Identificador Único Verificable (UID)
     capturedScreenshot: string | null;
-    gfwStatus?: 'secure' | 'warning' | 'idle' | 'error';
+    gfwStatus?: 'secure' | 'warning' | 'idle' | 'error' | 'unverified';
 }
 
 interface DeliverableModalProps {
@@ -105,6 +107,36 @@ export default function DeliverableModal({ isOpen, onClose, data, lang = 'en' }:
     const [copiedNequi, setCopiedNequi] = useState(false);
     const [copiedBank, setCopiedBank] = useState(false);
     const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+
+    // Data Treatment, Habeas Data & Truthfulness Checklist
+    const [consentPersonalData, setConsentPersonalData] = useState(false);
+    const [consentGeoCoordinates, setConsentGeoCoordinates] = useState(false);
+    const [declarationTruthfulness, setDeclarationTruthfulness] = useState(false);
+    const [consentError, setConsentError] = useState(false);
+    const [privacyModalOpen, setPrivacyModalOpen] = useState(false);
+
+    const allConsentsGranted = consentPersonalData && consentGeoCoordinates && declarationTruthfulness;
+
+    const handleToggleAllConsents = () => {
+        const nextVal = !allConsentsGranted;
+        setConsentPersonalData(nextVal);
+        setConsentGeoCoordinates(nextVal);
+        setDeclarationTruthfulness(nextVal);
+        if (nextVal) setConsentError(false);
+    };
+
+    const handleProceedToStep2 = () => {
+        if (!farmerName.trim()) {
+            alert(isEn ? 'Please enter the producer name.' : 'Por favor ingresa el nombre del productor.');
+            return;
+        }
+        if (!allConsentsGranted) {
+            setConsentError(true);
+            return;
+        }
+        setConsentError(false);
+        setStep('checkout');
+    };
 
     useEffect(() => {
         setIsMounted(true);
@@ -205,6 +237,9 @@ export default function DeliverableModal({ isOpen, onClose, data, lang = 'en' }:
                         IdentificadorUnicoVerificable_UID: data.uid,
                         EUDRCompliance: 'Regulation EU 2023/1115 TRACES NT Compliant',
                         DeforestationStatus: '0.00 ha post-2020 (Verified)',
+                        HabeasDataConsent: consentPersonalData ? 'Authorized (Ley Estatutaria 1581/2012)' : 'Pending',
+                        CoordinatesTransferConsent: consentGeoCoordinates ? 'Authorized for EUDR TRACES NT' : 'Pending',
+                        ProducerTruthfulnessDeclaration: declarationTruthfulness ? 'Confirmed under oath' : 'Pending',
                         IssuedBy: 'AxisTrace - mouselab.dev'
                     },
                     geometry: {
@@ -226,7 +261,7 @@ export default function DeliverableModal({ isOpen, onClose, data, lang = 'en' }:
 
     const handleShareWhatsApp = () => {
         const message = isEn
-            ? `🌲 *EUDR DUE DILIGENCE CERTIFICATE (AXISTRACE)* 🌲%0A` +
+            ? `🌲 *FIRST-MILE EUDR GEOREFERENCING REPORT (AXISTRACE)* 🌲%0A` +
               `-------------------------------------------%0A` +
               `👤 *Producer:* ${farmerName || 'Unregistered'} (ID: ${farmerId || 'N/A'})%0A` +
               `🏡 *Farm/Lot:* ${farmName || 'Holding'} • ${lotName}%0A` +
@@ -236,12 +271,13 @@ export default function DeliverableModal({ isOpen, onClose, data, lang = 'en' }:
               `📐 *Area:* ${data.areaHa} ha (≈ ${Math.round(data.areaHa * 10000).toLocaleString('en-US')} m²)%0A` +
               `📏 *Perimeter:* ${data.perimeterMeters} m%0A` +
               `🏔️ *Altitude:* ${data.altitudeMeters ? `${data.altitudeMeters.toLocaleString('en-US')} masl` : 'GNSS Logged'}%0A` +
-              `🛡️ *EUDR Compliance:* 0.00 ha Deforestation (2020 Baseline)%0A` +
-              `🔑 *Unique Identifier (UID):*%0A${data.uid}%0A` +
+              `🛡️ *2020 Satellite Check:* ${data.gfwStatus === 'secure' ? 'No forest loss detected (post-2020)' : data.gfwStatus === 'warning' ? 'Alert: Loss detected' : 'Unverified (pending)'}%0A` +
+              `🔑 *Integrity Identifier (UID):*%0A${data.uid}%0A` +
               `-------------------------------------------%0A` +
-              `✅ *TRACES NT Ingestion Ready (European Union)*%0A` +
+              `✅ *TRACES NT Compatible Format (European Union)*%0A` +
+              `⚠️ *Notice:* Technical first-mile pre-validation. Does not replace official SICA registry nor operator due diligence.%0A` +
               `Designed by mouselab.dev for AxisTrace`
-            : `🌲 *CERTIFICADO DE DILIGENCIA DEBIDA EUDR (AXISTRACE)* 🌲%0A` +
+            : `🌲 *INFORME DE GEORREFERENCIACIÓN PREVIA EUDR (AXISTRACE)* 🌲%0A` +
               `-------------------------------------------%0A` +
               `👤 *Productor:* ${farmerName || 'Sin Registrar'} (ID: ${farmerId || 'N/A'})%0A` +
               `🏡 *Finca/Lote:* ${farmName || 'Predio'} • ${lotName}%0A` +
@@ -251,10 +287,11 @@ export default function DeliverableModal({ isOpen, onClose, data, lang = 'en' }:
               `📐 *Área:* ${data.areaHa} ha (≈ ${Math.round(data.areaHa * 10000).toLocaleString('es-CO')} m²)%0A` +
               `📏 *Perímetro:* ${data.perimeterMeters} m%0A` +
               `🏔️ *Altitud:* ${data.altitudeMeters ? `${data.altitudeMeters.toLocaleString('es-CO')} msnm` : 'Registrada por GPS'}%0A` +
-              `🛡️ *Cumplimiento EUDR:* 0.00 ha Deforestación (Línea Base 2020)%0A` +
-              `🔑 *Identificador Único Verificable (UID):*%0A${data.uid}%0A` +
+              `🛡️ *Consulta Satelital 2020:* ${data.gfwStatus === 'secure' ? 'Sin pérdida detectada post-2020' : data.gfwStatus === 'warning' ? 'ALERTA: Pérdida detectada' : 'No verificado (pendiente)'}%0A` +
+              `🔑 *Identificador de Integridad (UID):*%0A${data.uid}%0A` +
               `-------------------------------------------%0A` +
-              `✅ *Listo para TRACES NT (Unión Europea)*%0A` +
+              `✅ *Formato compatible con TRACES NT (Unión Europea)*%0A` +
+              `⚠️ *Aviso:* Apoyo técnico de primera milla. No reemplaza el registro del SICA ni la debida diligencia del operador (Reglamento UE 2023/1115).%0A` +
               `Diseñado por mouselab.dev para AxisTrace`;
 
         window.open(`https://api.whatsapp.com/send?text=${message}`, '_blank');
@@ -271,12 +308,12 @@ export default function DeliverableModal({ isOpen, onClose, data, lang = 'en' }:
                         </div>
                         <div>
                             <span className="text-[10px] font-black uppercase tracking-wider text-[#83DF9C] block">
-                                {isEn ? 'Official EUDR 2023/1115 Dossier' : 'Entregable Oficial EUDR 2023/1115'}
+                                {isEn ? 'First-Mile EUDR 2023/1115 Dossier' : 'Expediente de Primera Milla EUDR 2023/1115'}
                             </span>
                             <h3 className="text-sm sm:text-base font-black text-white">
                                 {step === 'form'
                                     ? (isEn ? '1. Producer & Holding Details' : '1. Datos del Productor & Predio')
-                                    : (isEn ? '2. Certificate Activation & Downloads' : '2. Descarga & Activación del Certificado')}
+                                    : (isEn ? '2. Report Downloads & GeoJSON' : '2. Descarga del Informe & GeoJSON')}
                             </h3>
                         </div>
                     </div>
@@ -449,10 +486,129 @@ export default function DeliverableModal({ isOpen, onClose, data, lang = 'en' }:
                                 </div>
                             </div>
 
+                            {/* CHECKLIST DE TRATAMIENTO DE DATOS & HABEAS DATA */}
+                            <div className={`p-4 rounded-2xl border transition-all ${consentError ? 'bg-amber-500/10 border-amber-500/60 ring-2 ring-amber-500/30' : 'bg-[#0C3C60]/70 border-white/15'}`}>
+                                <div className="flex items-center justify-between pb-2.5 border-b border-white/10 mb-3">
+                                    <div className="flex items-center gap-2">
+                                        <ShieldCheck className="w-4 h-4 text-[#83DF9C]" />
+                                        <h4 className="text-xs font-black uppercase tracking-wider text-[#83DF9C]">
+                                            {isEn ? 'Data Treatment & EUDR Consent Checklist' : 'Checklist de Tratamiento de Datos y Autorizaciones EUDR'}
+                                        </h4>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={handleToggleAllConsents}
+                                        className="text-[10px] font-bold text-[#FAF2CA] hover:text-white underline cursor-pointer"
+                                    >
+                                        {allConsentsGranted
+                                            ? (isEn ? 'Deselect all' : 'Desmarcar todo')
+                                            : (isEn ? 'Accept all (Quick)' : 'Aceptar todo (Rápido)')}
+                                    </button>
+                                </div>
+
+                                <div className="space-y-3">
+                                    {/* Item 1: Personal Data / Habeas Data */}
+                                    <label className="flex items-start gap-2.5 cursor-pointer group">
+                                        <input
+                                            type="checkbox"
+                                            checked={consentPersonalData}
+                                            onChange={e => {
+                                                setConsentPersonalData(e.target.checked);
+                                                if (e.target.checked && consentGeoCoordinates && declarationTruthfulness) setConsentError(false);
+                                            }}
+                                            className="mt-0.5 w-4 h-4 rounded border-white/30 text-[#83DF9C] focus:ring-[#83DF9C] bg-[#082840] cursor-pointer shrink-0"
+                                        />
+                                        <div className="text-[11px] leading-tight text-white/90">
+                                            <span className="font-bold text-white block">
+                                                {isEn ? '1. Personal Data Treatment (Habeas Data):' : '1. Tratamiento de Datos Personales (Habeas Data - Ley 1581/2012):'}
+                                            </span>
+                                            <span className="text-white/70 text-[10px]">
+                                                {isEn
+                                                    ? 'I authorize the collection and processing of identification and contact data for technical dossier issuance and traceability.'
+                                                    : 'Autorizo de manera previa, expresa e informada a AxisTrace el tratamiento de mis datos de identificación y contacto para la expedición del informe y trazabilidad técnica.'}
+                                            </span>
+                                        </div>
+                                    </label>
+
+                                    {/* Item 2: Geolocation & EUDR Coordinates */}
+                                    <label className="flex items-start gap-2.5 cursor-pointer group">
+                                        <input
+                                            type="checkbox"
+                                            checked={consentGeoCoordinates}
+                                            onChange={e => {
+                                                setConsentGeoCoordinates(e.target.checked);
+                                                if (consentPersonalData && e.target.checked && declarationTruthfulness) setConsentError(false);
+                                            }}
+                                            className="mt-0.5 w-4 h-4 rounded border-white/30 text-[#83DF9C] focus:ring-[#83DF9C] bg-[#082840] cursor-pointer shrink-0"
+                                        />
+                                        <div className="text-[11px] leading-tight text-white/90">
+                                            <span className="font-bold text-white block">
+                                                {isEn ? '2. Geolocation Coordinates Transfer (EUDR 2023/1115):' : '2. Tratamiento y Transferencia de Coordenadas EUDR:'}
+                                            </span>
+                                            <span className="text-white/70 text-[10px]">
+                                                {isEn
+                                                    ? 'I authorize capturing plot coordinates for satellite baseline screening and submission to operators, buyers, and EU TRACES NT.'
+                                                    : 'Autorizo la captura de coordenadas de mi predio para análisis satelital y transferencia a cooperativas, exportadores, compradores y la plataforma TRACES NT de la Unión Europea.'}
+                                            </span>
+                                        </div>
+                                    </label>
+
+                                    {/* Item 3: Truthfulness & Legitimate Tenure Declaration */}
+                                    <label className="flex items-start gap-2.5 cursor-pointer group">
+                                        <input
+                                            type="checkbox"
+                                            checked={declarationTruthfulness}
+                                            onChange={e => {
+                                                setDeclarationTruthfulness(e.target.checked);
+                                                if (consentPersonalData && consentGeoCoordinates && e.target.checked) setConsentError(false);
+                                            }}
+                                            className="mt-0.5 w-4 h-4 rounded border-white/30 text-[#83DF9C] focus:ring-[#83DF9C] bg-[#082840] cursor-pointer shrink-0"
+                                        />
+                                        <div className="text-[11px] leading-tight text-white/90">
+                                            <span className="font-bold text-white block">
+                                                {isEn ? '3. Truthfulness & Legitimate Tenure Declaration:' : '3. Declaración de Tenencia Legítima y Veracidad:'}
+                                            </span>
+                                            <span className="text-white/70 text-[10px]">
+                                                {isEn
+                                                    ? 'I declare under oath that the recorded perimeter corresponds to the actual physical boundary of the legitimately held productive parcel.'
+                                                    : 'Declaro bajo gravedad de juramento que la información suministrada es veraz y que el polígono perimetral corresponde a los linderos reales de la parcela productiva legítimamente ocupada.'}
+                                            </span>
+                                        </div>
+                                    </label>
+                                </div>
+
+                                {/* Warning message if unconfirmed */}
+                                {consentError && (
+                                    <div className="mt-3 p-2.5 rounded-xl bg-amber-500/20 border border-amber-500/40 text-[11px] text-amber-200 flex items-start gap-2 animate-in fade-in">
+                                        <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                                        <span>
+                                            {isEn
+                                                ? 'Legal requirement: You must confirm all three authorizations (Personal Data, Coordinates Transfer, and Truthfulness Declaration) to generate the dossier.'
+                                                : 'Requisito legal: Debes aceptar las tres autorizaciones (Habeas Data, Transferencia de Coordenadas y Veracidad) para generar el expediente técnico.'}
+                                        </span>
+                                    </div>
+                                )}
+
+                                {/* Link to full legal policy */}
+                                <div className="mt-3 pt-2.5 border-t border-white/10 flex items-center justify-between text-[10px]">
+                                    <span className="text-white/60">
+                                        {isEn ? 'Law 1581/2012 & Regulation (EU) 2023/1115' : 'Ley 1581 de 2012 & Reglamento (UE) 2023/1115'}
+                                    </span>
+                                    <button
+                                        type="button"
+                                        onClick={() => setPrivacyModalOpen(true)}
+                                        className="text-[#83DF9C] hover:text-[#9cf0b3] underline font-bold flex items-center gap-1 cursor-pointer"
+                                    >
+                                        <FileText className="w-3 h-3" />
+                                        <span>{isEn ? 'Read Full Privacy Policy' : 'Ver Política Completa de Datos'}</span>
+                                    </button>
+                                </div>
+                            </div>
+
                             {/* Continue Button */}
                             <button
                                 type="button"
-                                onClick={() => setStep('checkout')}
+                                onClick={handleProceedToStep2}
                                 className="w-full bg-[#83DF9C] hover:bg-[#6fd48b] active:scale-98 text-[#0C3C60] py-3.5 px-4 rounded-xl font-black uppercase text-xs tracking-wider transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer mt-4"
                             >
                                 <span>{isEn ? 'Continue to Activation & Download' : 'Continuar a Generación & Pago'}</span>
@@ -519,8 +675,18 @@ export default function DeliverableModal({ isOpen, onClose, data, lang = 'en' }:
                                     className="w-full bg-[#83DF9C] hover:bg-[#6fd48b] active:scale-98 text-[#0C3C60] py-4 px-4 rounded-2xl font-black uppercase text-xs sm:text-sm tracking-wider transition-all shadow-xl flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-60"
                                 >
                                     <Download className="w-5 h-5" />
-                                    <span>{isGeneratingPdf ? (isEn ? 'Generating Certificate...' : 'Generando Certificado...') : (isEn ? 'Download Official PDF Certificate' : 'Descargar Certificado PDF Oficial')}</span>
+                                    <span>{isGeneratingPdf ? (isEn ? 'Generating Report...' : 'Generando Informe...') : (isEn ? 'Download Georeferencing PDF Report' : 'Descargar Informe PDF de Georreferenciación')}</span>
                                 </button>
+
+                                {/* Institutional Notice Disclaimer */}
+                                <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-[10px] text-amber-200/90 leading-relaxed">
+                                    <span className="font-bold text-amber-300">
+                                        {isEn ? 'Institutional Notice: ' : 'Aviso Institucional: '}
+                                    </span>
+                                    {isEn 
+                                        ? 'First-mile pre-validation tool. Does not replace official institutional registries (such as SICA for coffee in Colombia) or operator due diligence under EUDR.'
+                                        : 'Herramienta de primera milla y validación previa. No reemplaza el reporte oficial del SICA (FNC) ni la debida diligencia del operador (Reglamento UE 2023/1115).'}
+                                </div>
 
                                 <div className="grid grid-cols-2 gap-2">
                                     <button
@@ -547,7 +713,7 @@ export default function DeliverableModal({ isOpen, onClose, data, lang = 'en' }:
                                     <div className="flex items-center gap-2">
                                         <ShieldCheck className="w-4 h-4 text-[#83DF9C]" />
                                         <span className="text-xs font-black uppercase text-[#FAF2CA] tracking-wider">
-                                            {isEn ? 'Lot Activation & Certification' : 'Activación & Certificación de Lote'}
+                                            {isEn ? 'Lot Dossier Activation' : 'Activación del Expediente de Lote'}
                                         </span>
                                     </div>
                                     <span className="text-xs font-black text-[#83DF9C] font-mono">
@@ -621,6 +787,13 @@ export default function DeliverableModal({ isOpen, onClose, data, lang = 'en' }:
                     )}
                 </div>
             </div>
+
+            {/* Privacy Policy & Data Treatment Modal */}
+            <PrivacyPolicyModal
+                isOpen={privacyModalOpen}
+                onClose={() => setPrivacyModalOpen(false)}
+                lang={lang}
+            />
         </div>,
         document.body
     );

@@ -14,12 +14,12 @@ export const translations = {
             whatsapp: "WhatsApp"
         },
         hero: {
-            badge: "EUDR 2023/1115 & TRACES NT Ready",
-            rating: "4.9/5 First-Mile Precision Benchmark",
+            badge: "EUDR 2023/1115 & TRACES NT Compatible",
+            rating: "High-Precision First-Mile Georeferencing",
             title1: "First-Mile",
             title2: "Georeferencing.",
             title3: "Proven Results.",
-            description: "Eliminate customs confiscation risks in European ports. Capture tamper-proof perimeter polygons 100% offline in the field and generate GeoJSON dossiers with Unique Identifiers (UID).",
+            description: "Support your export compliance for European markets. Capture parcel perimeter polygons offline in the field and generate GeoJSON dossiers with digital security seals (UID).",
             ctaPrimary: "Start Free Field Walk",
             ctaSecondary: "Explore Pricing Plans",
             perks: ["Zero App Store downloads required", "Operates directly on any smartphone"],
@@ -27,15 +27,15 @@ export const translations = {
                 title: "Live GNSS Farm Telemetry",
                 status: "Live",
                 accuracy: "GPS Precision:",
-                accuracyVal: "< 1.4 meters",
+                accuracyVal: "± 3.0 m (Mobile GNSS)",
                 deforestation: "Deforestation Check:",
                 deforestationVal: "Zero post-2020",
-                crypto: "Verified UID:",
-                cryptoVal: "UID-VERIFIED"
+                crypto: "Security Code:",
+                cryptoVal: "DIGITAL SEAL"
             },
             bottom: {
                 selfService: "100% Self-Service in the Field",
-                resolution: "Sentinel-2 Multi-Spectral Matching",
+                resolution: "Copernicus & GFW Data Auditing",
                 standard: "IETF RFC 7946 GeoJSON Standard"
             }
         },
@@ -47,30 +47,30 @@ export const translations = {
             tag: "Agricultural Scope & Regulated Chains",
             title1: "How Far Does the Platform Reach?",
             title2: "Precision Perimeter Mapping for Every Sector",
-            subtitle: "Follow the satellite perimeter trajectory. Each numbered GPS vertex marks a regulated commodity protected for friction-free EU import access.",
+            subtitle: "Follow the perimeter trajectory. Each numbered vertex illustrates a key regulated commodity preparing for European market compliance.",
             items: {
                 coffee: {
                     node: "11",
                     tag: "Coffee Sector",
                     badge: "Export Coffee",
                     title: "Coffee Plantations",
-                    desc: "Map micro-lots and highland agroforestry shade-grown coffee farms. Ensure every quintal of green or specialty coffee shipped to the European Union features a closed polygon free of post-2020 deforestation.",
-                    pills: ["Parcels >4 ha", "Exporter Cooperatives", "SHA-256 Immutable Seal"]
+                    desc: "Map micro-lots and highland shade-grown coffee parcels. Enable green or specialty coffee shipments to include verified field perimeters and preliminary post-2020 deforestation checks.",
+                    pills: ["Parcels >4 ha", "Exporter Cooperatives", "Digital Security Seal"]
                 },
                 cacao: {
                     node: "22",
                     tag: "Agroforestry Systems",
                     badge: "Cocoa & Derivatives",
                     title: "Cocoa Plantations",
-                    desc: "Engineered for cacao cultivated under dense jungle canopies in humid tropical regions. The platform accurately distinguishes productive agroforestry canopy from primary deforestation.",
-                    pills: ["Fine Flavour Cocoa", "Regenerative Agroforestry", "100% Deep Jungle Offline"]
+                    desc: "Engineered for cacao cultivated under forest canopies in humid tropical regions. Distinguishes productive agroforestry canopy from primary deforestation to support due diligence.",
+                    pills: ["Fine Flavour Cocoa", "Regenerative Agroforestry", "Offline Field Capture"]
                 },
                 palm: {
                     node: "35",
                     tag: "Large Acreage Holdings",
                     badge: "Oil Palm",
                     title: "Oil Palm Plantations",
-                    desc: "High-throughput topological boundary verification for commercial oil palm blocks. Scales seamlessly from the 6th hectare upward at $3 USD/ha, certifying fresh fruit bunches originate from legal pre-2020 plots.",
+                    desc: "High-throughput topological boundary verification for commercial oil palm blocks. Scales seamlessly from the 6th hectare upward at $3 USD/ha, verifying that fresh fruit bunches originate from documented pre-2020 production areas.",
                     pills: ["Scalable >100 ha", "Satellite Forest Baseline", "Mill Traceability"]
                 },
                 cattle: {
@@ -78,14 +78,14 @@ export const translations = {
                     tag: "Sustainable Livestock",
                     badge: "Bovine & Hides",
                     title: "Cattle Ranching & Leather",
-                    desc: "Georeference rotational grazing pastures and silvopastoral enclosures. Provide indisputable legal evidence that beef and leather supply chains are raised exclusively on deforestation-free ranches.",
+                    desc: "Georeference rotational grazing paddocks and silvopastoral systems. Generate technical records supporting due diligence for deforestation-free livestock supply chains.",
                     pills: ["EUDR Beef & Leather", "Silvopastoral Systems", "Closed Geometric Rings"]
                 },
                 closing: {
                     node: "58",
                     badge: "Geoclosure Vertex #58 • Verified Polygon",
                     question: "Which Agricultural Supply Chain Do You Need to Georeference for Europe?",
-                    desc: "Regardless of your commodity or farm size—whether coffee, cocoa, palm, rubber, timber, soy, or livestock—AxisTrace is your digital customs passport guaranteeing zero delays across EU borders.",
+                    desc: "Whether you produce coffee, cocoa, palm, rubber, timber, soy, or livestock, AxisTrace provides the first-mile georeferencing dossier required to support your export due diligence.",
                     ctaPrimary: "Launch Field Walk on Smartphone",
                     ctaSecondary: "Talk via WhatsApp (+57 301 397 0002)",
                     ctaSecondaryText: "Chat on WhatsApp",
@@ -100,30 +100,30 @@ export const translations = {
             subtitle: "From on-site perimeter footpaths to satellite remote sensing and automated customs dossiers.",
             stats: [
                 { val: "100%", label: "Digital Self-Service", sub: "Operators survey with their own phone" },
-                { val: "0%", label: "Cellular Dependency", sub: "100% offline in remote mountain terrain" },
-                { val: "100%", label: "Unique Identifier (UID)", sub: "Tamper-proof atomic UTC timestamp" }
+                { val: "0%", label: "Cellular Dependency", sub: "Field perimeter survey offline in remote terrain" },
+                { val: "100%", label: "Security Seal (UID)", sub: "Digital verification code with UTC timestamp" }
             ],
             cards: [
                 {
                     image: "/images/field-technician.jpg",
                     tag: "01 • Offline Pocket Walk",
                     title: "Digital Field Perimeter Walk",
-                    desc: "Field operators walk parcel boundaries. AxisTrace logs high-fidelity coordinates automatically with deadband kinematic filtering that rejects GNSS multipath bounces.",
+                    desc: "Field operators walk parcel boundaries. AxisTrace logs coordinates automatically with deadband kinematic filtering that rejects GNSS multipath bounces.",
                     bullet: "Automated perimeter closure with zero data usage"
                 },
                 {
                     image: "/images/satellite-survey.jpg",
                     tag: "02 • Sentinel-2 Copernicus",
                     title: "Satellite Deforestation Audit",
-                    desc: "Cross-checks parcel boundaries against multi-spectral satellite baseline records, strictly auditing zero deforestation after the December 31, 2020 regulatory cutoff.",
-                    bullet: "Topological repair & CRS84 WGS84 validation"
+                    desc: "Cross-checks parcel boundaries against satellite records, strictly auditing forest loss indicators after the December 31, 2020 regulatory cutoff.",
+                    bullet: "Topological verification & CRS84 WGS84 compliance"
                 },
                 {
                     image: "/images/export-compliance.jpg",
                     tag: "03 • TRACES NT Ready",
-                    title: "Due Diligence Dossier (DDS)",
-                    desc: "Instant automated generation of 300 DPI Legal-sized cartographic PDF certificates with QR codes and standardized RFC 7946 GeoJSON files ready for bulk customs ingestion.",
-                    bullet: "Accepted by European port authorities & buyers"
+                    title: "Due Diligence Pre-Validation Dossier",
+                    desc: "Automated generation of A4 cartographic PDF reports with QR verification and standardized RFC 7946 GeoJSON files formatted for customs systems.",
+                    bullet: "Engineered for TRACES NT import due diligence standards"
                 }
             ]
         },
@@ -141,8 +141,8 @@ export const translations = {
                     ref: "~ 40,000 COP",
                     features: [
                         "Topological repair of vertex sequence",
-                        "Post-2020 satellite forest baseline validation",
-                        "Valid TRACES NT GeoJSON + Official PDF"
+                        "Post-2020 satellite forest baseline check",
+                        "Valid TRACES NT GeoJSON + Cartographic PDF"
                     ],
                     cta: "Audit Coordinates"
                 },
@@ -155,10 +155,10 @@ export const translations = {
                     unit: "USD / base lot",
                     ref: "~ 100,000 COP",
                     features: [
-                        "Pocket mode with inertial anti-fraud signature",
-                        "Sentinel-2 post-2020 deforestation cross-check",
-                        "300 DPI Legal-sized PDF dossier with QR",
-                        "RFC 7946 GeoJSON with Unique Identifier (UID)"
+                        "Pocket mode with inertial telemetry to mitigate tampering",
+                        "Copernicus & GFW post-2020 satellite cross-check",
+                        "A4 Cartographic PDF report with QR",
+                        "RFC 7946 GeoJSON with Integrity Identifier (UID)"
                     ],
                     cta: "Start Field Walk"
                 },
@@ -172,7 +172,7 @@ export const translations = {
                     features: [
                         "100 mapping passes for internal technicians",
                         "Centralized dashboard for member lots",
-                        "Bulk batch export for EU customs clearance"
+                        "Bulk batch export compatible with TRACES NT"
                     ],
                     cta: "Order via WhatsApp",
                     ctaHref: "https://wa.me/573013970002?text=Hello%2C%20I%20am%20interested%20in%20the%20Corporate%20Bulk%20Pack%20(100%20lots)%20for%20AxisTRACE."
@@ -186,8 +186,8 @@ export const translations = {
                     ref: "~ 12,000 COP / ha"
                 },
                 deliverables: {
-                    title: "Official Deliverables Included",
-                    desc: "300 DPI Legal Cartographic Dossier with QR + RFC 7946 GeoJSON with immutable SHA-256 hash.",
+                    title: "Technical Deliverables Included",
+                    desc: "A4 Cartographic PDF Report with QR + RFC 7946 GeoJSON with Unique Identifier (UID).",
                     badge: "Included"
                 }
             }
@@ -215,12 +215,12 @@ export const translations = {
             whatsapp: "WhatsApp"
         },
         hero: {
-            badge: "EUDR 2023/1115 & TRACES NT Ready",
-            rating: "4.9/5 Estándar de Precisión en Primera Milla",
+            badge: "EUDR 2023/1115 & TRACES NT Compatible",
+            rating: "Georreferenciación de Alta Precisión en Primera Milla",
             title1: "Georreferenciación",
             title2: "de Primera Milla.",
             title3: "Resultados Comprobados.",
-            description: "Elimina el riesgo de confiscación en aduanas europeas. Captura polígonos perimetrales inmutables 100% offline en finca y emite certificados GeoJSON con Identificador Único Verificable (UID).",
+            description: "Apoya el cumplimiento de exportación hacia la Unión Europea. Captura polígonos perimetrales sin conexión en finca y genera informes GeoJSON con sellos digitales de seguridad (UID).",
             ctaPrimary: "Iniciar Caminata Gratis",
             ctaSecondary: "Estructura de Planes",
             perks: ["Sin descargas de app", "Funciona con tu propio smartphone"],
@@ -228,15 +228,15 @@ export const translations = {
                 title: "Telemetría GNSS en Finca",
                 status: "En Vivo",
                 accuracy: "Precisión GPS:",
-                accuracyVal: "< 1.4 metros",
+                accuracyVal: "± 3.0 m (GNSS Móvil)",
                 deforestation: "Cruce Deforestación:",
                 deforestationVal: "Cero post-2020",
-                crypto: "Verificación UID:",
-                cryptoVal: "UID VERIFICADO"
+                crypto: "Sello de Integridad:",
+                cryptoVal: "SELLO DIGITAL"
             },
             bottom: {
                 selfService: "100% Autoservicio en Terreno",
-                resolution: "Sentinel-2 Resolution",
+                resolution: "Auditoría Satelital Copernicus & GFW",
                 standard: "Validación IETF RFC 7946"
             }
         },
@@ -248,30 +248,30 @@ export const translations = {
             tag: "Alcance Agrícola & Cadenas Productivas",
             title1: "¿Hasta Dónde Llega el Sistema?",
             title2: "Delimitación Precisa para Cada Sector",
-            subtitle: "Sigue el recorrido perimetral de nuestra línea satelital. Cada vértice numerado representa una de las cadenas reguladas que hoy protegemos para el mercado internacional.",
+            subtitle: "Sigue el recorrido perimetral. Cada vértice numerado ilustra una de las cadenas reguladas que apoyamos en su debida diligencia de exportación.",
             items: {
                 coffee: {
                     node: "11",
                     tag: "Sector Cafetero",
                     badge: "Café de Exportación",
                     title: "Plantaciones de Café",
-                    desc: "Delimita microlotes y fincas cafeteras tradicionales o bajo sombra en laderas de alta montaña. Garantiza que cada quintal de café verde o especial exportado a la Unión Europea cuente con su polígono cerrado sin riesgo de deforestación post-2020.",
-                    pills: ["Microlotes >4 ha", "Asociaciones Cafeteras", "Firma SHA-256"]
+                    desc: "Delimita microlotes y fincas cafeteras tradicionales o bajo sombra en laderas de alta montaña. Permite que el café de exportación cuente con su delimitación perimetral y validación técnica previa de no deforestación post-2020.",
+                    pills: ["Lotes >4 ha", "Asociaciones Cafeteras", "Sello Digital UID"]
                 },
                 cacao: {
                     node: "22",
                     tag: "Sistemas Agroforestales",
                     badge: "Cacao & Derivados",
                     title: "Plantaciones de Cacao",
-                    desc: "Ideal para cacaotales bajo dosel forestal en zonas tropicales húmedas. La app discrimina la cobertura arbórea productiva de la deforestación primaria, blindando a los pequeños cacaocultores ante las exigencias aduaneras de la UE.",
-                    pills: ["Cacao Fino y de Aroma", "Agroforestería Regenerativa", "Modo Offline en Selva"]
+                    desc: "Ideal para cacaotales bajo dosel forestal en zonas tropicales húmedas. La app discrimina la cobertura arbórea productiva de la deforestación primaria, apoyando a los pequeños cacaocultores en el cumplimiento técnico de debida diligencia de la UE.",
+                    pills: ["Cacao Fino y de Aroma", "Agroforestería Regenerativa", "Captura sin Conexión"]
                 },
                 palm: {
                     node: "35",
                     tag: "Grandes Extensiones",
                     badge: "Palma de Aceite",
                     title: "Plantaciones de Palma",
-                    desc: "Monitoreo perimetral y topológico de macro-parcelas palmicultoras. Aplica a partir de la 6ta hectárea con tarifa escalable de $3 USD/ha, certificando que los racimos de fruta fresca provienen de áreas establecidas legalmente antes de 2020.",
+                    desc: "Monitoreo perimetral y topológico de parcelas palmicultoras. Aplica a partir de la 6ta hectárea con tarifa escalable de $3 USD/ha, verificando que los racimos de fruta fresca provienen de áreas establecidas antes de 2020.",
                     pills: ["Escalabilidad >100 ha", "Línea Base Satelital", "Trazabilidad Almazaras"]
                 },
                 cattle: {
@@ -279,14 +279,14 @@ export const translations = {
                     tag: "Ganadería Sostenible",
                     badge: "Bovinos & Pastoreo",
                     title: "Ganadería Bovina & Cueros",
-                    desc: "Georreferenciación de potreros y rotación silvopastoril. Demuestra de manera fehaciente que los hatos ganaderos pastorean en predios consolidados libres de deforestación para exportación de carne fresca y cueros a curtiembres europeas.",
+                    desc: "Georreferenciación de potreros y rotación silvopastoril. Aporta registros técnicos georreferenciados para respaldar la debida diligencia de hatos ganaderos en predios sin deforestación post-2020.",
                     pills: ["Carne & Cueros EUDR", "Predios Silvopastoriles", "Perímetros Cerrados"]
                 },
                 closing: {
                     node: "58",
                     badge: "Punto de Geocierre #58 • Polígono Verificado",
                     question: "¿En qué rama del agro necesitas georreferenciar para ingresar a Europa?",
-                    desc: "No importa tu cultivo ni el tamaño de tu predio. Si produces café, cacao, palma, caucho, madera o ganado, AxisTrace es el pasaporte digital que garantiza que tu cosecha cruce las aduanas europeas sin tropiezos.",
+                    desc: "No importa tu cultivo ni el tamaño de tu predio. Si produces café, cacao, palma, caucho, madera o ganado, AxisTrace es tu herramienta de primera milla para respaldar la debida diligencia de acceso a la Unión Europea.",
                     ctaPrimary: "Iniciar Caminata en Terreno Ahora",
                     ctaSecondary: "Hablar por WhatsApp (+57 301 397 0002)",
                     ctaSecondaryText: "Contactar por WhatsApp",
@@ -301,30 +301,30 @@ export const translations = {
             subtitle: "Desde la caminata perimetral en finca hasta la verificación satelital y la emisión de expedientes oficiales.",
             stats: [
                 { val: "100%", label: "Autoservicio Digital", sub: "El operario mapea con su propio celular" },
-                { val: "0%", label: "Dependencia de Red", sub: "100% offline en zonas montañosas remotas" },
-                { val: "100%", label: "Identificador Único (UID)", sub: "Trazabilidad inmutable con hora atómica UTC" }
+                { val: "0%", label: "Dependencia de Red", sub: "Captura de perímetro sin conexión en zonas remotas" },
+                { val: "100%", label: "Sello de Integridad (UID)", sub: "Trazabilidad con código de seguridad y hora UTC" }
             ],
             cards: [
                 {
                     image: "/images/field-technician.jpg",
                     tag: "01 • Caminata Offline",
                     title: "Caminata Digital de Campo",
-                    desc: "El operario recorre el perímetro de la parcela. AxisTrace captura coordenadas automáticamente con filtro cinemático deadband que descarta rebotes GNSS.",
+                    desc: "El operario recorre el perímetro de la parcela. AxisTrace captura coordenadas con filtro cinemático deadband que descarta rebotes GNSS.",
                     bullet: "Cierre perimetral automático sin consumo de datos"
                 },
                 {
                     image: "/images/satellite-survey.jpg",
                     tag: "02 • Sentinel-2 Copernicus",
                     title: "Auditoría Satelital de Deforestación",
-                    desc: "Cruce de geometrías con series históricas satelitales. Verificación estricta de deforestación cero con fecha de corte oficial del 31 de diciembre de 2020.",
-                    bullet: "Reparación topológica y validación WGS84 CRS84"
+                    desc: "Cruce de geometrías con series históricas satelitales. Verificación técnica preliminar con fecha de corte oficial del 31 de diciembre de 2020.",
+                    bullet: "Comprobación topológica y formato WGS84 CRS84"
                 },
                 {
                     image: "/images/export-compliance.jpg",
                     tag: "03 • Listo para TRACES NT",
                     title: "Expediente de Diligencia Debida (DDS)",
-                    desc: "Emisión instantánea de Fichas Cartográficas Oficio a 300 DPI con QR y archivos GeoJSON RFC 7946 listos para su carga masiva en aduanas europeas.",
-                    bullet: "Aprobado por autoridades portuarias y compradores"
+                    desc: "Generación de informes cartográficos en PDF A4 con código QR y archivos GeoJSON RFC 7946 listos para aduanas europeas.",
+                    bullet: "Formato técnico compatible con TRACES NT (Reglamento UE 2023/1115)"
                 }
             ]
         },
@@ -343,7 +343,7 @@ export const translations = {
                     features: [
                         "Reparación topológica del polígono",
                         "Cruce satelital línea base bosque post-2020",
-                        "GeoJSON válido TRACES NT + PDF oficial"
+                        "GeoJSON compatible TRACES NT + Informe PDF"
                     ],
                     cta: "Auditar Coordenadas"
                 },
@@ -356,10 +356,10 @@ export const translations = {
                     unit: "USD / lote base",
                     ref: "~ 100.000 COP",
                     features: [
-                        "Modo bolsillo con firma inercial antifraude",
-                        "Cruce satelital Sentinel-2 post-2020",
-                        "Ficha cartográfica Oficio 300 DPI con QR",
-                        "GeoJSON RFC 7946 con Identificador Único (UID)"
+                        "Modo bolsillo con telemetría inercial para mitigar manipulación",
+                        "Cruce satelital Copernicus & GFW post-2020",
+                        "Informe cartográfico A4 con QR",
+                        "GeoJSON RFC 7946 con Identificador de Integridad (UID)"
                     ],
                     cta: "Iniciar Caminata"
                 },
@@ -373,7 +373,7 @@ export const translations = {
                     features: [
                         "100 pases para técnicos propios",
                         "Panel centralizado de lotes asociados",
-                        "Exportación masiva para aduanas UE"
+                        "Exportación masiva GeoJSON compatible con TRACES NT"
                     ],
                     cta: "Pedir por WhatsApp",
                     ctaHref: "https://wa.me/573013970002?text=Hola%2C%20me%20interesa%20adquirir%20la%20Bolsa%20Corporativa%20(100%20predios)%20de%20AxisTRACE."
@@ -387,8 +387,8 @@ export const translations = {
                     ref: "~ 12.000 COP / ha"
                 },
                 deliverables: {
-                    title: "Entregables Oficiales Incluidos",
-                    desc: "Ficha Técnica Oficio 300 DPI + GeoJSON RFC 7946 con hash SHA-256 inmutable.",
+                    title: "Entregables Técnicos Incluidos",
+                    desc: "Informe Técnico A4 + GeoJSON RFC 7946 con Identificador Único (UID).",
                     badge: "Incluido"
                 }
             }

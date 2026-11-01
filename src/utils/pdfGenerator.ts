@@ -21,13 +21,14 @@ export interface EUDRCertificateData {
     uid: string; // Identificador Único Verificable (UID)
     timestamp: string;
     mapScreenshotUrl: string | null;
-    gfwStatus?: 'secure' | 'warning' | 'idle' | 'error';
+    gfwStatus?: 'secure' | 'warning' | 'idle' | 'error' | 'unverified';
     lang?: Language; // 'en' (primary) or 'es' (secondary)
 }
 
 /**
- * Generates and downloads the Official EUDR Due Diligence Cartographic Certificate (PDF)
- * Designed pursuant to European Commission Regulation (EU) 2023/1115 and TRACES NT guidelines
+ * Generates and downloads the EUDR Due Diligence First-Mile Georeferencing Report (PDF)
+ * Designed pursuant to European Commission Regulation (EU) 2023/1115 and TRACES NT guidelines.
+ * Notice: This technical pre-validation document does not replace official institutional registries (e.g. SICA in Colombia).
  */
 export async function generateEUDRCertificatePdf(data: EUDRCertificateData) {
     const isEn = data.lang !== 'es'; // English is primary by default
@@ -86,16 +87,16 @@ export async function generateEUDRCertificatePdf(data: EUDRCertificateData) {
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(7);
     doc.setTextColor(250, 242, 202);
-    doc.text('DIGITAL DUE DILIGENCE INFRASTRUCTURE • INFRAESTRUCTURA DE DILIGENCIA DEBIDA', textStartX, 11);
-    doc.text('REGULATION (EU) 2023/1115 • TRACES NT COMPLIANT', textStartX, 16);
+    doc.text('FIRST-MILE GEOREFERENCING DOSSIER • EXPEDIENTE PREVIO DE PRIMERA MILLA', textStartX, 11);
+    doc.text('REGULATION (EU) 2023/1115 • TRACES NT COMPLIANT FORMAT', textStartX, 16);
     doc.setTextColor(131, 223, 156);
-    doc.text('CERTIFIED GROUND GEOREFERENCING • GEORREFERENCIACIÓN TERRESTRE CERTIFICADA', textStartX, 21);
+    doc.text('GROUND PERIMETER GEODATA • DELIMITACIÓN GEODÉSICA DE CAMPO', textStartX, 21);
 
     // Right Badge on Header
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(8);
     doc.setTextColor(255, 255, 255);
-    doc.text('EUDR CARTOGRAPHIC CERTIFICATE / CERTIFICADO EUDR', pageWidth - margin, 11, { align: 'right' });
+    doc.text('EUDR GEOREFERENCING REPORT / INFORME EUDR', pageWidth - margin, 11, { align: 'right' });
 
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(7);
@@ -116,19 +117,19 @@ export async function generateEUDRCertificatePdf(data: EUDRCertificateData) {
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(8);
     doc.setTextColor(...primaryNavy);
-    doc.text('UNIQUE IDENTIFIER (UID) / IDENTIFICADOR ÚNICO (UID):', margin + 3, currentY + 5.5);
+    doc.text('INTEGRITY IDENTIFIER (UID) / IDENTIFICADOR DE INTEGRIDAD (UID):', margin + 3, currentY + 5.5);
 
     doc.setFont('courier', 'bold');
     doc.setFontSize(8);
     doc.setTextColor(...accentGreen);
     const uidDisplay = data.uid.length > 38 ? `${data.uid.slice(0, 20)}...${data.uid.slice(-16)}` : data.uid;
-    doc.text(uidDisplay, margin + 92, currentY + 5.5);
+    doc.text(uidDisplay, margin + 98, currentY + 5.5);
 
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(6.8);
+    doc.setFontSize(6.5);
     doc.setTextColor(...mutedText);
     doc.text(
-        'Official geodetic perimeter certificate for EU import due diligence • Documento oficial de geolocalización perimetral para debida diligencia de importación UE.',
+        'Geodetic perimeter pre-validation report for EU import due diligence • Informe preliminar de delimitación para debida diligencia de importación UE.',
         margin + 3,
         currentY + 10.5
     );
@@ -213,7 +214,12 @@ export async function generateEUDRCertificatePdf(data: EUDRCertificateData) {
     boxY += 6;
     printField('Elevation', 'Altitud:', data.altitudeMeters ? `${data.altitudeMeters.toLocaleString('en-US')} masl / msnm` : 'GNSS Logged / GPS', rightColX + 3, boxY);
     boxY += 6;
-    printField('2020 Baseline', 'Línea 2020:', '0.00 ha Deforestation / CLEARED', rightColX + 3, boxY);
+    const baselineLabel = data.gfwStatus === 'secure'
+        ? 'Sin pérdida detectada (post-2020)'
+        : data.gfwStatus === 'warning'
+        ? 'ALERTA: Pérdida detectada'
+        : 'NO VERIFICADO (Pendiente)';
+    printField('2020 Baseline', 'Línea 2020:', baselineLabel, rightColX + 3, boxY);
 
     currentY += boxHeight + 5;
 
@@ -350,34 +356,39 @@ export async function generateEUDRCertificatePdf(data: EUDRCertificateData) {
     doc.text('Due Diligence / Diligencia Debida', qrBoxX + qrWidth / 2, currentY + 47, { align: 'center' });
     doc.text('European Commission 2023/1115', qrBoxX + qrWidth / 2, currentY + 50, { align: 'center' });
     doc.text('TRACES NT Ingestion Ready', qrBoxX + qrWidth / 2, currentY + 53, { align: 'center' });
+    doc.text('Habeas Data & Geodata Consent', qrBoxX + qrWidth / 2, currentY + 56, { align: 'center' });
 
     // ==========================================
     // 6. OFFICIAL FOOTER
     // ==========================================
-    const footerY = pageHeight - 11;
+    const footerY = pageHeight - 12;
     doc.setDrawColor(...borderColor);
     doc.setLineWidth(0.3);
     doc.line(margin, footerY, pageWidth - margin, footerY);
 
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(6);
+    doc.setFontSize(5.8);
     doc.setTextColor(...charcoalText);
-    doc.text('AxisTrace • Due Diligence & Traceability / Diligencia Debida y Trazabilidad', margin, footerY + 4);
+    doc.text('AxisTrace • Expediente de Georreferenciación de Primera Milla / Due Diligence Dossier', margin, footerY + 3.5);
 
     doc.setFont('helvetica', 'normal');
+    doc.setFontSize(5.2);
     doc.setTextColor(...mutedText);
-    doc.text('EU Validity / Validez Unión Europea • Standard IETF RFC 7946 • CRS84', margin, footerY + 7.5);
+    doc.text('Aviso legal: Documento técnico de apoyo previo. No reemplaza el registro del SICA ni la debida diligencia del operador (Reglamento UE 2023/1115).', margin, footerY + 6.8);
+    doc.text('WGS84 • IETF RFC 7946 • TRACES NT Ready • Autorización de Datos: Ley 1581/2012 y Reg. (UE) 2023/1115', margin, footerY + 9.8);
 
     doc.setFont('helvetica', 'bold');
+    doc.setFontSize(6);
     doc.setTextColor(...accentGreen);
-    doc.text('Designed by mouselab.dev', pageWidth - margin, footerY + 4, { align: 'right' });
+    doc.text('Designed by mouselab.dev', pageWidth - margin, footerY + 3.5, { align: 'right' });
 
     doc.setFont('helvetica', 'normal');
+    doc.setFontSize(5.5);
     doc.setTextColor(...mutedText);
-    doc.text('Page 1 of 1 / Página 1 de 1 • Official Certificate', pageWidth - margin, footerY + 7.5, { align: 'right' });
+    doc.text('Informe Técnico / Pre-validation Report', pageWidth - margin, footerY + 6.8, { align: 'right' });
 
     // Save and download the PDF
-    const filename = `CERTIFICADO_EUDR_${data.commodityName.toUpperCase()}_${data.lotName.replace(/\s+/g, '_')}.pdf`;
+    const filename = `INFORME_GEORREFERENCIACION_EUDR_${data.commodityName.toUpperCase()}_${data.lotName.replace(/\s+/g, '_')}.pdf`;
     doc.save(filename);
 }
 

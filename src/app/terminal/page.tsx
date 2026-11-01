@@ -129,10 +129,12 @@ function AxisTraceApp() {
             {/* Footer */}
             <footer className="border-t border-[#0C3C60]/60 bg-[#082840] py-6 px-4 text-center text-xs text-[#FAF2CA]/50">
                 <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap justify-center sm:justify-start">
                         <span className="font-black text-white">AxisTrace</span>
                         <span>•</span>
-                        <span>{lang === 'es' ? 'Infraestructura Digital de Diligencia Debida' : 'Digital Due Diligence Infrastructure'}</span>
+                        <Link href="/privacidad" className="hover:text-[#83DF9C] underline underline-offset-2 transition-colors">
+                            {lang === 'es' ? 'Tratamiento de Datos & Privacidad' : 'Data Privacy Policy'}
+                        </Link>
                         <span>•</span>
                         <span>{lang === 'es' ? 'Todos los derechos reservados' : 'All rights reserved'}</span>
                     </div>

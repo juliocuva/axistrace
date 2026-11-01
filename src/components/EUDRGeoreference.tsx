@@ -27,7 +27,8 @@ import {
     Smartphone,
     Leaf,
     ArrowRight,
-    FileText
+    FileText,
+    Sparkles
 } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import { validateDeforestationWithGFW } from '../actions/eudr';
@@ -100,6 +101,106 @@ function calculatePerimeterMeters(coords: [number, number][]): number {
         );
     }
     return Math.round(total);
+}
+
+// 2D segment intersection test to prevent self-intersecting polygons (rejected by TRACES NT)
+function ccw(A: [number, number], B: [number, number], C: [number, number]): number {
+    return (C[1] - A[1]) * (B[0] - A[0]) - (B[1] - A[1]) * (C[0] - A[0]);
+}
+
+function segmentsIntersect(
+    A: [number, number],
+    B: [number, number],
+    C: [number, number],
+    D: [number, number]
+): boolean {
+    const ccw1 = ccw(A, B, C);
+    const ccw2 = ccw(A, B, D);
+    const ccw3 = ccw(C, D, A);
+    const ccw4 = ccw(C, D, B);
+
+    return (
+        ((ccw1 > 0 && ccw2 < 0) || (ccw1 < 0 && ccw2 > 0)) &&
+        ((ccw3 > 0 && ccw4 < 0) || (ccw3 < 0 && ccw4 > 0))
+    );
+}
+
+function checkPolygonSelfIntersections(coords: [number, number][]): boolean {
+    if (coords.length < 4) return false;
+    const n = coords.length;
+    for (let i = 0; i < n; i++) {
+        const p1 = coords[i];
+        const p2 = coords[(i + 1) % n];
+        for (let j = i + 2; j < n; j++) {
+            if (i === 0 && j === n - 1) continue; // Skip adjacent first and last edges
+            const p3 = coords[j];
+            const p4 = coords[(j + 1) % n];
+            if (segmentsIntersect(p1, p2, p3, p4)) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+// Smart loop and obstacle detour pruner
+// Detects when the user deviates around a ravine/obstacle and crosses back or backtracks,
+// removing the spurious detour vertices to restore a clean straight perimeter line.
+function pruneLoopOrDetour(
+    existingPoints: [number, number][],
+    candidatePoint: [number, number]
+): { cleanedPoints: [number, number][]; prunedCount: number; reason: 'loop' | 'backtrack' | 'outlier' | 'none' } {
+    if (existingPoints.length < 2) {
+        return { cleanedPoints: [...existingPoints, candidatePoint], prunedCount: 0, reason: 'none' };
+    }
+
+    const lastPoint = existingPoints[existingPoints.length - 1];
+    const n = existingPoints.length;
+
+    // 1. Loop / Crossing Detection: Check if the new segment (lastPoint -> candidatePoint) intersects any previous segment
+    for (let i = n - 3; i >= 0; i--) {
+        const segStart = existingPoints[i];
+        const segEnd = existingPoints[i + 1];
+
+        if (segmentsIntersect(segStart, segEnd, lastPoint, candidatePoint)) {
+            // Loop detected! The user took a detour around an obstacle and crossed their previous path.
+            // Prune all vertices between the intersection (from i + 1 to n - 1)
+            const pruned = n - 1 - i;
+            const cleaned: [number, number][] = [...existingPoints.slice(0, i + 1), candidatePoint];
+            return { cleanedPoints: cleaned, prunedCount: pruned, reason: 'loop' };
+        }
+    }
+
+    // 2. Acute Backtrack / U-Turn Detection (e.g., ran into an obstacle/dog and had to turn around)
+    if (existingPoints.length >= 2) {
+        const pPrev = existingPoints[n - 2];
+        const pLast = existingPoints[n - 1];
+
+        const distPrevToCand = haversineDistanceMeters([pPrev[1], pPrev[0]], [candidatePoint[1], candidatePoint[0]]);
+
+        const v1 = [pLast[0] - pPrev[0], pLast[1] - pPrev[1]];
+        const v2 = [candidatePoint[0] - pLast[0], candidatePoint[1] - pLast[1]];
+        const dot = v1[0] * v2[0] + v1[1] * v2[1];
+        const mag1 = Math.sqrt(v1[0] ** 2 + v1[1] ** 2);
+        const mag2 = Math.sqrt(v2[0] ** 2 + v2[1] ** 2);
+
+        if (mag1 > 0 && mag2 > 0) {
+            const cosAngle = dot / (mag1 * mag2);
+            // Deflection angle > 125 degrees means a sharp U-turn backwards
+            if (cosAngle < -0.60) {
+                if (distPrevToCand < 4.5) {
+                    // Reached back near previous point; discard the failed excursion vertex
+                    return { cleanedPoints: existingPoints.slice(0, -1), prunedCount: 1, reason: 'backtrack' };
+                } else {
+                    // Replace the failed dead-end excursion with the new valid forward point
+                    const cleaned: [number, number][] = [...existingPoints.slice(0, -1), candidatePoint];
+                    return { cleanedPoints: cleaned, prunedCount: 1, reason: 'backtrack' };
+                }
+            }
+        }
+    }
+
+    return { cleanedPoints: [...existingPoints, candidatePoint], prunedCount: 0, reason: 'none' };
 }
 
 // Text-to-speech voice guidance supporting English and Spanish
@@ -193,9 +294,27 @@ export default function EUDRGeoreference({
     const [geoJsonData, setGeoJsonData] = useState<string>(initialPolygon || '');
     const isCompleted = Boolean(geoJsonData && !isCapturing);
     const [isGfwValidating, setIsGfwValidating] = useState<boolean>(false);
-    const [gfwStatus, setGfwStatus] = useState<'idle' | 'secure' | 'warning' | 'error'>('idle');
+    const [gfwStatus, setGfwStatus] = useState<'idle' | 'secure' | 'warning' | 'error' | 'unverified'>('idle');
     const [lossHa, setLossHa] = useState<number>(0);
     const [copiedCoords, setCopiedCoords] = useState(false);
+
+    // Detect if polygon edges self-intersect (invalid for TRACES NT)
+    const hasSelfIntersection = useMemo(() => {
+        return checkPolygonSelfIntersections(gpsPoints);
+    }, [gpsPoints]);
+
+    // Auto-Pruning Notifications (silent helper for loop/backtrack correction)
+    const [prunedNotice, setPrunedNotice] = useState<string | null>(null);
+    const prunedNoticeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+    const triggerPrunedNotice = useCallback((msg: string) => {
+        if (prunedNoticeTimeoutRef.current) clearTimeout(prunedNoticeTimeoutRef.current);
+        setPrunedNotice(msg);
+        prunedNoticeTimeoutRef.current = setTimeout(() => {
+            setPrunedNotice(null);
+            prunedNoticeTimeoutRef.current = null;
+        }, 5000);
+    }, []);
 
     // Track if user is currently stationary (< 3.5m from last recorded vertex)
     const isStationary = useMemo(() => {
@@ -490,9 +609,11 @@ export default function EUDRGeoreference({
                         perimeterMeters: calculatedPerimeter,
                         autoClosed: isAutoClosed,
                         sensorVerified: avgAcc > 1,
-                        immutableHash: `SHA256:${sha256}`,
-                        tamperProof: true,
-                        integritySeal: 'IMMUTABLE_AXISTRACE_VERIFIED'
+                        sha256Hash: sha256,
+                        hashVerified: true,
+                        integritySeal: 'AXISTRACE_INTEGRITY_SEAL',
+                        eudrGeometryRule: calculatedArea > 4 ? 'POLYGON_MANDATORY_OVER_4HA' : 'POLYGON_VOLUNTARY_PRECISION_UNDER_4HA',
+                        disclaimer: 'Herramienta de primera milla y validación previa. No reemplaza el registro oficial del SICA ni la debida diligencia del operador (Reglamento UE 2023/1115).'
                     },
                     features: [
                         {
@@ -504,11 +625,11 @@ export default function EUDRGeoreference({
                                 AltitudeMsnm: altitudeMeters,
                                 Method: isAutoClosed
                                     ? 'axistrace_handsfree_proximity_autoclosed'
-                                    : 'axistrace_digital_walk_sensor_verified',
+                                    : 'axistrace_digital_walk_imu_assisted',
                                 CutoffDate: '31-Dec-2020',
                                 DeforestationHa: lossHa,
-                                EudrStatus: gfwStatus === 'secure' ? 'CLEARED' : gfwStatus === 'warning' ? 'ALERT_DEFORESTATION' : 'PENDING',
-                                ImmutableSha256: sha256
+                                EudrStatus: gfwStatus === 'secure' ? 'SIN_PERDIDA_DETECTADA' : gfwStatus === 'warning' ? 'PERDIDA_DETECTADA' : 'NO_VERIFICADO',
+                                Sha256Seal: sha256
                             },
                             geometry: { type: 'Polygon', coordinates: [polygonCoords] }
                         }
@@ -521,18 +642,24 @@ export default function EUDRGeoreference({
             setGeoJsonData(generatedGeoJson);
             if (onPolygonChange) onPolygonChange(generatedGeoJson);
 
-            // Query GFW / Sentinel-2 satellite intersection
+            // Query GFW UMD satellite dataset
             validateDeforestationWithGFW(generatedGeoJson)
                 .then(result => {
                     if (result && result.success) {
                         setLossHa(result.lossDetectedHa || 0);
-                        setGfwStatus(result.isDeforestationFree ? 'secure' : 'warning');
+                        if (result.status === 'SIN_PERDIDA_DETECTADA') {
+                            setGfwStatus('secure');
+                        } else if (result.status === 'PERDIDA_DETECTADA') {
+                            setGfwStatus('warning');
+                        } else {
+                            setGfwStatus('unverified');
+                        }
                     } else {
-                        setGfwStatus('secure');
+                        setGfwStatus('unverified');
                     }
                 })
                 .catch(() => {
-                    setGfwStatus('secure');
+                    setGfwStatus('unverified');
                 });
 
             setIsCapturing(false);
@@ -619,17 +746,36 @@ export default function EUDRGeoreference({
             }
         }
 
-        if (typeof window !== 'undefined' && navigator.vibrate) {
-            navigator.vibrate([40, 30, 40]);
-        }
+        const candidatePoint: [number, number] = [currentLng, currentLat];
+        const { cleanedPoints, prunedCount } = pruneLoopOrDetour(currentPoints, candidatePoint);
 
-        const newPoint: [number, number] = [currentLng, currentLat];
-        setGpsPoints(prev => [...prev, newPoint]);
-        speakVoiceGuidance(
-            isEn ? `Vertex ${currentPoints.length + 1}` : `Punto ${currentPoints.length + 1}`,
-            lang
-        );
-    }, [checkProximityAndAutoClose]);
+        if (prunedCount > 0) {
+            setGpsPoints(cleanedPoints);
+            gpsPointsRef.current = cleanedPoints;
+            if (typeof window !== 'undefined' && navigator.vibrate) {
+                navigator.vibrate([120, 60, 120]);
+            }
+            const notice = isEn
+                ? `Auto-corrected: ${prunedCount} detour ${prunedCount === 1 ? 'point' : 'points'} pruned`
+                : `Auto-corrección: ${prunedCount} ${prunedCount === 1 ? 'punto' : 'puntos'} de desvío podados`;
+            triggerPrunedNotice(notice);
+            speakVoiceGuidance(
+                isEn ? 'Obstacle loop pruned. Straight line restored.' : 'Desvío por obstáculo corregido. Línea recta restaurada.',
+                lang
+            );
+        } else {
+            if (typeof window !== 'undefined' && navigator.vibrate) {
+                navigator.vibrate([40, 30, 40]);
+            }
+
+            setGpsPoints(cleanedPoints);
+            gpsPointsRef.current = cleanedPoints;
+            speakVoiceGuidance(
+                isEn ? `Vertex ${cleanedPoints.length}` : `Punto ${cleanedPoints.length}`,
+                lang
+            );
+        }
+    }, [checkProximityAndAutoClose, isEn, lang, triggerPrunedNotice]);
 
     handleAutoCaptureStepRef.current = handleAutoCaptureStep;
 
@@ -703,7 +849,9 @@ export default function EUDRGeoreference({
         isCapturingRef.current = true;
         requestWakeLock();
         setAutoClosedNotice(false);
-        maxDistanceAwayRef.current = 0;
+        if (gpsPointsRef.current.length === 0) {
+            maxDistanceAwayRef.current = 0;
+        }
         setDistanceToStart(null);
         setGfwStatus('idle');
         countdownRef.current = AUTO_CAPTURE_INTERVAL_SECONDS;
@@ -723,7 +871,7 @@ export default function EUDRGeoreference({
             );
         } else {
             speakVoiceGuidance(
-                isEn ? 'Walking survey in progress, keep right.' : 'Caminata en curso, dirígete a la derecha.',
+                isEn ? 'Walking survey resumed. Keep walking along the boundary.' : 'Caminata reanudada. Continúa por el lindero.',
                 lang
             );
         }
@@ -805,14 +953,10 @@ export default function EUDRGeoreference({
         };
     }, [isCapturing]);
 
-    // Manual capture fallback
+    // Manual capture fallback with auto-pruning
     const handleManualCapturePoint = () => {
         const currentPos = currentPositionRef.current;
         if (!currentPos) return;
-
-        if (typeof window !== 'undefined' && navigator.vibrate) {
-            navigator.vibrate([40, 30, 40]);
-        }
 
         const currentLat = currentPos[0];
         const currentLng = currentPos[1];
@@ -822,11 +966,35 @@ export default function EUDRGeoreference({
             if (closed) return;
         }
 
-        setGpsPoints(prev => [...prev, [currentLng, currentLat]]);
-        speakVoiceGuidance(
-            isEn ? `Manual vertex ${gpsPoints.length + 1}` : `Vértice ${gpsPoints.length + 1} manual`,
-            lang
-        );
+        const candidatePoint: [number, number] = [currentLng, currentLat];
+        const { cleanedPoints, prunedCount } = pruneLoopOrDetour(gpsPoints, candidatePoint);
+
+        if (prunedCount > 0) {
+            setGpsPoints(cleanedPoints);
+            gpsPointsRef.current = cleanedPoints;
+            if (typeof window !== 'undefined' && navigator.vibrate) {
+                navigator.vibrate([120, 60, 120]);
+            }
+            const notice = isEn
+                ? `Auto-corrected: ${prunedCount} detour ${prunedCount === 1 ? 'point' : 'points'} pruned`
+                : `Auto-corrección: ${prunedCount} ${prunedCount === 1 ? 'punto' : 'puntos'} de desvío podados`;
+            triggerPrunedNotice(notice);
+            speakVoiceGuidance(
+                isEn ? 'Detour pruned. Straight line restored.' : 'Desvío corregido. Línea recta restaurada.',
+                lang
+            );
+        } else {
+            if (typeof window !== 'undefined' && navigator.vibrate) {
+                navigator.vibrate([40, 30, 40]);
+            }
+
+            setGpsPoints(cleanedPoints);
+            gpsPointsRef.current = cleanedPoints;
+            speakVoiceGuidance(
+                isEn ? `Manual vertex ${cleanedPoints.length}` : `Vértice ${cleanedPoints.length} manual`,
+                lang
+            );
+        }
     };
 
     // Undo last point
@@ -860,6 +1028,7 @@ export default function EUDRGeoreference({
         setImmutableHash(null);
         setSealedTimestamp(null);
         setAutoClosedNotice(false);
+        setPrunedNotice(null);
         setCapturedScreenshot(null);
         setGfwStatus('idle');
         setLossHa(0);
@@ -931,12 +1100,24 @@ export default function EUDRGeoreference({
                 setImmutableHash(sha256);
                 if (onPolygonChange) onPolygonChange(strGeoJson);
 
-                validateDeforestationWithGFW(strGeoJson).then(res => {
-                    if (res && res.success) {
-                        setLossHa(res.lossDetectedHa || 0);
-                        setGfwStatus(res.isDeforestationFree ? 'secure' : 'warning');
-                    }
-                });
+                validateDeforestationWithGFW(strGeoJson)
+                    .then(res => {
+                        if (res && res.success) {
+                            setLossHa(res.lossDetectedHa || 0);
+                            if (res.status === 'SIN_PERDIDA_DETECTADA') {
+                                setGfwStatus('secure');
+                            } else if (res.status === 'PERDIDA_DETECTADA') {
+                                setGfwStatus('warning');
+                            } else {
+                                setGfwStatus('unverified');
+                            }
+                        } else {
+                            setGfwStatus('unverified');
+                        }
+                    })
+                    .catch(() => {
+                        setGfwStatus('unverified');
+                    });
             } catch (err: any) {
                 alert(isEn ? `Error loading file: ${err.message}` : `Error cargando archivo: ${err.message}`);
             }
@@ -1021,7 +1202,7 @@ export default function EUDRGeoreference({
         if (!capturedScreenshot) return;
         const a = document.createElement('a');
         a.href = capturedScreenshot;
-        a.download = `Certificado_AxisTrace_${currentLotId}.jpg`;
+        a.download = `Informe_AxisTrace_${currentLotId}.jpg`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -1040,11 +1221,11 @@ export default function EUDRGeoreference({
         const currentComm = COMMODITIES.find(c => c.id === commodity) || COMMODITIES[0];
         const commName = isEn && currentComm.nameEn ? currentComm.nameEn : currentComm.name;
         const eudrStatusText = isEn
-            ? (gfwStatus === 'secure' ? '0.00 ha Deforestation (Dec 31, 2020 Baseline CLEARED)' : gfwStatus === 'warning' ? 'ALERT: Deforestation Detected' : '2020 Baseline (Pending Validation)')
-            : (gfwStatus === 'secure' ? '0.00 ha Deforestación (Línea Base 31-Dic-2020 CLEARED)' : gfwStatus === 'warning' ? 'ALERTA: Deforestación detectada' : 'Línea Base 2020 (Pendiente Validación)');
+            ? (gfwStatus === 'secure' ? 'No forest loss detected (Dec 31, 2020 Baseline)' : gfwStatus === 'warning' ? 'ALERT: Deforestation Detected' : '2020 Baseline (Unverified / Pending)')
+            : (gfwStatus === 'secure' ? 'Sin pérdida detectada (Línea Base 31-Dic-2020)' : gfwStatus === 'warning' ? 'ALERTA: Deforestación detectada' : 'Línea Base 2020 (No verificada / Pendiente)');
 
         const text = isEn
-            ? `*AXISTRACE - EUDR Georeferencing Certificate*%0A` +
+            ? `*AXISTRACE - EUDR Georeferencing Pre-validation Report*%0A` +
               `🌾 *Crop:* ${currentComm.icon} ${commName} (HS: ${currentComm.eudrCode})%0A` +
               `🏷️ *Lot ID:* ${currentLotId}%0A` +
               `⏰ *Date & Time:* ${currentTimestampDisplay}%0A` +
@@ -1052,12 +1233,13 @@ export default function EUDRGeoreference({
               `📐 *Area:* ${areaHa > 0 ? `${areaHa} ha (≈ ${Math.round(areaHa * 10000).toLocaleString('en-US')} m²)` : 'In progress'}%0A` +
               `📏 *Perimeter:* ${perimeterMeters} m%0A` +
               `🌐 *Recorded Vertices:* ${markersCoords.length}%0A` +
-              `🛡️ *EUDR Compliance:* ${eudrStatusText}%0A` +
-              (immutableHash ? `🔑 *Unique Identifier (UID):* AXIS-UID-${immutableHash.slice(0, 16)}...${immutableHash.slice(-8)}%0A` : '') +
-              `🔐 *Integrity:* Tamper-proof audit record for EU TRACES NT.%0A` +
-              `📲 *Inertial Signature:* Human walking path certified with IMU anti-spoofing.%0A` +
+              `🛡️ *2020 Baseline Check:* ${eudrStatusText}%0A` +
+              (immutableHash ? `🔑 *Integrity ID (UID):* AXIS-UID-${immutableHash.slice(0, 16)}...${immutableHash.slice(-8)}%0A` : '') +
+              `🔐 *Integrity:* Verifiable Unique Security Identifier (UID) for EU TRACES NT formatted dossier.%0A` +
+              `📲 *Telemetry:* Inertial sensors (IMU) logged to mitigate unauthorized manipulation.%0A` +
+              `⚠️ *Notice:* First-mile pre-validation. Does not replace official institutional registries (SICA).%0A` +
               (currentPosition ? `🗺️ *Location on Google Maps:* https://www.google.com/maps?q=${currentPosition[0]},${currentPosition[1]}` : '')
-            : `*AXISTRACE - Certificado de Georreferenciación EUDR*%0A` +
+            : `*AXISTRACE - Informe de Georreferenciación Previa EUDR*%0A` +
               `🌾 *Cultivo:* ${currentComm.icon} ${commName} (HS: ${currentComm.eudrCode})%0A` +
               `🏷️ *Lote:* ${currentLotId}%0A` +
               `⏰ *Fecha y Hora:* ${currentTimestampDisplay}%0A` +
@@ -1065,10 +1247,11 @@ export default function EUDRGeoreference({
               `📐 *Área:* ${areaHa > 0 ? `${areaHa} ha (≈ ${Math.round(areaHa * 10000).toLocaleString('es-CO')} m²)` : 'En proceso'}%0A` +
               `📏 *Perímetro:* ${perimeterMeters} m%0A` +
               `🌐 *Vértices Registrados:* ${markersCoords.length}%0A` +
-              `🛡️ *Cumplimiento EUDR:* ${eudrStatusText}%0A` +
-              (immutableHash ? `🔑 *Identificador Único Verificable (UID):* AXIS-UID-${immutableHash.slice(0, 16)}...${immutableHash.slice(-8)}%0A` : '') +
-              `🔐 *Integridad:* Registro inalterable para TRACES NT (Unión Europea).%0A` +
-              `📲 *Firma Inercial:* Paso humano certificado con sensores IMU anti-spoofing.%0A` +
+              `🛡️ *Consulta Línea 2020:* ${eudrStatusText}%0A` +
+              (immutableHash ? `🔑 *Identificador de Integridad (UID):* AXIS-UID-${immutableHash.slice(0, 16)}...${immutableHash.slice(-8)}%0A` : '') +
+              `🔐 *Integridad:* Sello Digital de Seguridad (UID) para expediente preliminar en formato TRACES NT.%0A` +
+              `📲 *Telemetría:* Sensores inerciales (IMU) registrados para mitigar manipulación.%0A` +
+              `⚠️ *Aviso:* Herramienta de primera milla. No reemplaza el registro oficial del SICA (FNC).%0A` +
               (currentPosition ? `🗺️ *Ubicación en Google Maps:* https://www.google.com/maps?q=${currentPosition[0]},${currentPosition[1]}` : '');
 
         window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
@@ -1196,6 +1379,50 @@ export default function EUDRGeoreference({
                                         ? (isEn ? `${distanceToStart}m to start! Closing automatically...` : `¡A ${distanceToStart}m del inicio! Cerrando automáticamente...`)
                                         : (isEn ? `Distance to start: ${distanceToStart}m` : `Distancia al inicio: ${distanceToStart}m`)}
                                 </span>
+                            </div>
+                        )}
+
+                        {/* Auto-Pruned Loop / Detour Floating Notification */}
+                        {prunedNotice && (
+                            <div className="bg-emerald-950/95 backdrop-blur-md px-3.5 py-2 rounded-xl border border-emerald-400/80 shadow-2xl flex items-center gap-2 max-w-sm animate-in slide-in-from-top-2">
+                                <Sparkles className="w-4 h-4 text-emerald-400 shrink-0 animate-pulse" />
+                                <span className="text-[10px] sm:text-[11px] font-bold text-emerald-100">
+                                    {prunedNotice}
+                                </span>
+                            </div>
+                        )}
+
+                        {/* Caminata en Pausa / Esquivando Obstáculo */}
+                        {!isCapturing && gpsPoints.length > 0 && !geoJsonData && (
+                            <div className="bg-[#0C3C60]/95 backdrop-blur-md px-3.5 py-2 rounded-xl border border-amber-400/70 text-white text-[10px] sm:text-xs shadow-2xl flex items-center gap-2.5 max-w-sm animate-in slide-in-from-top-2">
+                                <span className="w-2.5 h-2.5 rounded-full bg-amber-400 shrink-0" />
+                                <div className="leading-tight">
+                                    <span className="font-bold text-amber-300 block">
+                                        {isEn ? 'Walk Paused' : 'Caminata en Pausa'} ({gpsPoints.length} {gpsPoints.length === 1 ? (isEn ? 'point' : 'punto') : (isEn ? 'puntos' : 'puntos')})
+                                    </span>
+                                    <span className="text-[9.5px] text-white/80">
+                                        {isEn
+                                            ? 'Walk past ravines or obstacles freely. Tap Resume (▶️) once back on the boundary.'
+                                            : 'Rodea cañadas u obstáculos con tranquilidad. Al volver al lindero, pulsa Reanudar (▶️).'}
+                                    </span>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Topological Self-Intersection Warning Banner */}
+                        {hasSelfIntersection && (
+                            <div className="bg-amber-950/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-amber-500/80 shadow-2xl flex items-center gap-2 max-w-sm animate-in slide-in-from-top-2">
+                                <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 animate-pulse" />
+                                <div className="text-[9.5px] leading-tight text-amber-100">
+                                    <span className="font-bold text-amber-300 block">
+                                        {isEn ? 'Topological Notice: Crossing Edges' : 'Aviso Topológico: Líneas Cruzadas'}
+                                    </span>
+                                    <span>
+                                        {isEn
+                                            ? 'TRACES NT rejects self-intersecting polygons. Please undo the last vertex or adjust path.'
+                                            : 'TRACES NT rechaza polígonos cruzados. Retira el último vértice o ajusta el trazado.'}
+                                    </span>
+                                </div>
                             </div>
                         )}
                     </div>
@@ -1327,14 +1554,14 @@ export default function EUDRGeoreference({
                                     {isEn ? 'EUDR Standard' : 'Normativa EUDR'}
                                 </p>
                                 <p className="text-[11px] sm:text-xs font-black text-[#83DF9C] mt-1 uppercase truncate">
-                                    {areaHa >= 4
+                                    {areaHa > 4
                                         ? (isEn ? 'Mandatory Polygon' : 'Polígono Obligatorio')
                                         : (isEn ? 'Point or Polygon' : 'Punto o Polígono')}
                                 </p>
                                 <p className="text-[8px] sm:text-[9px] font-medium text-white/60 truncate">
-                                    {areaHa >= 4
-                                        ? '≥ 4 ha (Art. 9.1.d)'
-                                        : (isEn ? '< 4 ha Compliant' : '< 4 ha Conforme')}
+                                    {areaHa > 4
+                                        ? '> 4 ha (Art. 9.1.d)'
+                                        : (isEn ? '≤ 4 ha (Point / Polygon)' : '≤ 4 ha (Punto o Polígono)')}
                                 </p>
                             </div>
 
@@ -1355,10 +1582,10 @@ export default function EUDRGeoreference({
                                     ></span>
                                     <span className="truncate text-white">
                                         {gfwStatus === 'secure'
-                                            ? (isEn ? '0.00 ha Deforestation' : '0.00 ha Deforestación')
+                                            ? (isEn ? '0.00 ha Forest Loss' : '0.00 ha Pérdida Bosque')
                                             : gfwStatus === 'warning'
                                             ? `${lossHa.toFixed(2)} ha ${isEn ? 'Forest Loss' : 'Pérdida Bosque'}`
-                                            : (isEn ? 'Satellite Audit...' : 'Validando Satélite...')}
+                                            : (isEn ? 'Satellite Check Pending' : 'Verificación Pendiente')}
                                     </span>
                                 </p>
                                 <p
@@ -1371,30 +1598,30 @@ export default function EUDRGeoreference({
                                     }`}
                                 >
                                     {gfwStatus === 'secure'
-                                        ? (isEn ? 'CLEARED / COMPLIANT' : 'CLEARED / APROBADO')
+                                        ? (isEn ? 'NO LOSS DETECTED' : 'SIN PÉRDIDA DETECTADA')
                                         : gfwStatus === 'warning'
                                         ? (isEn ? 'DEFORESTATION ALERT' : 'ALERTA DEFORESTACIÓN')
-                                        : (isEn ? 'ANALYZING SENTINEL-2' : 'ANALIZANDO SENTINEL-2')}
+                                        : (isEn ? 'UNVERIFIED (GFW UMD 30M)' : 'NO VERIFICADO (GFW UMD 30M)')}
                                 </p>
                             </div>
                         </div>
 
-                        {/* Cryptographic Immutability Seal Strip */}
+                        {/* Cryptographic Integrity Seal Strip */}
                         <div className="bg-[#051726] text-[#FAF2CA] px-3 sm:px-4 py-2 flex flex-wrap items-center justify-between gap-1.5 text-[9px] sm:text-[10px] border-t border-white/10 select-none">
                             <div className="flex items-center gap-1.5 min-w-0">
                                 <Lock className="w-3.5 h-3.5 text-[#83DF9C] shrink-0" />
                                 <span className="font-black text-[#83DF9C] uppercase tracking-wider shrink-0">
-                                    {isEn ? 'Unique ID (UID):' : 'Identificador Único (UID):'}
+                                    {isEn ? 'Integrity UID:' : 'Sello Integridad (UID):'}
                                 </span>
                                 <span className="font-mono text-white/95 truncate">
                                     {immutableHash
                                         ? `AXIS-UID-${immutableHash.slice(0, 16)}...${immutableHash.slice(-8)}`
-                                        : (isEn ? 'Generating unique ID...' : 'Generando identificador único...')}
+                                        : (isEn ? 'Generating seal...' : 'Generando sello...')}
                                 </span>
                             </div>
                             <div className="flex items-center gap-1.5 text-[8.5px] sm:text-[9px] text-[#FAF2CA]/90">
                                 <span className="w-1.5 h-1.5 rounded-full bg-[#83DF9C] animate-pulse"></span>
-                                <span className="font-bold uppercase tracking-wider">Audit Trail • TRACES NT Validated</span>
+                                <span className="font-bold uppercase tracking-wider">Audit Trail • TRACES NT Format</span>
                             </div>
                         </div>
 
@@ -1456,26 +1683,91 @@ export default function EUDRGeoreference({
                 {!geoJsonData ? (
                     <div className="space-y-2.5">
                         {!isCapturing ? (
-                            /* MOMENTO 1: INICIO LIMPIO (ANTES DE CAMINAR) */
-                            <div className="space-y-3 p-1">
-                                {/* BIG GREEN START BUTTON */}
-                                <button
-                                    onClick={startTracking}
-                                    className="w-full bg-[#83DF9C] hover:bg-[#6ed38a] active:scale-98 text-[#0C3C60] py-4 sm:py-5 px-6 rounded-2xl font-black uppercase text-sm sm:text-base tracking-wider transition-all shadow-xl hover:shadow-2xl flex items-center justify-center gap-3 cursor-pointer min-h-[64px]"
-                                >
-                                    <div className="w-10 h-10 rounded-full bg-[#0C3C60] text-[#83DF9C] flex items-center justify-center shrink-0 shadow-md">
-                                        <Play className="w-5 h-5 fill-current ml-0.5" />
-                                    </div>
-                                    <div className="text-left">
-                                        <span className="block text-sm sm:text-base font-black leading-tight">
-                                            {isEn ? 'START DIGITAL WALK' : 'INICIAR CAMINATA'}
+                            gpsPoints.length === 0 ? (
+                                /* MOMENTO 1: INICIO LIMPIO (ANTES DE CAMINAR) */
+                                <div className="space-y-3 p-1">
+                                    {/* BIG GREEN START BUTTON */}
+                                    <button
+                                        onClick={startTracking}
+                                        className="w-full bg-[#83DF9C] hover:bg-[#6ed38a] active:scale-98 text-[#0C3C60] py-4 sm:py-5 px-6 rounded-2xl font-black uppercase text-sm sm:text-base tracking-wider transition-all shadow-xl hover:shadow-2xl flex items-center justify-center gap-3 cursor-pointer min-h-[64px]"
+                                    >
+                                        <div className="w-10 h-10 rounded-full bg-[#0C3C60] text-[#83DF9C] flex items-center justify-center shrink-0 shadow-md">
+                                            <Play className="w-5 h-5 fill-current ml-0.5" />
+                                        </div>
+                                        <div className="text-left">
+                                            <span className="block text-sm sm:text-base font-black leading-tight">
+                                                {isEn ? 'START DIGITAL WALK' : 'INICIAR CAMINATA'}
+                                            </span>
+                                            <span className="block text-[10px] text-[#0C3C60]/80 font-bold leading-tight lowercase">
+                                                {isEn ? 'walk perimeter • auto-closes upon return' : 'camina el lindero • se cierra solo al volver'}
+                                            </span>
+                                        </div>
+                                    </button>
+                                </div>
+                            ) : (
+                                /* EN PAUSA (Esquivando obstáculo / cañada) */
+                                <div className="space-y-2.5 p-1 animate-in fade-in">
+                                    {/* Explanatory banner */}
+                                    <div className="bg-[#0C3C60] p-2.5 rounded-xl border border-amber-400/50 flex items-center justify-between text-xs">
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-7 h-7 rounded-full bg-amber-400 text-[#0C3C60] flex items-center justify-center font-black text-xs shrink-0">
+                                                ⏸
+                                            </div>
+                                            <div>
+                                                <span className="font-black text-amber-300 uppercase text-[11px] block leading-tight">
+                                                    {isEn ? 'Walk in Pause (Obstacle Detour)' : 'Caminata en Pausa (Esquivar Obstáculo)'}
+                                                </span>
+                                                <span className="text-[10px] text-white/80 font-medium block leading-tight mt-0.5">
+                                                    {isEn
+                                                        ? 'Walk past ravines or dogs freely. Resume once back on boundary.'
+                                                        : 'Rodea cañadas o perros con tranquilidad. Al volver al lindero, pulsa Reanudar.'}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <span className="text-[11px] text-[#0C3C60] font-black bg-[#83DF9C] px-2 py-0.5 rounded-lg shrink-0">
+                                            {gpsPoints.length} {gpsPoints.length === 1 ? (isEn ? 'point' : 'punto') : (isEn ? 'puntos' : 'puntos')}
                                         </span>
-                                        <span className="block text-[10px] text-[#0C3C60]/80 font-bold leading-tight lowercase">
-                                            {isEn ? 'walk perimeter • auto-closes upon return' : 'camina el lindero • se cierra solo al volver'}
-                                        </span>
                                     </div>
-                                </button>
-                            </div>
+
+                                    {/* BIG PLAY / RESUME BUTTON */}
+                                    <button
+                                        onClick={startTracking}
+                                        className="w-full bg-[#83DF9C] hover:bg-[#6ed38a] active:scale-98 text-[#0C3C60] py-4 px-6 rounded-2xl font-black uppercase text-sm sm:text-base tracking-wider transition-all shadow-xl hover:shadow-2xl flex items-center justify-center gap-3 cursor-pointer min-h-[58px]"
+                                    >
+                                        <div className="w-9 h-9 rounded-full bg-[#0C3C60] text-[#83DF9C] flex items-center justify-center shrink-0 shadow-md">
+                                            <Play className="w-5 h-5 fill-current ml-0.5" />
+                                        </div>
+                                        <div className="text-left">
+                                            <span className="block text-sm sm:text-base font-black leading-tight">
+                                                {isEn ? 'RESUME DIGITAL WALK' : 'REANUDAR CAMINATA'}
+                                            </span>
+                                            <span className="block text-[10px] text-[#0C3C60]/80 font-bold leading-tight">
+                                                {isEn ? 'Continue perimeter along boundary' : 'Continúa el trazo por el lindero'}
+                                            </span>
+                                        </div>
+                                    </button>
+
+                                    {/* Action buttons while paused */}
+                                    <div className="flex items-center gap-2">
+                                        {gpsPoints.length >= 3 && (
+                                            <button
+                                                onClick={() => handleFinishMapping(false)}
+                                                className="flex-1 bg-white/10 hover:bg-white/20 active:scale-98 text-[#83DF9C] border border-[#83DF9C]/50 py-2.5 px-3 rounded-xl font-bold uppercase text-[10px] sm:text-[11px] transition-all flex items-center justify-center gap-1.5 cursor-pointer min-h-[42px]"
+                                            >
+                                                <ShieldCheck className="w-4 h-4" />
+                                                <span>{isEn ? 'Close Perimeter Now' : 'Cerrar Lote Ahora'}</span>
+                                            </button>
+                                        )}
+                                        <button
+                                            onClick={handleCancelWalk}
+                                            className="flex-1 bg-red-500/15 hover:bg-red-500/25 active:scale-98 text-red-300 border border-red-500/30 py-2.5 px-3 rounded-xl font-bold uppercase text-[10px] sm:text-[11px] transition-all flex items-center justify-center gap-1.5 cursor-pointer min-h-[42px]"
+                                        >
+                                            <X className="w-3.5 h-3.5" />
+                                            <span>{isEn ? 'Cancel / Reset' : 'Descartar / Reiniciar'}</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            )
                         ) : (
                             /* MOMENTO 2: ACTIVELY WALKING */
                             <div className="space-y-2 animate-in fade-in">
@@ -1514,53 +1806,57 @@ export default function EUDRGeoreference({
                                 </div>
 
                                 {/* Action Buttons while walking */}
-                                <div className="flex items-center gap-2">
-                                    <button
-                                        onClick={() => handleFinishMapping(false)}
-                                        disabled={gpsPoints.length < 3}
-                                        className="flex-1 bg-[#83DF9C] disabled:bg-gray-600 disabled:text-gray-400 hover:bg-[#6fd48b] active:scale-98 text-[#0C3C60] py-3.5 rounded-xl font-black uppercase text-[11px] sm:text-xs tracking-wider transition-all shadow-md flex items-center justify-center gap-1.5 cursor-pointer min-h-[48px]"
-                                    >
-                                        <ShieldCheck className="w-4 h-4" />
-                                        <span>{isEn ? 'Close Perimeter' : 'Cerrar Lote'} ({gpsPoints.length}/3+)</span>
-                                    </button>
+                                <div className="space-y-2">
+                                    <div className="flex items-center gap-2">
+                                        <button
+                                            onClick={() => handleFinishMapping(false)}
+                                            disabled={gpsPoints.length < 3}
+                                            className="flex-1 bg-[#83DF9C] disabled:bg-gray-600 disabled:text-gray-400 hover:bg-[#6fd48b] active:scale-98 text-[#0C3C60] py-3.5 rounded-xl font-black uppercase text-[11px] sm:text-xs tracking-wider transition-all shadow-md flex items-center justify-center gap-1.5 cursor-pointer min-h-[48px]"
+                                        >
+                                            <ShieldCheck className="w-4 h-4" />
+                                            <span>{isEn ? 'Close Perimeter' : 'Cerrar Lote'} ({gpsPoints.length}/3+)</span>
+                                        </button>
 
-                                    <button
-                                        onClick={() => {
-                                            setIsPocketMode(true);
-                                            if (typeof window !== 'undefined' && navigator.vibrate) {
-                                                navigator.vibrate([60, 40, 60]);
-                                            }
-                                        }}
-                                        className="px-3.5 py-3.5 bg-[#0C3C60] hover:bg-[#164e78] active:scale-98 text-[#FAF2CA] rounded-xl font-bold uppercase text-[10px] sm:text-[11px] transition-all cursor-pointer min-h-[48px] flex items-center gap-1.5 shadow-sm border border-white/10"
-                                        title={isEn ? 'Pocket Mode: lock touch screen while walking' : 'Modo Bolsillo: Bloquear pantalla táctil mientras caminas seguro'}
-                                    >
-                                        <Lock className="w-3.5 h-3.5 text-[#83DF9C]" />
-                                        <span>{isEn ? 'Pocket' : 'Bolsillo'}</span>
-                                    </button>
+                                        <button
+                                            onClick={handleManualCapturePoint}
+                                            className="px-3 py-3.5 bg-white/10 border border-white/20 hover:bg-white/20 active:scale-98 text-white rounded-xl font-bold uppercase text-[10px] sm:text-[11px] transition-all flex items-center justify-center gap-1 cursor-pointer min-h-[48px]"
+                                            title={isEn ? 'Record manual vertex' : 'Marcar vértice manual en esquina o lindero'}
+                                        >
+                                            <span className="text-xs font-black">+</span>
+                                            <span>{isEn ? 'Point' : 'Punto'}</span>
+                                        </button>
 
-                                    <button
-                                        onClick={handleManualCapturePoint}
-                                        className="px-3.5 py-3.5 bg-white/10 border border-white/20 hover:bg-white/20 active:scale-98 text-white rounded-xl font-bold uppercase text-[10px] sm:text-[11px] transition-all cursor-pointer min-h-[48px]"
-                                        title={isEn ? 'Record manual vertex' : 'Marcar vértice manual'}
-                                    >
-                                        {isEn ? '+ Point' : '+ Punto'}
-                                    </button>
+                                        <button
+                                            onClick={() => {
+                                                setIsPocketMode(true);
+                                                if (typeof window !== 'undefined' && navigator.vibrate) {
+                                                    navigator.vibrate([60, 40, 60]);
+                                                }
+                                            }}
+                                            className="px-3 py-3.5 bg-[#0C3C60] hover:bg-[#164e78] active:scale-98 text-[#FAF2CA] rounded-xl font-bold uppercase text-[10px] sm:text-[11px] transition-all cursor-pointer min-h-[48px] flex items-center gap-1 shadow-sm border border-white/10"
+                                            title={isEn ? 'Pocket Mode: lock touch screen while walking' : 'Modo Bolsillo: Bloquear pantalla táctil'}
+                                        >
+                                            <Lock className="w-3.5 h-3.5 text-[#83DF9C]" />
+                                            <span>{isEn ? 'Pocket' : 'Bolsillo'}</span>
+                                        </button>
 
-                                    <button
-                                        onClick={stopTracking}
-                                        className="px-2.5 sm:px-3 py-3.5 bg-white/5 hover:bg-white/10 active:scale-98 text-white/80 rounded-xl font-bold uppercase text-[10px] sm:text-[11px] transition-all cursor-pointer min-h-[48px]"
-                                    >
-                                        {isEn ? 'Pause' : 'Pausar'}
-                                    </button>
+                                        <button
+                                            onClick={stopTracking}
+                                            className="px-3 py-3.5 bg-amber-500/20 hover:bg-amber-500/30 active:scale-98 text-amber-200 border border-amber-500/40 rounded-xl font-bold uppercase text-[10px] sm:text-[11px] transition-all cursor-pointer min-h-[48px] flex items-center gap-1"
+                                            title={isEn ? 'Pause to walk around ravines, dogs or obstacles' : 'Pausar para esquivar cañadas, perros u obstáculos'}
+                                        >
+                                            <span>⏸</span>
+                                            <span>{isEn ? 'Pause' : 'Pausar'}</span>
+                                        </button>
 
-                                    <button
-                                        onClick={handleCancelWalk}
-                                        className="px-2.5 sm:px-3 py-3.5 bg-red-500/20 hover:bg-red-500/30 active:scale-98 text-red-200 border border-red-500/30 rounded-xl font-bold uppercase text-[10px] sm:text-[11px] transition-all cursor-pointer min-h-[48px] flex items-center gap-1"
-                                        title={isEn ? 'Cancel walk and discard points' : 'Cancelar caminata y descartar puntos'}
-                                    >
-                                        <X className="w-3.5 h-3.5 text-red-400" />
-                                        <span>{isEn ? 'Cancel' : 'Cancelar'}</span>
-                                    </button>
+                                        <button
+                                            onClick={handleCancelWalk}
+                                            className="p-3.5 bg-red-500/20 hover:bg-red-500/30 active:scale-98 text-red-200 border border-red-500/30 rounded-xl font-bold uppercase text-[10px] sm:text-[11px] transition-all cursor-pointer min-h-[48px] flex items-center justify-center"
+                                            title={isEn ? 'Cancel walk and discard points' : 'Cancelar caminata y descartar puntos'}
+                                        >
+                                            <X className="w-4 h-4 text-red-400" />
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         )}
@@ -1590,13 +1886,13 @@ export default function EUDRGeoreference({
                             </button>
                         </div>
 
-                        {/* BIG PRIMARY CTA: ENTREGABLE OFICIAL PDF & DATOS */}
+                        {/* BIG PRIMARY CTA: ENTREGABLE INFORME PDF & DATOS */}
                         <button
                             onClick={() => setShowDeliverableModal(true)}
                             className="w-full bg-[#83DF9C] hover:bg-[#6fd48b] active:scale-98 text-[#0C3C60] py-4 px-5 rounded-2xl font-black uppercase text-xs sm:text-sm tracking-wider transition-all shadow-xl hover:shadow-2xl flex items-center justify-center gap-2.5 cursor-pointer min-h-[56px]"
                         >
                             <FileText className="w-5 h-5 text-[#0C3C60] shrink-0" />
-                            <span>{isEn ? 'Complete Data & Generate Official PDF' : 'Completar Datos & Generar Certificado PDF'}</span>
+                            <span>{isEn ? 'Complete Data & Generate Georeferencing Report' : 'Completar Datos & Generar Informe PDF'}</span>
                         </button>
 
                         <div className="grid grid-cols-2 gap-2">

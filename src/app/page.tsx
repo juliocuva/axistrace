@@ -546,6 +546,14 @@ export default function LandingPage() {
                         <span>EUDR Regulation (EU) 2023/1115</span>
                     </div>
                     <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-[11px] text-[#FAF2CA]/50">
+                        <Link href="/privacidad" className="hover:text-[#83DF9C] transition-colors underline underline-offset-2">
+                            {lang === 'es' ? 'Tratamiento de Datos & Privacidad' : 'Data Privacy Policy'}
+                        </Link>
+                        <span className="hidden sm:inline text-[#0C3C60]">•</span>
+                        <a href="mailto:contacto@axistrace.app" className="hover:text-[#83DF9C] transition-colors">
+                            contacto@axistrace.app
+                        </a>
+                        <span className="hidden sm:inline text-[#0C3C60]">•</span>
                         <span>© {new Date().getFullYear()} AxisTrace. {t.footer.rights}</span>
                         <span className="hidden sm:inline text-[#0C3C60]">•</span>
                         <a 
@@ -558,6 +566,15 @@ export default function LandingPage() {
                             <span className="font-bold text-white group-hover:text-[#83DF9C] underline underline-offset-4 decoration-[#83DF9C]/50 group-hover:decoration-[#83DF9C] transition-all">Mouselab</span>
                         </a>
                     </div>
+                </div>
+
+                {/* Institutional Notice Disclaimer */}
+                <div className="max-w-6xl mx-auto mt-4 pt-4 border-t border-white/5 text-[10px] text-white/40 leading-relaxed text-center sm:text-left">
+                    <p>
+                        {lang === 'es'
+                            ? 'Aviso reglamentario e institucional: AxisTrace es una plataforma tecnológica de apoyo a la primera milla y validación previa de georreferenciación. No sustituye el registro ni los reportes oficiales emitidos por el Sistema de Información Cafetera (SICA / FNC) ni exime a los operadores comerciales de su obligación legal de debida diligencia según el Reglamento (UE) 2023/1115.'
+                            : 'Regulatory and Institutional Notice: AxisTrace is a first-mile technical pre-validation georeferencing infrastructure. It does not replace official institutional registries (such as SICA / FNC in Colombia) nor does it exempt commercial operators from their legal due diligence obligations under EU Regulation 2023/1115.'}
+                    </p>
                 </div>
             </footer>
 
