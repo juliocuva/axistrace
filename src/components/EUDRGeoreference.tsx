@@ -2134,85 +2134,87 @@ export default function EUDRGeoreference({
                 document.body
             )}
 
-            {/* FULL-SCREEN POCKET MODE OVERLAY (MODO BOLSILLO ANTI-ROCES) */}
+            {/* FULL-SCREEN TRANSPARENT POCKET MODE SHIELD (MODO BOLSILLO TRANSPARENTE ANTI-ROCES) */}
             {isPocketMode && isCapturing && isMounted && createPortal(
-                <div className="fixed inset-0 z-[99999] bg-[#05131e] text-white flex flex-col justify-between p-6 select-none animate-in fade-in">
-                    {/* Header */}
-                    <div className="flex items-center justify-between border-b border-white/10 pb-4">
-                        <div className="flex items-center gap-2.5">
-                            <div className="w-8 h-8 rounded-full bg-[#83DF9C]/20 border border-[#83DF9C]/40 flex items-center justify-center text-[#83DF9C]">
-                                <Lock className="w-4 h-4" />
+                <div className="fixed inset-0 z-[99999] bg-black/40 backdrop-blur-[1px] text-white flex flex-col justify-between p-4 sm:p-6 select-none animate-in fade-in">
+                    {/* Top Floating HUD: Metrics & Live Status */}
+                    <div className="bg-[#082840]/90 backdrop-blur-md border border-white/20 rounded-2xl p-3.5 shadow-xl space-y-2.5">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <div className="w-7 h-7 rounded-full bg-[#83DF9C]/20 border border-[#83DF9C]/40 flex items-center justify-center text-[#83DF9C] shrink-0">
+                                    <Lock className="w-3.5 h-3.5" />
+                                </div>
+                                <div>
+                                    <h3 className="text-xs font-black uppercase tracking-wider text-[#FAF2CA] flex items-center gap-1.5">
+                                        <span>{isEn ? 'Pocket Mode (Locked)' : 'Modo Bolsillo (Bloqueado)'}</span>
+                                        <span className="w-2 h-2 rounded-full bg-[#83DF9C] animate-pulse"></span>
+                                    </h3>
+                                    <p className="text-[9.5px] text-white/60">
+                                        {isEn ? 'Touch screen protected • Map tracing live' : 'Toque protegido • Trazando mapa en vivo'}
+                                    </p>
+                                </div>
                             </div>
-                            <div>
-                                <h3 className="text-xs font-black uppercase tracking-wider text-[#FAF2CA]">
-                                    {isEn ? 'Pocket Mode Active' : 'Modo Bolsillo Activo'}
-                                </h3>
-                                <p className="text-[10px] text-white/60">
-                                    {isEn ? 'Touch screen protected against fabric touches' : 'Pantalla táctil protegida contra toques de tela'}
-                                </p>
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#83DF9C]/20 text-[#83DF9C] text-[10px] font-mono font-bold border border-[#83DF9C]/30">
-                            <span className="w-2 h-2 rounded-full bg-[#83DF9C] animate-ping" />
-                            <span>{isEn ? 'GPS Logging' : 'GPS Grabando'}</span>
-                        </div>
-                    </div>
-
-                    {/* Big Live Metrics in Pocket Mode */}
-                    <div className="flex flex-col items-center justify-center text-center my-auto space-y-6">
-                        <div>
-                            <span className="text-[11px] font-bold text-white/50 uppercase tracking-widest block mb-1">
-                                {isEn ? 'Recorded Vertices' : 'Vértices Registrados'}
-                            </span>
-                            <div className="text-7xl font-black font-mono text-[#83DF9C]">
-                                {gpsPoints.length}
+                            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#83DF9C]/20 text-[#83DF9C] text-[10px] font-mono font-bold border border-[#83DF9C]/30 shrink-0">
+                                <span className="w-2 h-2 rounded-full bg-[#83DF9C] animate-ping" />
+                                <span>{isEn ? 'GPS Active' : 'GPS Activo'}</span>
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-3 w-full max-w-xs">
-                            <div className="bg-white/5 border border-white/10 rounded-2xl p-3 text-center">
-                                <span className="text-[9px] uppercase tracking-wider text-white/50 block font-bold">
-                                    {isEn ? 'Next Point' : 'Próximo Punto'}
+                        {/* Compact HUD Metrics Bar */}
+                        <div className="grid grid-cols-3 gap-2 pt-1 border-t border-white/10 text-center">
+                            <div className="bg-white/5 rounded-xl p-1.5 border border-white/10">
+                                <span className="text-[8.5px] uppercase font-bold text-white/50 block">
+                                    {isEn ? 'Vertices' : 'Vértices'}
                                 </span>
-                                <span className="text-2xl font-black font-mono text-[#FAF2CA]">
+                                <span className="text-base font-black font-mono text-[#83DF9C]">
+                                    {gpsPoints.length}
+                                </span>
+                            </div>
+
+                            <div className="bg-white/5 rounded-xl p-1.5 border border-white/10">
+                                <span className="text-[8.5px] uppercase font-bold text-white/50 block">
+                                    {isEn ? 'Next Point' : 'Próximo'}
+                                </span>
+                                <span className="text-base font-black font-mono text-[#FAF2CA]">
                                     {countdownSeconds}s
                                 </span>
                             </div>
-                            <div className="bg-white/5 border border-white/10 rounded-2xl p-3 text-center">
-                                <span className="text-[9px] uppercase tracking-wider text-white/50 block font-bold">
+
+                            <div className="bg-white/5 rounded-xl p-1.5 border border-white/10">
+                                <span className="text-[8.5px] uppercase font-bold text-white/50 block">
                                     {isEn ? 'Altitude' : 'Altitud'}
                                 </span>
-                                <span className="text-2xl font-black font-mono text-white">
-                                    {altitudeMeters ? altitudeMeters.toLocaleString(isEn ? 'en-US' : 'es-CO') : '--'}
+                                <span className="text-base font-black font-mono text-white">
+                                    {altitudeMeters ? `${altitudeMeters}m` : '--'}
                                 </span>
-                                <span className="text-[9px] text-white/40 block">{isEn ? 'masl' : 'msnm'}</span>
                             </div>
                         </div>
 
                         {distanceToStart !== null && gpsPoints.length >= 3 && (
-                            <div className="bg-[#83DF9C]/15 border border-[#83DF9C]/30 rounded-2xl p-3 max-w-xs w-full text-center">
-                                <span className="text-[10px] font-bold text-[#83DF9C] block uppercase tracking-wider">
+                            <div className="bg-[#83DF9C]/15 border border-[#83DF9C]/30 rounded-xl px-3 py-1.5 text-center flex items-center justify-between">
+                                <span className="text-[10px] font-bold text-[#83DF9C]">
                                     {distanceToStart <= 10.0
-                                        ? (isEn ? '🎯 Within 10m of start! Closing automatically...' : '🎯 ¡A 10m del inicio! Cerrando automáticamente...')
-                                        : (isEn ? `Distance to start: ${distanceToStart}m` : `Distancia al inicio: ${distanceToStart}m`)}
+                                        ? (isEn ? '🎯 Within 10m! Auto-closing...' : '🎯 ¡A 10m! Cerrando automáticamente...')
+                                        : (isEn ? `Distance to start:` : `Distancia al inicio:`)}
                                 </span>
-                                <span className="text-[9px] text-white/60 block mt-0.5">
-                                    {distanceToStart <= 10.0
-                                        ? (isEn ? 'Closing parcel perimeter now' : 'Cerrando el polígono ahora')
-                                        : (isEn ? 'Auto-closes at 10m from start' : 'Se cierra solo al estar a 10m del inicio')}
+                                <span className="font-mono text-xs font-black text-white">
+                                    {distanceToStart}m
                                 </span>
                             </div>
                         )}
+                    </div>
 
-                        <div className="flex items-center gap-2 text-[10px] text-white/50 bg-white/5 px-3 py-1.5 rounded-full">
-                            <Smartphone className="w-3.5 h-3.5 text-[#83DF9C]" />
-                            <span>{isEn ? 'Gently vibrates in your pocket at every captured point' : 'Vibra suave en tu bolsillo en cada punto capturado'}</span>
+                    {/* Center: Completely Transparent View Area so walker sees satellite map & vertices being drawn */}
+                    <div className="flex-1 flex items-center justify-center pointer-events-none p-4">
+                        <div className="bg-[#082840]/75 backdrop-blur-md border border-white/20 px-3.5 py-1.5 rounded-full text-[11px] text-[#FAF2CA] font-bold shadow-lg flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-[#83DF9C] animate-pulse shrink-0"></span>
+                            <span>{isEn ? '🗺️ Viewing live polygon trace below' : '🗺️ Visualizando trazado del mapa en vivo'}</span>
                         </div>
                     </div>
 
-                    {/* Unlock Action: Hold for 1.2s to prevent accidental unlocks in pocket */}
-                    <div className="space-y-2">
-                        <div className="relative overflow-hidden rounded-2xl">
+                    {/* Bottom Floating Bar: Unlock Action (Hold to unlock) */}
+                    <div className="bg-[#082840]/90 backdrop-blur-md border border-white/20 rounded-2xl p-3.5 shadow-xl space-y-2">
+                        <div className="relative overflow-hidden rounded-xl">
                             <div
                                 className="absolute inset-0 bg-[#83DF9C] transition-all duration-100 ease-linear"
                                 style={{ width: `${holdProgress}%` }}
@@ -2223,19 +2225,20 @@ export default function EUDRGeoreference({
                                 onMouseDown={handleStartHold}
                                 onMouseUp={handleCancelHold}
                                 onMouseLeave={handleCancelHold}
-                                className="relative w-full py-4 bg-white/10 hover:bg-white/15 active:bg-white/20 border border-white/20 rounded-2xl font-black uppercase text-xs tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer select-none text-white shadow-lg"
+                                className="relative w-full py-3.5 bg-white/10 hover:bg-white/15 active:bg-white/20 border border-white/20 rounded-xl font-black uppercase text-xs tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer select-none text-white shadow-lg"
                             >
                                 <Unlock className="w-4 h-4 text-[#FAF2CA]" />
                                 <span>
                                     {holdProgress > 0
                                         ? (isEn ? `Releasing in ${Math.max(1, Math.round((100 - holdProgress) / 10))}...` : `Soltando en ${Math.max(1, Math.round((100 - holdProgress) / 10))}...`)
-                                        : (isEn ? 'Hold to unlock' : 'Mantén presionado para desbloquear')}
+                                        : (isEn ? 'Hold to unlock touch' : 'Mantén presionado para desbloquear')}
                                 </span>
                             </button>
                         </div>
-                        <p className="text-[10px] text-center text-white/50">
-                            {isEn ? 'Place your phone in your pocket and walk freely with both hands safe.' : 'Guarda el celular en tu bolsillo y camina libremente con ambas manos seguras.'}
-                        </p>
+                        <div className="flex items-center justify-between text-[9.5px] text-white/60 px-1">
+                            <span>{isEn ? 'Touch locked against pocket friction' : 'Toque bloqueado contra roces del bolsillo'}</span>
+                            <span>{isEn ? 'Vibrates at each point' : 'Vibra en cada punto'}</span>
+                        </div>
                     </div>
                 </div>,
                 document.body
