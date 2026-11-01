@@ -28,7 +28,8 @@ import {
     Leaf,
     ArrowRight,
     FileText,
-    Sparkles
+    Sparkles,
+    Mic
 } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import { validateDeforestationWithGFW } from '../actions/eudr';
@@ -365,7 +366,10 @@ export default function EUDRGeoreference({
     const countdownRef = useRef<number>(AUTO_CAPTURE_INTERVAL_SECONDS);
     const handleFinishMappingRef = useRef<(isAutoClosed?: boolean) => void | Promise<void>>(() => {});
     const handleAutoCaptureStepRef = useRef<() => void>(() => {});
+    const handleManualCapturePointRef = useRef<() => void>(() => {});
     const processGpsUpdateRef = useRef<(lat: number, lng: number, acc: number, alt?: number | null) => void>(() => {});
+    const speechRecognitionRef = useRef<any>(null);
+    const [isListeningForVoicePin, setIsListeningForVoicePin] = useState(false);
 
     // Sync refs
     useEffect(() => {
@@ -845,6 +849,71 @@ export default function EUDRGeoreference({
         processGpsUpdateRef.current = processGpsUpdate;
     }, [processGpsUpdate]);
 
+    // Voice-activated "PIN" listener: enables hands-free corner tagging simply by saying "PIN" or "esquina"
+    const startVoicePinListener = useCallback(() => {
+        if (typeof window === 'undefined') return;
+        const SpeechRecognitionClass = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+        if (!SpeechRecognitionClass) {
+            return;
+        }
+
+        try {
+            const recognition = new SpeechRecognitionClass();
+            recognition.continuous = true;
+            recognition.interimResults = false;
+            recognition.lang = lang === 'en' ? 'en-US' : 'es-CO';
+
+            recognition.onresult = (event: any) => {
+                const results = event.results;
+                if (!results || results.length === 0) return;
+                const lastResult = results[results.length - 1];
+                const text = lastResult[0]?.transcript?.trim().toLowerCase() || '';
+
+                // If walker says "pin", "pín", "esquina", "punto", "corner", "mark"
+                if (
+                    text.includes('pin') ||
+                    text.includes('pín') ||
+                    text.includes('esquina') ||
+                    text.includes('punto') ||
+                    text.includes('corner') ||
+                    text.includes('mark')
+                ) {
+                    handleManualCapturePointRef.current();
+                }
+            };
+
+            recognition.onerror = (e: any) => {
+                if (e.error !== 'no-speech' && e.error !== 'aborted') {
+                    console.warn('Voice command notice:', e.error);
+                }
+            };
+
+            recognition.onend = () => {
+                if (isCapturingRef.current && speechRecognitionRef.current) {
+                    try {
+                        recognition.start();
+                    } catch (err) {}
+                }
+            };
+
+            recognition.start();
+            speechRecognitionRef.current = recognition;
+            setIsListeningForVoicePin(true);
+        } catch (e) {
+            console.warn('Speech recognition notice:', e);
+        }
+    }, [lang]);
+
+    const stopVoicePinListener = useCallback(() => {
+        if (speechRecognitionRef.current) {
+            try {
+                speechRecognitionRef.current.stop();
+            } catch (e) {}
+            speechRecognitionRef.current = null;
+        }
+        setIsListeningForVoicePin(false);
+    }, []);
+
     // Start GPS & Sensor Tracking (Hands-Free)
     const startTracking = () => {
         if (!navigator.geolocation) {
@@ -864,6 +933,7 @@ export default function EUDRGeoreference({
         countdownRef.current = AUTO_CAPTURE_INTERVAL_SECONDS;
         setCountdownSeconds(AUTO_CAPTURE_INTERVAL_SECONDS);
         triggerRightArrowBlink();
+        startVoicePinListener();
 
         if (currentPositionRef.current && gpsPointsRef.current.length === 0) {
             const [lat, lng] = currentPositionRef.current;
@@ -902,6 +972,7 @@ export default function EUDRGeoreference({
         }
         setIsCapturing(false);
         isCapturingRef.current = false;
+        stopVoicePinListener();
         releaseWakeLock();
         setIsPocketMode(false);
         countdownRef.current = AUTO_CAPTURE_INTERVAL_SECONDS;
@@ -960,21 +1031,31 @@ export default function EUDRGeoreference({
         };
     }, [isCapturing]);
 
-    // Manual capture fallback with auto-pruning
-    const handleManualCapturePoint = () => {
+    // Manual & Voice PIN capture with auto-pruning (specifically designed for sharp corners & non-beveled turns)
+    const handleManualCapturePoint = useCallback(() => {
         const currentPos = currentPositionRef.current;
         if (!currentPos) return;
 
         const currentLat = currentPos[0];
         const currentLng = currentPos[1];
 
-        if (gpsPoints.length >= 3) {
+        if (gpsPointsRef.current.length >= 3) {
             const closed = checkProximityAndAutoClose(currentLat, currentLng);
             if (closed) return;
         }
 
+        const currentPoints = gpsPointsRef.current;
+        if (currentPoints.length > 0) {
+            const last = currentPoints[currentPoints.length - 1];
+            const dist = haversineDistanceMeters([currentLat, currentLng], [last[1], last[0]]);
+            if (dist < 1.0) {
+                // Ignore redundant taps or voice echo if standing in the exact same spot
+                return;
+            }
+        }
+
         const candidatePoint: [number, number] = [currentLng, currentLat];
-        const { cleanedPoints, prunedCount } = pruneLoopOrDetour(gpsPoints, candidatePoint);
+        const { cleanedPoints, prunedCount } = pruneLoopOrDetour(currentPoints, candidatePoint);
 
         if (prunedCount > 0) {
             setGpsPoints(cleanedPoints);
@@ -992,17 +1073,24 @@ export default function EUDRGeoreference({
             );
         } else {
             if (typeof window !== 'undefined' && navigator.vibrate) {
-                navigator.vibrate([40, 30, 40]);
+                navigator.vibrate([100, 50, 100]);
             }
 
             setGpsPoints(cleanedPoints);
             gpsPointsRef.current = cleanedPoints;
+            triggerPrunedNotice(
+                isEn ? `📍 PIN ${cleanedPoints.length} logged (sharp corner)` : `📍 ¡PIN ${cleanedPoints.length} fijado en esquina!`
+            );
             speakVoiceGuidance(
-                isEn ? `Manual vertex ${cleanedPoints.length}` : `Vértice ${cleanedPoints.length} manual`,
+                isEn ? `Corner PIN ${cleanedPoints.length} logged` : `Pin ${cleanedPoints.length} de esquina marcado`,
                 lang
             );
         }
-    };
+    }, [checkProximityAndAutoClose, isEn, lang, triggerPrunedNotice]);
+
+    useEffect(() => {
+        handleManualCapturePointRef.current = handleManualCapturePoint;
+    }, [handleManualCapturePoint]);
 
     // Undo last point
     const handleUndoPoint = () => {
@@ -1796,7 +1884,7 @@ export default function EUDRGeoreference({
                                                     ? (isEn ? 'Point 1 logs upon coordinates capture' : 'Punto 1 se marcará al capturar coordenadas')
                                                     : isStationary
                                                     ? (isEn ? 'Head right to log next point' : 'Dirígete a la derecha para marcar el siguiente punto')
-                                                    : (isEn ? `Next point in ${countdownSeconds}s • Auto-closes on return` : `Próximo punto en ${countdownSeconds}s • Se cierra solo al volver`)}
+                                                    : (isEn ? `Next point in ${countdownSeconds}s • Say "PIN" at corners` : `Próximo punto en ${countdownSeconds}s • Di "PIN" en esquinas`)}
                                             </span>
                                         </div>
                                     </div>
@@ -1826,11 +1914,17 @@ export default function EUDRGeoreference({
 
                                         <button
                                             onClick={handleManualCapturePoint}
-                                            className="px-3 py-3.5 bg-white/10 border border-white/20 hover:bg-white/20 active:scale-98 text-white rounded-xl font-bold uppercase text-[10px] sm:text-[11px] transition-all flex items-center justify-center gap-1 cursor-pointer min-h-[48px]"
-                                            title={isEn ? 'Record manual vertex' : 'Marcar vértice manual en esquina o lindero'}
+                                            className="px-3 sm:px-4 py-3.5 bg-[#83DF9C]/20 hover:bg-[#83DF9C]/35 border border-[#83DF9C]/50 active:scale-98 text-white rounded-xl font-bold uppercase text-[10px] sm:text-[11px] transition-all flex items-center justify-center gap-1.5 cursor-pointer min-h-[48px] shadow-sm"
+                                            title={isEn ? 'Record sharp corner (tap or say "PIN")' : 'Marcar esquina afilada (toca o di "PIN")'}
                                         >
-                                            <span className="text-xs font-black">+</span>
-                                            <span>{isEn ? 'Point' : 'Punto'}</span>
+                                            <MapPin className="w-4 h-4 text-[#83DF9C]" />
+                                            <div className="flex flex-col text-left leading-none">
+                                                <span className="font-black text-[#83DF9C] text-xs">PIN</span>
+                                                <span className="text-[7.5px] text-white/70 font-semibold lowercase">o di &quot;pin&quot;</span>
+                                            </div>
+                                            {isListeningForVoicePin && (
+                                                <Mic className="w-3.5 h-3.5 text-[#83DF9C] animate-pulse ml-0.5" />
+                                            )}
                                         </button>
 
                                         <button
@@ -2194,6 +2288,15 @@ export default function EUDRGeoreference({
                         <div className="flex items-center gap-2 text-[10px] text-white/50 bg-white/5 px-3 py-1.5 rounded-full">
                             <Smartphone className="w-3.5 h-3.5 text-[#83DF9C]" />
                             <span>{isEn ? 'Gently vibrates in your pocket at every captured point' : 'Vibra suave en tu bolsillo en cada punto capturado'}</span>
+                        </div>
+
+                        <div className="flex items-center gap-2 text-[10.5px] text-emerald-300 bg-emerald-500/15 border border-emerald-500/30 px-3.5 py-2 rounded-2xl max-w-xs text-left">
+                            <Mic className="w-4 h-4 text-emerald-400 shrink-0 animate-pulse" />
+                            <span>
+                                {isEn
+                                    ? 'Voice Command: Say "PIN" out loud at corners to log sharp vertices hands-free.'
+                                    : 'Comando de Voz: Di "PIN" en voz alta en las esquinas para marcar vértices exactos sin biselar.'}
+                            </span>
                         </div>
                     </div>
 
