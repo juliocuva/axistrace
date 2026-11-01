@@ -6,7 +6,6 @@ export interface EUDRCertificateData {
     farmerName: string;
     farmerId: string;
     farmerPhone: string;
-    sicaCode?: string;
     farmName: string;
     lotName: string;
     municipality: string;
@@ -58,39 +57,39 @@ export async function generateEUDRCertificatePdf(data: EUDRCertificateData) {
     // 1. TOP HEADER & BRANDING
     // ==========================================
     doc.setFillColor(...primaryNavy);
-    doc.rect(0, 0, pageWidth, 28, 'F');
+    doc.rect(0, 0, pageWidth, 32, 'F');
 
     // Accent line below header
     doc.setFillColor(131, 223, 156);
-    doc.rect(0, 28, pageWidth, 1.5, 'F');
+    doc.rect(0, 32, pageWidth, 1.5, 'F');
 
-    // Official Brand Logo
+    // Official Brand Logo (Bigger & Prominent)
     const logoDataUrl = await getAxisTraceLogoDataUrl();
-    const textStartX = logoDataUrl ? margin + 36 : margin;
+    const textStartX = logoDataUrl ? margin + 50 : margin;
 
     if (logoDataUrl) {
         try {
-            doc.addImage(logoDataUrl, 'PNG', margin, 5, 33, 18, undefined, 'FAST');
+            doc.addImage(logoDataUrl, 'PNG', margin, 3.5, 46, 24.8, undefined, 'FAST');
         } catch {
             doc.setTextColor(255, 255, 255);
             doc.setFont('helvetica', 'bold');
-            doc.setFontSize(16);
-            doc.text('AXISTRACE', margin, 12);
+            doc.setFontSize(18);
+            doc.text('AXISTRACE', margin, 18);
         }
     } else {
         doc.setTextColor(255, 255, 255);
         doc.setFont('helvetica', 'bold');
-        doc.setFontSize(16);
-        doc.text('AXISTRACE', margin, 12);
+        doc.setFontSize(18);
+        doc.text('AXISTRACE', margin, 18);
     }
 
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(7);
     doc.setTextColor(250, 242, 202);
     doc.text('DIGITAL DUE DILIGENCE INFRASTRUCTURE • INFRAESTRUCTURA DE DILIGENCIA DEBIDA', textStartX, 11);
-    doc.text('REGULATION (EU) 2023/1115 • TRACES NT COMPLIANT', textStartX, 15.5);
+    doc.text('REGULATION (EU) 2023/1115 • TRACES NT COMPLIANT', textStartX, 16);
     doc.setTextColor(131, 223, 156);
-    doc.text('CERTIFIED GROUND GEOREFERENCING • GEORREFERENCIACIÓN TERRESTRE CERTIFICADA', textStartX, 20);
+    doc.text('CERTIFIED GROUND GEOREFERENCING • GEORREFERENCIACIÓN TERRESTRE CERTIFICADA', textStartX, 21);
 
     // Right Badge on Header
     doc.setFont('helvetica', 'bold');
@@ -101,10 +100,10 @@ export async function generateEUDRCertificatePdf(data: EUDRCertificateData) {
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(7);
     doc.setTextColor(200, 225, 240);
-    doc.text(`ISSUED / EMISIÓN: ${data.timestamp}`, pageWidth - margin, 15.5, { align: 'right' });
-    doc.text('IETF RFC 7946 / WGS84 STANDARD', pageWidth - margin, 20, { align: 'right' });
+    doc.text(`ISSUED / EMISIÓN: ${data.timestamp}`, pageWidth - margin, 16, { align: 'right' });
+    doc.text('IETF RFC 7946 / WGS84 STANDARD', pageWidth - margin, 21, { align: 'right' });
 
-    let currentY = 36;
+    let currentY = 38;
 
     // ==========================================
     // 2. DOCUMENT SUMMARY BANNER
@@ -178,11 +177,7 @@ export async function generateEUDRCertificatePdf(data: EUDRCertificateData) {
     boxY += 6;
     printField('Tax ID', 'Cédula:', data.farmerId || 'Not registered / No registrada', margin + 3, boxY);
     boxY += 6;
-    if (data.sicaCode) {
-        printField('SICA Code', 'Reg. SICA:', data.sicaCode, margin + 3, boxY);
-    } else {
-        printField('Phone', 'Tel / WA:', data.farmerPhone || 'Not registered / No registrado', margin + 3, boxY);
-    }
+    printField('Phone / WA', 'Teléfono:', data.farmerPhone || 'Not registered / No registrado', margin + 3, boxY);
     boxY += 6;
     printField('Holding', 'Predio:', data.farmName || 'Main Holding / Predio Principal', margin + 3, boxY);
     boxY += 6;

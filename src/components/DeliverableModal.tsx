@@ -91,7 +91,6 @@ export default function DeliverableModal({ isOpen, onClose, data, lang = 'en' }:
     const [farmerName, setFarmerName] = useState('');
     const [farmerId, setFarmerId] = useState('');
     const [farmerPhone, setFarmerPhone] = useState('');
-    const [sicaCode, setSicaCode] = useState('');
     const [farmName, setFarmName] = useState('');
     const [lotName, setLotName] = useState(data.lotId || 'LOTE-01');
     const [municipality, setMunicipality] = useState('');
@@ -153,7 +152,6 @@ export default function DeliverableModal({ isOpen, onClose, data, lang = 'en' }:
                 farmerName: farmerName.trim(),
                 farmerId: farmerId.trim(),
                 farmerPhone: farmerPhone.trim(),
-                sicaCode: sicaCode.trim() || undefined,
                 farmName: farmName.trim(),
                 lotName: lotName.trim() || 'LOTE-01',
                 municipality: municipality.trim(),
@@ -194,7 +192,6 @@ export default function DeliverableModal({ isOpen, onClose, data, lang = 'en' }:
                         LotIdentifier: lotName || 'LOTE-01',
                         Producer: farmerName || 'Sin Registrar',
                         ProducerDocumentId: farmerId || 'N/A',
-                        SicaNumber: sicaCode || 'N/A',
                         Farm: farmName || 'Finca Principal',
                         Municipality: municipality || 'N/A',
                         Department: department || 'N/A',
@@ -232,7 +229,6 @@ export default function DeliverableModal({ isOpen, onClose, data, lang = 'en' }:
             `🌲 *CERTIFICADO DE DILIGENCIA DEBIDA EUDR (AXISTRACE)* 🌲%0A` +
             `-------------------------------------------%0A` +
             `👤 *Productor:* ${farmerName || 'Sin Registrar'} (ID: ${farmerId || 'N/A'})%0A` +
-            (sicaCode ? `🏷️ *Registro SICA / Predial:* ${sicaCode}%0A` : '') +
             `🏡 *Finca/Lote:* ${farmName || 'Predio'} • ${lotName}%0A` +
             `📍 *Ubicación:* ${municipality || 'Municipio'}, ${department || 'Depto'} - ${country}%0A` +
             `🌱 *Cultivo:* ${currentComm.icon} ${currentComm.name} (HS: ${currentComm.hsCode})%0A` +
@@ -374,21 +370,6 @@ export default function DeliverableModal({ isOpen, onClose, data, lang = 'en' }:
 
                                 <div>
                                     <label className="block text-[10px] font-bold uppercase tracking-wider text-white/70 mb-1">
-                                        {selectedCommodity === 'cafe'
-                                            ? (isEn ? 'SICA Code / Coffee Farm Registry:' : 'Código SICA / Registro Cafetero:')
-                                            : (isEn ? 'Holding / Farm Registry (Optional):' : 'Código Predial / ICA / Registro:')}
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value={sicaCode}
-                                        onChange={e => setSicaCode(e.target.value)}
-                                        placeholder={selectedCommodity === 'cafe' ? 'Ej: 6617000587' : (isEn ? 'e.g., ICA-987654 (Optional)' : 'Ej: ICA-987654 (Opcional)')}
-                                        className="w-full bg-[#0C3C60] border border-white/20 rounded-xl px-3 py-2 text-xs font-bold text-white outline-none focus:border-[#83DF9C]"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block text-[10px] font-bold uppercase tracking-wider text-white/70 mb-1">
                                         {isEn ? 'Farm / Holding Name:' : 'Nombre de la Finca / Predio:'}
                                     </label>
                                     <input
@@ -499,8 +480,8 @@ export default function DeliverableModal({ isOpen, onClose, data, lang = 'en' }:
                                         <span className="font-mono font-bold text-white">{data.vertices.length} {isEn ? 'points' : 'puntos'}</span>
                                     </div>
                                     <div>
-                                        <span className="text-white/50 block text-[9px] uppercase font-bold">{sicaCode ? (isEn ? 'Producer / SICA:' : 'Productor / SICA:') : (isEn ? 'Producer:' : 'Productor:')}</span>
-                                        <span className="font-bold text-white truncate block">{farmerName || (isEn ? 'Unregistered' : 'Sin Registrar')}{sicaCode ? ` (${sicaCode})` : ''}</span>
+                                        <span className="text-white/50 block text-[9px] uppercase font-bold">{isEn ? 'Producer:' : 'Productor:'}</span>
+                                        <span className="font-bold text-white truncate block">{farmerName || (isEn ? 'Unregistered' : 'Sin Registrar')}</span>
                                     </div>
                                 </div>
 
