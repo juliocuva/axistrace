@@ -460,14 +460,16 @@ export default function EUDRGeoreference({
     useEffect(() => {
         if (typeof window === 'undefined' || !navigator.geolocation) return;
 
-        // 1. Fast instant position check (cellular / cache)
+        // 1. Immediate high-precision position request as soon as user grants location
         navigator.geolocation.getCurrentPosition(
             pos => {
                 const { latitude, longitude, accuracy, altitude } = pos.coords;
                 processGpsUpdateRef.current(latitude, longitude, accuracy, altitude);
             },
-            () => {},
-            { enableHighAccuracy: false, timeout: 5000, maximumAge: 300000 }
+            err => {
+                console.warn('GPS initial position notice:', err.message);
+            },
+            { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
         );
 
         // 2. High-precision continuous watch (Single unified watcher)
@@ -812,8 +814,14 @@ export default function EUDRGeoreference({
                 }
             }
 
+            const isFirstPosition = currentPositionRef.current === null;
             setCurrentPosition([latitude, longitude]);
             currentPositionRef.current = [latitude, longitude];
+
+            // Trigger immediate map recentering upon receiving the first GPS fix
+            if (isFirstPosition) {
+                setRecenterKey(prev => prev + 1);
+            }
 
             if (altitude !== null && altitude !== undefined && altitude > 0) {
                 const alt = Math.round(altitude);

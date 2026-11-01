@@ -51,6 +51,7 @@ interface LeafletMapProps {
 function MapUpdater({ center, polygonCoords, markers, currentLocation, recenterKey }: LeafletMapProps) {
     const map = useMap();
     const hasCenteredInitial = React.useRef(false);
+    const hasCenteredGpsFix = React.useRef(false);
     const lastRecenterKey = React.useRef(recenterKey);
 
     useEffect(() => {
@@ -83,6 +84,17 @@ function MapUpdater({ center, polygonCoords, markers, currentLocation, recenterK
         }
     }, [recenterKey, currentLocation, center, map]);
 
+    // Immediate auto-center as soon as GPS location is granted and arrives
+    useEffect(() => {
+        if (currentLocation && !hasCenteredGpsFix.current) {
+            // If there's no pre-existing polygon to display, center immediately on the user's position
+            if (!polygonCoords || polygonCoords.length === 0) {
+                hasCenteredGpsFix.current = true;
+                map.setView(currentLocation, 18, { animate: true });
+            }
+        }
+    }, [currentLocation, polygonCoords, map]);
+
     // Handle bounds and initial one-time centering
     useEffect(() => {
         if (polygonCoords && polygonCoords.length > 0) {
@@ -91,9 +103,15 @@ function MapUpdater({ center, polygonCoords, markers, currentLocation, recenterK
         } else if (markers && markers.length > 1) {
             const bounds = L.latLngBounds(markers);
             map.fitBounds(bounds, { padding: [40, 40], maxZoom: 18, animate: false });
-        } else if (!hasCenteredInitial.current && (currentLocation || center)) {
+        } else if (!hasCenteredInitial.current) {
             hasCenteredInitial.current = true;
-            map.setView(currentLocation || center, 18);
+            const initialTarget = currentLocation || center;
+            if (initialTarget) {
+                if (currentLocation) {
+                    hasCenteredGpsFix.current = true;
+                }
+                map.setView(initialTarget, 18);
+            }
         }
     }, [polygonCoords, markers, currentLocation, center, map]);
 
