@@ -703,7 +703,7 @@ export default function EUDRGeoreference({
 
     handleFinishMappingRef.current = handleFinishMapping;
 
-    // Check proximity to start point and auto-close
+    // Check proximity to start point and auto-close (Auto-closes at 10 meters before reaching Point 1)
     const checkProximityAndAutoClose = useCallback((currentLat: number, currentLng: number) => {
         const points = gpsPointsRef.current;
         if (points.length < 3) return false;
@@ -717,10 +717,11 @@ export default function EUDRGeoreference({
             maxDistanceAwayRef.current = distToStart;
         }
 
-        const accuracy = accuracyRef.current || 5;
-        const closeThresholdMeters = Math.max(2.5, Math.min(4.5, accuracy * 0.75));
+        // Auto-close when walker returns within 10 meters of start point
+        // Must have walked at least 12 meters away from Point 1 initially
+        const closeThresholdMeters = 10.0;
 
-        if (maxDistanceAwayRef.current >= 4.5 && distToStart <= closeThresholdMeters) {
+        if (maxDistanceAwayRef.current >= 12.0 && distToStart <= closeThresholdMeters) {
             handleFinishMappingRef.current(true);
             return true;
         }
@@ -1463,15 +1464,15 @@ export default function EUDRGeoreference({
                         {isCapturing && distanceToStart !== null && gpsPoints.length >= 3 && (
                             <div
                                 className={`px-3 py-1 rounded-full shadow-lg flex items-center gap-1.5 text-[9px] sm:text-[10px] font-black uppercase tracking-wider animate-in fade-in w-fit ${
-                                    distanceToStart <= 3.5
+                                    distanceToStart <= 10.0
                                         ? 'bg-[#FAF2CA] text-[#0C3C60] ring-2 ring-[#0C3C60] animate-bounce'
                                         : 'bg-[#0C3C60]/90 text-[#FAF2CA] border border-white/20'
                                 }`}
                             >
                                 <Compass className="w-3 h-3 text-[#83DF9C]" />
                                 <span>
-                                    {distanceToStart <= 3.5
-                                        ? (isEn ? `${distanceToStart}m to start! Closing automatically...` : `¡A ${distanceToStart}m del inicio! Cerrando automáticamente...`)
+                                    {distanceToStart <= 10.0
+                                        ? (isEn ? `¡${distanceToStart}m to start! Closing automatically...` : `¡A ${distanceToStart}m del inicio! Cerrando automáticamente...`)
                                         : (isEn ? `Distance to start: ${distanceToStart}m` : `Distancia al inicio: ${distanceToStart}m`)}
                                 </span>
                             </div>
@@ -2275,12 +2276,14 @@ export default function EUDRGeoreference({
                         {distanceToStart !== null && gpsPoints.length >= 3 && (
                             <div className="bg-[#83DF9C]/15 border border-[#83DF9C]/30 rounded-2xl p-3 max-w-xs w-full text-center">
                                 <span className="text-[10px] font-bold text-[#83DF9C] block uppercase tracking-wider">
-                                    {distanceToStart <= 5
-                                        ? (isEn ? '🎯 Starting point reached!' : '🎯 ¡Llegaste al punto de partida!')
+                                    {distanceToStart <= 10.0
+                                        ? (isEn ? '🎯 Within 10m of start! Closing automatically...' : '🎯 ¡A 10m del inicio! Cerrando automáticamente...')
                                         : (isEn ? `Distance to start: ${distanceToStart}m` : `Distancia al inicio: ${distanceToStart}m`)}
                                 </span>
                                 <span className="text-[9px] text-white/60 block mt-0.5">
-                                    {isEn ? 'Will auto-close upon arrival' : 'Se cerrará automáticamente al volver'}
+                                    {distanceToStart <= 10.0
+                                        ? (isEn ? 'Closing parcel perimeter now' : 'Cerrando el polígono ahora')
+                                        : (isEn ? 'Auto-closes at 10m from start' : 'Se cierra solo al estar a 10m del inicio')}
                                 </span>
                             </div>
                         )}
