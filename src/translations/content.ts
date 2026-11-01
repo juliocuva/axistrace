@@ -19,7 +19,7 @@ export const translations = {
             title1: "First-Mile",
             title2: "Georeferencing.",
             title3: "Proven Results.",
-            description: "Eliminate customs confiscation risks in European ports. Capture tamper-proof perimeter polygons 100% offline in the field and generate SHA-256 cryptographically sealed GeoJSON dossiers.",
+            description: "Eliminate customs confiscation risks in European ports. Capture tamper-proof perimeter polygons 100% offline in the field and generate GeoJSON dossiers with Unique Identifiers (UID).",
             ctaPrimary: "Start Free Field Walk",
             ctaSecondary: "Explore Pricing Plans",
             perks: ["Zero App Store downloads required", "Operates directly on any smartphone"],
@@ -30,8 +30,8 @@ export const translations = {
                 accuracyVal: "< 1.4 meters",
                 deforestation: "Deforestation Check:",
                 deforestationVal: "Zero post-2020",
-                crypto: "Crypto Hash:",
-                cryptoVal: "SHA-256 (VERIFIED)"
+                crypto: "Verified UID:",
+                cryptoVal: "UID-VERIFIED"
             },
             bottom: {
                 selfService: "100% Self-Service in the Field",
@@ -101,7 +101,7 @@ export const translations = {
             stats: [
                 { val: "100%", label: "Digital Self-Service", sub: "Operators survey with their own phone" },
                 { val: "0%", label: "Cellular Dependency", sub: "100% offline in remote mountain terrain" },
-                { val: "100%", label: "Cryptographic Seal", sub: "Tamper-proof atomic UTC timestamp" }
+                { val: "100%", label: "Unique Identifier (UID)", sub: "Tamper-proof atomic UTC timestamp" }
             ],
             cards: [
                 {
@@ -158,7 +158,7 @@ export const translations = {
                         "Pocket mode with inertial anti-fraud signature",
                         "Sentinel-2 post-2020 deforestation cross-check",
                         "300 DPI Legal-sized PDF dossier with QR",
-                        "RFC 7946 GeoJSON with cryptographic seal"
+                        "RFC 7946 GeoJSON with Unique Identifier (UID)"
                     ],
                     cta: "Start Field Walk"
                 },
@@ -220,7 +220,7 @@ export const translations = {
             title1: "Georreferenciación",
             title2: "de Primera Milla.",
             title3: "Resultados Comprobados.",
-            description: "Elimina el riesgo de confiscación en aduanas europeas. Captura polígonos perimetrales inmutables 100% offline en finca y emite certificados GeoJSON sellados con SHA-256.",
+            description: "Elimina el riesgo de confiscación en aduanas europeas. Captura polígonos perimetrales inmutables 100% offline en finca y emite certificados GeoJSON con Identificador Único Verificable (UID).",
             ctaPrimary: "Iniciar Caminata Gratis",
             ctaSecondary: "Estructura de Planes",
             perks: ["Sin descargas de app", "Funciona con tu propio smartphone"],
@@ -231,8 +231,8 @@ export const translations = {
                 accuracyVal: "< 1.4 metros",
                 deforestation: "Cruce Deforestación:",
                 deforestationVal: "Cero post-2020",
-                crypto: "Firma Criptográfica:",
-                cryptoVal: "SHA-256 (OK)"
+                crypto: "Verificación UID:",
+                cryptoVal: "UID VERIFICADO"
             },
             bottom: {
                 selfService: "100% Autoservicio en Terreno",
@@ -302,7 +302,7 @@ export const translations = {
             stats: [
                 { val: "100%", label: "Autoservicio Digital", sub: "El operario mapea con su propio celular" },
                 { val: "0%", label: "Dependencia de Red", sub: "100% offline en zonas montañosas remotas" },
-                { val: "100%", label: "Sello Criptográfico", sub: "Huella inmutable con hora atómica UTC" }
+                { val: "100%", label: "Identificador Único (UID)", sub: "Trazabilidad inmutable con hora atómica UTC" }
             ],
             cards: [
                 {
@@ -359,7 +359,7 @@ export const translations = {
                         "Modo bolsillo con firma inercial antifraude",
                         "Cruce satelital Sentinel-2 post-2020",
                         "Ficha cartográfica Oficio 300 DPI con QR",
-                        "GeoJSON RFC 7946 con sello criptográfico"
+                        "GeoJSON RFC 7946 con Identificador Único (UID)"
                     ],
                     cta: "Iniciar Caminata"
                 },

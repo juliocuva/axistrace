@@ -26,10 +26,12 @@ import {
     Unlock,
     Smartphone,
     Leaf,
-    ArrowRight
+    ArrowRight,
+    FileText
 } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import { validateDeforestationWithGFW } from '../actions/eudr';
+import DeliverableModal from './DeliverableModal';
 
 const DynamicLeafletMap = dynamic(() => import('./LeafletMap'), { ssr: false });
 
@@ -201,6 +203,7 @@ export default function EUDRGeoreference({
     const [capturedScreenshot, setCapturedScreenshot] = useState<string | null>(null);
     const [showScreenshotModal, setShowScreenshotModal] = useState<boolean>(false);
     const [showCancelModal, setShowCancelModal] = useState<boolean>(false);
+    const [showDeliverableModal, setShowDeliverableModal] = useState<boolean>(false);
     const [showDirectionArrow, setShowDirectionArrow] = useState<boolean>(false);
     const arrowTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const [sealedTimestamp, setSealedTimestamp] = useState<string | null>(null);
@@ -534,9 +537,9 @@ export default function EUDRGeoreference({
 
             if (isAutoClosed) {
                 setAutoClosedNotice(true);
-                speakVoiceGuidance('Lote cerrado con sello criptográfico inmutable. Capturando evidencia.');
+                speakVoiceGuidance('Lote cerrado y verificado con éxito. Capturando evidencia.');
             } else {
-                speakVoiceGuidance('Lote sellado con firma inmutable. Generando evidencia fotográfica.');
+                speakVoiceGuidance('Lote cerrado y verificado con éxito. Generando evidencia fotográfica.');
             }
 
             setTimeout(() => {
@@ -1013,11 +1016,11 @@ export default function EUDRGeoreference({
             `🏷️ *Lote:* ${currentLotId}%0A` +
             `⏰ *Fecha y Hora:* ${currentTimestampDisplay}%0A` +
             (altitudeMeters ? `⛰️ *Altitud:* ${altitudeMeters.toLocaleString('es-CO')} m.s.n.m.%0A` : '') +
-            `📐 *Área:* ${areaHa > 0 ? `${areaHa} ha (≈ ${(areaHa * 1.5625).toFixed(2)} Fanegadas)` : 'En proceso'}%0A` +
+            `📐 *Área:* ${areaHa > 0 ? `${areaHa} ha (≈ ${Math.round(areaHa * 10000).toLocaleString('es-CO')} m²)` : 'En proceso'}%0A` +
             `📏 *Perímetro:* ${perimeterMeters} m%0A` +
             `🌐 *Vértices Registrados:* ${markersCoords.length}%0A` +
             `🛡️ *Cumplimiento EUDR:* ${gfwStatus === 'secure' ? '0.00 ha Deforestación (Línea Base 31-Dic-2020 CLEARED)' : gfwStatus === 'warning' ? 'ALERTA: Deforestación detectada' : 'Línea Base 2020 (Pendiente Validación)'}%0A` +
-            (immutableHash ? `🔒 *Sello Inmutable (SHA-256):* ${immutableHash.slice(0, 16)}...${immutableHash.slice(-8)}%0A` : '') +
+            (immutableHash ? `🔑 *Identificador Único Verificable (UID):* AXIS-UID-${immutableHash.slice(0, 16)}...${immutableHash.slice(-8)}%0A` : '') +
             `🔐 *Integridad:* Registro inalterable para TRACES NT (Unión Europea).%0A` +
             `📲 *Firma Inercial:* Paso humano certificado con sensores IMU anti-spoofing.%0A` +
             (currentPosition
@@ -1048,11 +1051,11 @@ export default function EUDRGeoreference({
                                     AxisTrace // EUDR
                                 </span>
                                 <span className="text-[9px] font-mono px-1.5 py-0.2 rounded-full bg-[#83DF9C]/20 text-[#83DF9C] border border-[#83DF9C]/30 font-bold">
-                                    Auto 10s
+                                    Auto 30s
                                 </span>
                             </div>
                             <p className="text-[9px] sm:text-[10px] text-white/60 truncate">
-                                Trazabilidad Terrestre &amp; Sello Criptográfico
+                                Trazabilidad Terrestre &amp; Identificador Único Verificable (UID)
                             </p>
                         </div>
                     </div>
@@ -1237,7 +1240,7 @@ export default function EUDRGeoreference({
                                     {areaHa > 0 ? `${areaHa} ha` : '--'}
                                 </p>
                                 <p className="text-[8px] sm:text-[9px] font-medium text-white/60 truncate">
-                                    {areaHa > 0 ? `≈ ${(areaHa * 1.5625).toFixed(2)} Fanegadas` : 'Caminando lindero'}
+                                    {areaHa > 0 ? `≈ ${Math.round(areaHa * 10000).toLocaleString('es-CO')} m²` : 'Caminando lindero'}
                                 </p>
                             </div>
 
@@ -1326,12 +1329,12 @@ export default function EUDRGeoreference({
                             <div className="flex items-center gap-1.5 min-w-0">
                                 <Lock className="w-3.5 h-3.5 text-[#83DF9C] shrink-0" />
                                 <span className="font-black text-[#83DF9C] uppercase tracking-wider shrink-0">
-                                    Sello Inmutable:
+                                    Identificador Único (UID):
                                 </span>
                                 <span className="font-mono text-white/95 truncate">
                                     {immutableHash
-                                        ? `SHA256: ${immutableHash.slice(0, 16)}...${immutableHash.slice(-8)}`
-                                        : 'Generando firma digital...'}
+                                        ? `AXIS-UID-${immutableHash.slice(0, 16)}...${immutableHash.slice(-8)}`
+                                        : 'Generando identificador único...'}
                                 </span>
                             </div>
                             <div className="flex items-center gap-1.5 text-[8.5px] sm:text-[9px] text-[#FAF2CA]/90">
@@ -1526,6 +1529,15 @@ export default function EUDRGeoreference({
                             </button>
                         </div>
 
+                        {/* BIG PRIMARY CTA: ENTREGABLE OFICIAL PDF & DATOS */}
+                        <button
+                            onClick={() => setShowDeliverableModal(true)}
+                            className="w-full bg-[#83DF9C] hover:bg-[#6fd48b] active:scale-98 text-[#0C3C60] py-4 px-5 rounded-2xl font-black uppercase text-xs sm:text-sm tracking-wider transition-all shadow-xl hover:shadow-2xl flex items-center justify-center gap-2.5 cursor-pointer min-h-[56px]"
+                        >
+                            <FileText className="w-5 h-5 text-[#0C3C60] shrink-0" />
+                            <span>Completar Datos &amp; Generar Certificado PDF</span>
+                        </button>
+
                         <div className="grid grid-cols-2 gap-2">
                             {/* View / Download Screenshot Photo */}
                             <button
@@ -1536,18 +1548,18 @@ export default function EUDRGeoreference({
                                         captureEvidenceScreenshot();
                                     }
                                 }}
-                                className="w-full bg-[#0C3C60] hover:bg-[#83DF9C] active:scale-98 text-[#FAF2CA] hover:text-[#0C3C60] py-3.5 rounded-xl font-black uppercase text-[11px] sm:text-xs tracking-wider transition-all shadow-md flex items-center justify-center gap-1.5 cursor-pointer min-h-[48px] border border-white/10"
+                                className="w-full bg-[#0C3C60] hover:bg-[#164e78] active:scale-98 text-[#FAF2CA] py-3 rounded-xl font-bold uppercase text-[10px] sm:text-[11px] tracking-wider transition-all shadow-md flex items-center justify-center gap-1.5 cursor-pointer min-h-[44px] border border-white/10"
                             >
                                 <Camera className="w-4 h-4 text-[#83DF9C]" />
-                                <span>{isCapturingScreenshot ? 'Generando Foto...' : 'Ver Foto Oficial'}</span>
+                                <span>{isCapturingScreenshot ? 'Generando Foto...' : 'Ver Foto del Lote'}</span>
                             </button>
 
                             {/* Download GeoJSON for TRACES NT */}
                             <button
                                 onClick={downloadGeoJsonFile}
-                                className="w-full bg-[#83DF9C] hover:bg-[#6fd48b] active:scale-98 text-[#0C3C60] py-3.5 rounded-xl font-black uppercase text-[11px] sm:text-xs tracking-wider transition-all shadow-md flex items-center justify-center gap-1.5 cursor-pointer min-h-[48px]"
+                                className="w-full bg-[#0C3C60] hover:bg-[#164e78] active:scale-98 text-[#FAF2CA] py-3 rounded-xl font-bold uppercase text-[10px] sm:text-[11px] tracking-wider transition-all shadow-md flex items-center justify-center gap-1.5 cursor-pointer min-h-[44px] border border-white/10"
                             >
-                                <Download className="w-4 h-4" />
+                                <Download className="w-4 h-4 text-[#83DF9C]" />
                                 <span>GeoJSON EUDR</span>
                             </button>
                         </div>
@@ -1555,10 +1567,10 @@ export default function EUDRGeoreference({
                         {/* Instant WhatsApp Share */}
                         <button
                             onClick={shareViaWhatsApp}
-                            className="w-full bg-[#25D366] hover:bg-[#20ba5a] active:scale-98 text-white py-3.5 rounded-xl font-black uppercase text-xs tracking-wider transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer"
+                            className="w-full bg-[#25D366] hover:bg-[#20ba5a] active:scale-98 text-white py-3 rounded-xl font-bold uppercase text-[10px] sm:text-[11px] tracking-wider transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer"
                         >
                             <Share2 className="w-4 h-4" />
-                            <span>Enviar Reporte Oficial por WhatsApp</span>
+                            <span>Enviar Reporte Rápido por WhatsApp</span>
                         </button>
                     </div>
                 )}
@@ -1608,6 +1620,25 @@ export default function EUDRGeoreference({
                 document.body
             )}
 
+            {/* OFFICIAL EUDR DELIVERABLE & CHECKOUT MODAL */}
+            {showDeliverableModal && (
+                <DeliverableModal
+                    isOpen={showDeliverableModal}
+                    onClose={() => setShowDeliverableModal(false)}
+                    data={{
+                        lotId: currentLotId,
+                        commodity,
+                        areaHa,
+                        perimeterMeters,
+                        altitudeMeters,
+                        vertices: markersCoords,
+                        uid: immutableHash ? `AXIS-UID-${immutableHash.slice(0, 16)}-${immutableHash.slice(-8)}` : `AXIS-UID-${Date.now()}`,
+                        capturedScreenshot,
+                        gfwStatus
+                    }}
+                />
+            )}
+
             {/* AUTOMATIC SCREENSHOT EVIDENCE MODAL */}
             {showScreenshotModal && isMounted && createPortal(
                 <div className="fixed inset-0 z-[99999] bg-black/85 backdrop-blur-md p-3 sm:p-6 flex items-center justify-center animate-in fade-in">
@@ -1652,7 +1683,7 @@ export default function EUDRGeoreference({
                                     <p className="font-bold flex items-center gap-1.5 text-[#83DF9C]">
                                         <CheckCircle2 className="w-4 h-4 shrink-0" />
                                         <span>
-                                            Lote verificado: {areaHa} ha (≈ {(areaHa * 1.5625).toFixed(2)} Fanegadas)
+                                            Lote verificado: {areaHa} ha (≈ {Math.round(areaHa * 10000).toLocaleString('es-CO')} m²)
                                             {altitudeMeters && ` • ${altitudeMeters.toLocaleString('es-CO')} msnm`}
                                         </span>
                                     </p>
@@ -1670,7 +1701,7 @@ export default function EUDRGeoreference({
                                         <div className="flex items-center gap-1.5">
                                             <Lock className="w-3.5 h-3.5 text-[#83DF9C]" />
                                             <span className="font-black text-[#FAF2CA] uppercase text-[10px] tracking-wider">
-                                                Sello de Inmutabilidad SHA-256
+                                                Identificador Único Verificable (UID)
                                             </span>
                                         </div>
                                         <span className="text-[8.5px] bg-[#83DF9C] text-[#0C3C60] font-black px-1.5 py-0.2 rounded uppercase">
@@ -1678,12 +1709,12 @@ export default function EUDRGeoreference({
                                         </span>
                                     </div>
                                     <div className="bg-[#082840] p-1.5 rounded font-mono text-[9px] text-[#83DF9C] break-all border border-white/10 flex items-center justify-between gap-2">
-                                        <span className="truncate">{immutableHash ? `SHA256:${immutableHash}` : 'GENERANDO SELLO...'}</span>
+                                        <span className="truncate">{immutableHash ? `AXIS-UID-${immutableHash}` : 'GENERANDO UID...'}</span>
                                         {immutableHash && (
                                             <button
                                                 onClick={() => {
-                                                    navigator.clipboard.writeText(immutableHash);
-                                                    alert('Hash copiado al portapapeles');
+                                                    navigator.clipboard.writeText(`AXIS-UID-${immutableHash}`);
+                                                    alert('Identificador UID copiado al portapapeles');
                                                 }}
                                                 className="text-[9px] text-white/60 hover:text-white underline shrink-0 cursor-pointer"
                                             >

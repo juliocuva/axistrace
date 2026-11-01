@@ -3,7 +3,7 @@ import "./globals.css";
 import { Analytics } from "@vercel/analytics/next";
 
 export const metadata: Metadata = {
-  title: "AxisTrace | Georreferenciación & Sello EUDR",
+  title: "AxisTrace | Georreferenciación & Cumplimiento EUDR (UID)",
   description: "Infraestructura digital de georreferenciación terrestre y debida diligencia ambiental bajo el Reglamento (UE) 2023/1115 (EUDR).",
   applicationName: "AxisTrace",
   authors: [{ name: "AxisTrace Team" }],
