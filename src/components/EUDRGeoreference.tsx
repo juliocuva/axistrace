@@ -49,8 +49,8 @@ interface EUDRGeoreferenceProps {
     onLanguageChange?: (lang: Language) => void;
 }
 
-// Auto-capture interval for field walking (RFC 7946 perimeter pacing)
-const AUTO_CAPTURE_INTERVAL_SECONDS = 30;
+// Auto-capture interval for field walking (RFC 7946 perimeter pacing: 10s gives high-precision boundary tracking on parcels < 1 ha to > 4 ha)
+const AUTO_CAPTURE_INTERVAL_SECONDS = 10;
 
 // Haversine distance in meters
 function haversineDistanceMeters(coord1: [number, number], coord2: [number, number]): number {
@@ -684,7 +684,7 @@ export default function EUDRGeoreference({
 
             setTimeout(() => {
                 captureEvidenceScreenshot();
-            }, 450);
+            }, 800);
         },
         [
             currentLotId,
@@ -784,18 +784,25 @@ export default function EUDRGeoreference({
         (latitude: number, longitude: number, accuracy: number, altitude?: number | null) => {
             setGpsAccuracy(accuracy);
 
-            // Filter 1: Inaccurate jump filter (> 35m) when we already have an accurate fix (< 25m)
-            if (accuracyRef.current !== null && accuracyRef.current < 25 && accuracy > 35) {
+            // Filter 1: Accuracy filter — ignore degraded fixes (> 18m during walk, > 28m overall)
+            if (isCapturingRef.current && accuracy > 18) {
+                return;
+            } else if (accuracyRef.current !== null && accuracyRef.current < 20 && accuracy > 28) {
                 return;
             }
 
             accuracyRef.current = accuracy;
 
-            // Filter 2: Deadband filter — if user moved < 1.2m, ignore GNSS stationary jitter
+            // Filter 2: Deadband & GNSS bounce filter
             const prev = currentPositionRef.current;
             if (prev) {
                 const dist = haversineDistanceMeters([latitude, longitude], prev);
-                if (dist < 1.2) {
+                // Ignore stationary micro-jitter (< 1.0m)
+                if (dist < 1.0) {
+                    return;
+                }
+                // Ignore sudden teleportation jump (> 25m) caused by multi-path satellite bounce
+                if (isCapturingRef.current && dist > 25) {
                     return;
                 }
             }
@@ -1279,7 +1286,7 @@ export default function EUDRGeoreference({
                                     AxisTrace // EUDR
                                 </span>
                                 <span className="text-[9px] font-mono px-1.5 py-0.2 rounded-full bg-[#83DF9C]/20 text-[#83DF9C] border border-[#83DF9C]/30 font-bold">
-                                    Auto 30s
+                                    Auto 10s
                                 </span>
                             </div>
                             <p className="text-[9px] sm:text-[10px] text-white/60 truncate">

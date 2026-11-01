@@ -87,10 +87,10 @@ function MapUpdater({ center, polygonCoords, markers, currentLocation, recenterK
     useEffect(() => {
         if (polygonCoords && polygonCoords.length > 0) {
             const bounds = L.latLngBounds(polygonCoords);
-            map.fitBounds(bounds, { padding: [30, 30] });
+            map.fitBounds(bounds, { padding: [40, 40], animate: false });
         } else if (markers && markers.length > 1) {
             const bounds = L.latLngBounds(markers);
-            map.fitBounds(bounds, { padding: [30, 30], maxZoom: 18 });
+            map.fitBounds(bounds, { padding: [40, 40], maxZoom: 18, animate: false });
         } else if (!hasCenteredInitial.current && (currentLocation || center)) {
             hasCenteredInitial.current = true;
             map.setView(currentLocation || center, 18);
@@ -104,14 +104,16 @@ export default function LeafletMap({ center, polygonCoords, markers, currentLoca
     const markerElements = useMemo(() => {
         if (!markers || markers.length === 0) return null;
 
-        // When mapping is completed: show ONLY Point 1 with its circle + clean perimeter line
+        // When mapping is completed: show ALL vertices with Point 1 highlighted so the full polygon perimeter is visible
         if (isCompleted) {
-            const startPoint = markers[0];
-            const icon = getVertexIcon(1, false, true);
-            if (!icon) return null;
-            return (
-                <Marker key={`vertex-start-${startPoint[0]}-${startPoint[1]}`} position={startPoint} icon={icon} />
-            );
+            return markers.map((m, i) => {
+                const isStart = i === 0;
+                const icon = getVertexIcon(i + 1, false, isStart);
+                if (!icon) return null;
+                return (
+                    <Marker key={`vertex-done-${i}-${m[0]}-${m[1]}`} position={m} icon={icon} />
+                );
+            });
         }
 
         // While actively walking: show numbered vertices to guide the walk
@@ -129,6 +131,7 @@ export default function LeafletMap({ center, polygonCoords, markers, currentLoca
         <MapContainer
             center={center}
             zoom={18}
+            preferCanvas={true}
             style={{ width: '100%', height: '100%', background: '#082840' }}
             zoomControl={false}
             attributionControl={false}
@@ -143,10 +146,10 @@ export default function LeafletMap({ center, polygonCoords, markers, currentLoca
                 <Polygon
                     positions={polygonCoords}
                     pathOptions={{ 
-                        color: '#83DF9C', 
+                        color: '#00E676', 
                         fillColor: '#83DF9C', 
-                        fillOpacity: 0.22, 
-                        weight: 2,
+                        fillOpacity: 0.35, 
+                        weight: 3.5,
                         dashArray: isCompleted ? undefined : '4, 4',
                         lineJoin: 'round'
                     }}
@@ -155,8 +158,8 @@ export default function LeafletMap({ center, polygonCoords, markers, currentLoca
                 <Polyline
                     positions={markers}
                     pathOptions={{
-                        color: '#83DF9C',
-                        weight: 2,
+                        color: '#00E676',
+                        weight: 3,
                         dashArray: '4, 4',
                         lineJoin: 'round'
                     }}
