@@ -218,19 +218,19 @@ export default function EUDRGeoreference({
     const currentTimestampDisplay = useMemo(() => {
         if (sealedTimestamp) return sealedTimestamp;
         const now = new Date();
-        const dateStr = now.toLocaleDateString('es-CO', {
+        const dateStr = now.toLocaleDateString(isEn ? 'en-US' : 'es-CO', {
             year: 'numeric',
             month: '2-digit',
             day: '2-digit'
         });
-        const timeStr = now.toLocaleTimeString('es-CO', {
+        const timeStr = now.toLocaleTimeString(isEn ? 'en-US' : 'es-CO', {
             hour: '2-digit',
             minute: '2-digit',
             second: '2-digit',
             hour12: true
         });
         return `${dateStr}, ${timeStr}`;
-    }, [sealedTimestamp]);
+    }, [sealedTimestamp, isEn]);
 
     // Refs for real-time tracking without stale closure
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -1100,7 +1100,7 @@ export default function EUDRGeoreference({
                                 </span>
                             </div>
                             <p className="text-[9px] sm:text-[10px] text-white/60 truncate">
-                                Trazabilidad Terrestre &amp; Identificador Único Verificable (UID)
+                                {isEn ? 'Ground Traceability & Unique Identifier (UID)' : 'Trazabilidad Terrestre & Identificador Único Verificable (UID)'}
                             </p>
                         </div>
                     </div>
@@ -1120,7 +1120,7 @@ export default function EUDRGeoreference({
                                 }`}
                             ></span>
                             <span className="text-white/90">
-                                {gpsAccuracy ? `±${gpsAccuracy.toFixed(0)}m` : 'Buscando GPS'}
+                                {gpsAccuracy ? `±${gpsAccuracy.toFixed(0)}m` : (isEn ? 'Searching GPS' : 'Buscando GPS')}
                             </span>
                         </div>
 
@@ -1128,7 +1128,7 @@ export default function EUDRGeoreference({
                         <button
                             onClick={() => setIsFullscreen(!isFullscreen)}
                             className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-[#FAF2CA] transition-colors cursor-pointer"
-                            title={isFullscreen ? 'Minimizar' : 'Pantalla Completa'}
+                            title={isFullscreen ? (isEn ? 'Minimize' : 'Minimizar') : (isEn ? 'Fullscreen' : 'Pantalla Completa')}
                         >
                             {isFullscreen ? (
                                 <Minimize2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />

@@ -225,22 +225,37 @@ export default function DeliverableModal({ isOpen, onClose, data, lang = 'en' }:
     };
 
     const handleShareWhatsApp = () => {
-        const message =
-            `🌲 *CERTIFICADO DE DILIGENCIA DEBIDA EUDR (AXISTRACE)* 🌲%0A` +
-            `-------------------------------------------%0A` +
-            `👤 *Productor:* ${farmerName || 'Sin Registrar'} (ID: ${farmerId || 'N/A'})%0A` +
-            `🏡 *Finca/Lote:* ${farmName || 'Predio'} • ${lotName}%0A` +
-            `📍 *Ubicación:* ${municipality || 'Municipio'}, ${department || 'Depto'} - ${country}%0A` +
-            `🌱 *Cultivo:* ${currentComm.icon} ${currentComm.name} (HS: ${currentComm.hsCode})%0A` +
-            `🌿 *Variedad:* ${finalVariety}%0A` +
-            `📐 *Área:* ${data.areaHa} ha (≈ ${Math.round(data.areaHa * 10000).toLocaleString('es-CO')} m²)%0A` +
-            `📏 *Perímetro:* ${data.perimeterMeters} m%0A` +
-            `🏔️ *Altitud:* ${data.altitudeMeters ? `${data.altitudeMeters.toLocaleString('es-CO')} msnm` : 'Registrada por GPS'}%0A` +
-            `🛡️ *Cumplimiento EUDR:* 0.00 ha Deforestación (Línea Base 2020)%0A` +
-            `🔑 *Identificador Único Verificable (UID):*%0A${data.uid}%0A` +
-            `-------------------------------------------%0A` +
-            `✅ *Listo para TRACES NT (Unión Europea)*%0A` +
-            `Diseñado por mouselab.dev para AxisTrace`;
+        const message = isEn
+            ? `🌲 *EUDR DUE DILIGENCE CERTIFICATE (AXISTRACE)* 🌲%0A` +
+              `-------------------------------------------%0A` +
+              `👤 *Producer:* ${farmerName || 'Unregistered'} (ID: ${farmerId || 'N/A'})%0A` +
+              `🏡 *Farm/Lot:* ${farmName || 'Holding'} • ${lotName}%0A` +
+              `📍 *Location:* ${municipality || 'Municipality'}, ${department || 'Region'} - ${country}%0A` +
+              `🌱 *Crop:* ${currentComm.icon} ${isEn && currentComm.nameEn ? currentComm.nameEn : currentComm.name} (HS: ${currentComm.hsCode})%0A` +
+              `🌿 *Variety:* ${finalVariety}%0A` +
+              `📐 *Area:* ${data.areaHa} ha (≈ ${Math.round(data.areaHa * 10000).toLocaleString('en-US')} m²)%0A` +
+              `📏 *Perimeter:* ${data.perimeterMeters} m%0A` +
+              `🏔️ *Altitude:* ${data.altitudeMeters ? `${data.altitudeMeters.toLocaleString('en-US')} masl` : 'GNSS Logged'}%0A` +
+              `🛡️ *EUDR Compliance:* 0.00 ha Deforestation (2020 Baseline)%0A` +
+              `🔑 *Unique Identifier (UID):*%0A${data.uid}%0A` +
+              `-------------------------------------------%0A` +
+              `✅ *TRACES NT Ingestion Ready (European Union)*%0A` +
+              `Designed by mouselab.dev for AxisTrace`
+            : `🌲 *CERTIFICADO DE DILIGENCIA DEBIDA EUDR (AXISTRACE)* 🌲%0A` +
+              `-------------------------------------------%0A` +
+              `👤 *Productor:* ${farmerName || 'Sin Registrar'} (ID: ${farmerId || 'N/A'})%0A` +
+              `🏡 *Finca/Lote:* ${farmName || 'Predio'} • ${lotName}%0A` +
+              `📍 *Ubicación:* ${municipality || 'Municipio'}, ${department || 'Depto'} - ${country}%0A` +
+              `🌱 *Cultivo:* ${currentComm.icon} ${currentComm.name} (HS: ${currentComm.hsCode})%0A` +
+              `🌿 *Variedad:* ${finalVariety}%0A` +
+              `📐 *Área:* ${data.areaHa} ha (≈ ${Math.round(data.areaHa * 10000).toLocaleString('es-CO')} m²)%0A` +
+              `📏 *Perímetro:* ${data.perimeterMeters} m%0A` +
+              `🏔️ *Altitud:* ${data.altitudeMeters ? `${data.altitudeMeters.toLocaleString('es-CO')} msnm` : 'Registrada por GPS'}%0A` +
+              `🛡️ *Cumplimiento EUDR:* 0.00 ha Deforestación (Línea Base 2020)%0A` +
+              `🔑 *Identificador Único Verificable (UID):*%0A${data.uid}%0A` +
+              `-------------------------------------------%0A` +
+              `✅ *Listo para TRACES NT (Unión Europea)*%0A` +
+              `Diseñado por mouselab.dev para AxisTrace`;
 
         window.open(`https://api.whatsapp.com/send?text=${message}`, '_blank');
     };
@@ -532,7 +547,7 @@ export default function DeliverableModal({ isOpen, onClose, data, lang = 'en' }:
                                     <div className="flex items-center gap-2">
                                         <ShieldCheck className="w-4 h-4 text-[#83DF9C]" />
                                         <span className="text-xs font-black uppercase text-[#FAF2CA] tracking-wider">
-                                            Activación & Certificación de Lote
+                                            {isEn ? 'Lot Activation & Certification' : 'Activación & Certificación de Lote'}
                                         </span>
                                     </div>
                                     <span className="text-xs font-black text-[#83DF9C] font-mono">
@@ -566,7 +581,7 @@ export default function DeliverableModal({ isOpen, onClose, data, lang = 'en' }:
                                 {paymentTab === 'nequi' ? (
                                     <div className="flex items-center justify-between bg-black/30 p-2.5 rounded-xl border border-white/10 text-xs">
                                         <div>
-                                            <span className="text-[10px] text-white/50 block">Número Nequi:</span>
+                                            <span className="text-[10px] text-white/50 block">{isEn ? 'Nequi Number:' : 'Número Nequi:'}</span>
                                             <span className="font-mono font-black text-white text-sm">301 397 0002</span>
                                         </div>
                                         <button
@@ -574,13 +589,13 @@ export default function DeliverableModal({ isOpen, onClose, data, lang = 'en' }:
                                             className="px-2.5 py-1.5 rounded-lg bg-[#83DF9C] text-[#0C3C60] font-bold text-[10px] uppercase flex items-center gap-1 cursor-pointer"
                                         >
                                             {copiedNequi ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                                            <span>{copiedNequi ? 'Copiado' : 'Copiar'}</span>
+                                            <span>{copiedNequi ? (isEn ? 'Copied' : 'Copiado') : (isEn ? 'Copy' : 'Copiar')}</span>
                                         </button>
                                     </div>
                                 ) : (
                                     <div className="flex items-center justify-between bg-black/30 p-2.5 rounded-xl border border-white/10 text-xs">
                                         <div>
-                                            <span className="text-[10px] text-white/50 block">Cta. Ahorros Bancolombia:</span>
+                                            <span className="text-[10px] text-white/50 block">{isEn ? 'Bancolombia Savings Account:' : 'Cta. Ahorros Bancolombia:'}</span>
                                             <span className="font-mono font-black text-white text-sm">7089 0888702</span>
                                         </div>
                                         <button
@@ -588,7 +603,7 @@ export default function DeliverableModal({ isOpen, onClose, data, lang = 'en' }:
                                             className="px-2.5 py-1.5 rounded-lg bg-[#83DF9C] text-[#0C3C60] font-bold text-[10px] uppercase flex items-center gap-1 cursor-pointer"
                                         >
                                             {copiedBank ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                                            <span>{copiedBank ? 'Copiado' : 'Copiar'}</span>
+                                            <span>{copiedBank ? (isEn ? 'Copied' : 'Copiado') : (isEn ? 'Copy' : 'Copiar')}</span>
                                         </button>
                                     </div>
                                 )}
@@ -600,7 +615,7 @@ export default function DeliverableModal({ isOpen, onClose, data, lang = 'en' }:
                                 className="w-full py-2 text-center text-xs font-bold text-white/60 hover:text-white uppercase flex items-center justify-center gap-1 cursor-pointer"
                             >
                                 <ArrowLeft className="w-3.5 h-3.5" />
-                                <span>Volver a Editar Datos del Predio</span>
+                                <span>{isEn ? 'Back to Edit Holding Details' : 'Volver a Editar Datos del Predio'}</span>
                             </button>
                         </div>
                     )}
