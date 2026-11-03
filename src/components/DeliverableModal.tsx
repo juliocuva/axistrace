@@ -95,6 +95,7 @@ export default function DeliverableModal({ isOpen, onClose, data, lang = 'en' }:
     const [farmerPhone, setFarmerPhone] = useState('');
     const [farmName, setFarmName] = useState('');
     const [lotName, setLotName] = useState(data.lotId || 'LOTE-01');
+    const [customAltitude, setCustomAltitude] = useState<string>(data.altitudeMeters ? String(data.altitudeMeters) : '');
     const [municipality, setMunicipality] = useState('');
     const [department, setDepartment] = useState('');
     const [country, setCountry] = useState('Colombia');
@@ -180,6 +181,8 @@ export default function DeliverableModal({ isOpen, onClose, data, lang = 'en' }:
                 minute: '2-digit'
             });
 
+            const resolvedAltitude = customAltitude.trim() ? parseInt(customAltitude.trim(), 10) : data.altitudeMeters;
+
             const certData: EUDRCertificateData = {
                 farmerName: farmerName.trim(),
                 farmerId: farmerId.trim(),
@@ -194,7 +197,7 @@ export default function DeliverableModal({ isOpen, onClose, data, lang = 'en' }:
                 variety: finalVariety,
                 areaHa: data.areaHa,
                 perimeterMeters: data.perimeterMeters,
-                altitudeMeters: data.altitudeMeters,
+                altitudeMeters: resolvedAltitude,
                 vertices: data.vertices,
                 uid: data.uid,
                 timestamp: dateDisplay,
@@ -233,7 +236,7 @@ export default function DeliverableModal({ isOpen, onClose, data, lang = 'en' }:
                         Variety: finalVariety,
                         AreaHectares: data.areaHa,
                         PerimeterMeters: data.perimeterMeters,
-                        AltitudeMsnm: data.altitudeMeters,
+                        AltitudeMsnm: customAltitude.trim() ? parseInt(customAltitude.trim(), 10) : data.altitudeMeters,
                         IdentificadorUnicoVerificable_UID: data.uid,
                         EUDRCompliance: 'Regulation EU 2023/1115 TRACES NT Compliant',
                         DeforestationStatus: '0.00 ha post-2020 (Verified)',
@@ -442,6 +445,19 @@ export default function DeliverableModal({ isOpen, onClose, data, lang = 'en' }:
                                         value={lotName}
                                         onChange={e => setLotName(e.target.value)}
                                         placeholder={isEn ? 'e.g., LOT-MOISO-01' : 'Ej: LOT-MOISO-01'}
+                                        className="w-full bg-[#0C3C60] border border-white/20 rounded-xl px-3 py-2 text-xs font-bold text-white outline-none focus:border-[#83DF9C]"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-[10px] font-bold uppercase tracking-wider text-white/70 mb-1">
+                                        {isEn ? 'Altitude (masl):' : 'Altitud (m.s.n.m.):'}
+                                    </label>
+                                    <input
+                                        type="number"
+                                        value={customAltitude}
+                                        onChange={e => setCustomAltitude(e.target.value)}
+                                        placeholder={isEn ? 'e.g., 1600' : 'Ej: 1600'}
                                         className="w-full bg-[#0C3C60] border border-white/20 rounded-xl px-3 py-2 text-xs font-bold text-white outline-none focus:border-[#83DF9C]"
                                     />
                                 </div>

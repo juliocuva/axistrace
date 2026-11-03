@@ -1597,18 +1597,34 @@ export default function EUDRGeoreference({
                                 </p>
                             </div>
 
-                            {/* 3. Altitud / Elevación */}
-                            <div className="bg-white/5 p-2.5 sm:p-3 rounded-xl border border-white/10 shadow-sm">
-                                <p className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-white/60">
-                                    {isEn ? 'Avg Altitude' : 'Altitud Promedio'}
-                                </p>
+                            {/* 3. Altitud / Elevación (Editable al tocar) */}
+                            <div
+                                onClick={() => {
+                                    const val = prompt(isEn ? 'Edit Lot Altitude (masl):' : 'Modificar Altitud del Lote (m.s.n.m.):', String(altitudeMeters || ''));
+                                    if (val !== null) {
+                                        const num = parseInt(val.replace(/\D/g, ''), 10);
+                                        if (!isNaN(num) && num > 0) {
+                                            setAltitudeMeters(num);
+                                            altitudeMetersRef.current = num;
+                                        }
+                                    }
+                                }}
+                                className="bg-white/5 hover:bg-white/10 p-2.5 sm:p-3 rounded-xl border border-white/10 hover:border-[#83DF9C]/50 shadow-sm cursor-pointer transition-all"
+                                title={isEn ? 'Click to customize altitude' : 'Toca para ajustar la altitud real'}
+                            >
+                                <div className="flex items-center justify-between">
+                                    <p className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-white/60">
+                                        {isEn ? 'Avg Altitude' : 'Altitud Promedio'}
+                                    </p>
+                                    <span className="text-[8px] text-[#83DF9C] font-mono">✎</span>
+                                </div>
                                 <p className="text-lg sm:text-xl font-black text-white font-mono mt-0.5">
                                     {altitudeMeters ? `${altitudeMeters.toLocaleString(isEn ? 'en-US' : 'es-CO')} m` : '--'}
                                 </p>
                                 <p className="text-[8px] sm:text-[9px] font-medium text-white/60 truncate">
                                     {altitudeMeters
                                         ? `${altitudeMeters.toLocaleString(isEn ? 'en-US' : 'es-CO')} ${isEn ? 'masl' : 'm.s.n.m.'}`
-                                        : (isEn ? 'Logging elevation' : 'Midiendo elevación')}
+                                        : (isEn ? 'Tap to set' : 'Toca para fijar')}
                                 </p>
                             </div>
 
