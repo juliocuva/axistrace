@@ -3,8 +3,8 @@ export type Language = 'en' | 'es';
 export const translations = {
     en: {
         banner: {
-            title: "Mandatory EU Deforestation Regulation (EU) 2023/1115 (EUDR) Compliance",
-            subtitle: "Official formats engineered for European Customs TRACES NT system"
+            title: "Mandatory EU Deforestation Regulation (EU) 2023/1115 (EUDR) Due Diligence Support",
+            subtitle: "First-mile perimeter georeferencing and preliminary satellite checks"
         },
         nav: {
             scope: "Agri Scope",
@@ -14,12 +14,12 @@ export const translations = {
             whatsapp: "WhatsApp"
         },
         hero: {
-            badge: "EUDR 2023/1115 & TRACES NT Compatible",
+            badge: "EUDR (EU) 2023/1115 Due Diligence Support",
             rating: "High-Precision First-Mile Georeferencing",
             title1: "First-Mile",
             title2: "Georeferencing.",
             title3: "Proven Results.",
-            description: "Support your export compliance for European markets. Capture parcel perimeter polygons offline in the field and generate GeoJSON dossiers with digital security seals (UID).",
+            description: "Support your export due diligence for European markets. Capture parcel perimeter polygons offline in the field and generate GeoJSON dossiers with digital security seals (UID).",
             ctaPrimary: "Start Free Field Walk",
             ctaSecondary: "Explore Pricing Plans",
             perks: ["Zero App Store downloads required", "Operates directly on any smartphone"],
@@ -34,14 +34,14 @@ export const translations = {
                 cryptoVal: "DIGITAL SEAL"
             },
             bottom: {
-                selfService: "100% Self-Service in the Field",
-                resolution: "Copernicus & GFW Data Auditing",
+                selfService: "Field Self-Service on Smartphone",
+                resolution: "Global Forest Watch (GFW 30M) Baseline Check",
                 standard: "IETF RFC 7946 GeoJSON Standard"
             }
         },
         trust: {
-            label: "Compatible & Validated with International Trade Systems:",
-            badges: ["TRACES NT (European Commission)", "Sentinel-2 (Copernicus)", "IETF RFC 7946 GeoJSON", "WGS84 Decimal Degrees"]
+            label: "Technical Standards Supporting Due Diligence:",
+            badges: ["EUDR (EU) 2023/1115 Formats", "Global Forest Watch (GFW 30M)", "IETF RFC 7946 GeoJSON", "WGS84 Coordinates"]
         },
         scope: {
             tag: "Agricultural Scope & Regulated Chains",
@@ -94,36 +94,28 @@ export const translations = {
             }
         },
         unifiedPlatform: {
-            tag: "Precision Infrastructure",
-            title1: "Bridging Nature & Data for",
-            title2: "Frictionless European Market Access",
-            subtitle: "From on-site perimeter footpaths to satellite remote sensing and automated customs dossiers.",
-            stats: [
-                { val: "100%", label: "Digital Self-Service", sub: "Operators survey with their own phone" },
-                { val: "0%", label: "Cellular Dependency", sub: "Field perimeter survey offline in remote terrain" },
-                { val: "100%", label: "Security Seal (UID)", sub: "Digital verification code with UTC timestamp" }
-            ],
+            tag: "How it works",
+            title1: "The producer walks the plot.",
+            title2: "You get the evidence.",
+            subtitle: "Georeferencing done by the person who knows the boundaries, with a report you can review.",
             cards: [
                 {
-                    image: "/images/field-technician.jpg",
-                    tag: "01 • Offline Pocket Walk",
-                    title: "Digital Field Perimeter Walk",
-                    desc: "Field operators walk parcel boundaries. AxisTrace logs coordinates automatically with deadband kinematic filtering that rejects GNSS multipath bounces.",
-                    bullet: "Automated perimeter closure with zero data usage"
+                    tag: "Step 01",
+                    title: "1. Digital walk",
+                    desc: "The producer walks the perimeter with their phone. Capture works without a connection and filters GPS noise under the canopy.",
+                    bullet: "Offline capture under the canopy"
                 },
                 {
-                    image: "/images/satellite-survey.jpg",
-                    tag: "02 • Sentinel-2 Copernicus",
-                    title: "Satellite Deforestation Audit",
-                    desc: "Cross-checks parcel boundaries against satellite records, strictly auditing forest loss indicators after the December 31, 2020 regulatory cutoff.",
-                    bullet: "Topological verification & CRS84 WGS84 compliance"
+                    tag: "Step 02",
+                    title: "2. Preliminary satellite check",
+                    desc: "Looks for tree cover loss after 31 December 2020. Until it completes, the status shows as UNVERIFIED.",
+                    bullet: "Post-2020 tree cover loss screening"
                 },
                 {
-                    image: "/images/export-compliance.jpg",
-                    tag: "03 • TRACES NT Ready",
-                    title: "Due Diligence Pre-Validation Dossier",
-                    desc: "Automated generation of A4 cartographic PDF reports with QR verification and standardized RFC 7946 GeoJSON files formatted for customs systems.",
-                    bullet: "Engineered for TRACES NT import due diligence standards"
+                    tag: "Step 03",
+                    title: "3. Report and file",
+                    desc: "A PDF with a QR code and a GeoJSON (RFC 7946), with an integrity seal and timestamp. It supports your due diligence; it is not a certificate.",
+                    bullet: "RFC 7946 GeoJSON & PDF for due diligence"
                 }
             ]
         },
@@ -134,7 +126,7 @@ export const translations = {
             plans: {
                 audit: {
                     badge: "No walk needed",
-                    title: "Satellite Polygon Audit",
+                    title: "Satellite Polygon Check",
                     subtitle: "For parcels with existing surveyor coordinates.",
                     price: "$10",
                     unit: "USD / lot",
@@ -142,9 +134,9 @@ export const translations = {
                     features: [
                         "Topological repair of vertex sequence",
                         "Post-2020 satellite forest baseline check",
-                        "Valid TRACES NT GeoJSON + Cartographic PDF"
+                        "Standardized GeoJSON (RFC 7946) + Cartographic PDF"
                     ],
-                    cta: "Audit Coordinates"
+                    cta: "Check Coordinates"
                 },
                 walk: {
                     popular: "Most Popular on Farm",
@@ -156,7 +148,7 @@ export const translations = {
                     ref: "~ 100,000 COP",
                     features: [
                         "Pocket mode with inertial telemetry to mitigate tampering",
-                        "Copernicus & GFW post-2020 satellite cross-check",
+                        "Global Forest Watch (GFW) post-2020 screening",
                         "A4 Cartographic PDF report with QR",
                         "RFC 7946 GeoJSON with Integrity Identifier (UID)"
                     ],
@@ -172,7 +164,7 @@ export const translations = {
                     features: [
                         "100 mapping passes for internal technicians",
                         "Centralized dashboard for member lots",
-                        "Bulk batch export compatible with TRACES NT"
+                        "Bulk batch export in RFC 7946 format"
                     ],
                     cta: "Order via WhatsApp",
                     ctaHref: "https://wa.me/573013970002?text=Hello%2C%20I%20am%20interested%20in%20the%20Corporate%20Bulk%20Pack%20(100%20lots)%20for%20AxisTRACE."
@@ -204,8 +196,8 @@ export const translations = {
     },
     es: {
         banner: {
-            title: "Cumplimiento obligatorio Reglamento (UE) 2023/1115 (EUDR)",
-            subtitle: "Formatos oficiales para el sistema aduanero TRACES NT de la Unión Europea"
+            title: "Apoyo para la debida diligencia del Reglamento contra la Deforestación (UE) 2023/1115 (EUDR)",
+            subtitle: "Georreferenciación de primera milla y verificación satelital preliminar"
         },
         nav: {
             scope: "Alcance Agro",
@@ -215,12 +207,12 @@ export const translations = {
             whatsapp: "WhatsApp"
         },
         hero: {
-            badge: "EUDR 2023/1115 & TRACES NT Compatible",
+            badge: "Apoyo para Debida Diligencia EUDR 2023/1115",
             rating: "Georreferenciación de Alta Precisión en Primera Milla",
             title1: "Georreferenciación",
             title2: "de Primera Milla.",
             title3: "Resultados Comprobados.",
-            description: "Apoya el cumplimiento de exportación hacia la Unión Europea. Captura polígonos perimetrales sin conexión en finca y genera informes GeoJSON con sellos digitales de seguridad (UID).",
+            description: "Apoya la debida diligencia de exportación hacia la Unión Europea. Captura polígonos perimetrales sin conexión en finca y genera informes GeoJSON con sellos digitales de seguridad (UID).",
             ctaPrimary: "Iniciar Caminata Gratis",
             ctaSecondary: "Estructura de Planes",
             perks: ["Sin descargas de app", "Funciona con tu propio smartphone"],
@@ -235,14 +227,14 @@ export const translations = {
                 cryptoVal: "SELLO DIGITAL"
             },
             bottom: {
-                selfService: "100% Autoservicio en Terreno",
-                resolution: "Auditoría Satelital Copernicus & GFW",
+                selfService: "Autoservicio en Terreno con Smartphone",
+                resolution: "Cruce con Global Forest Watch (GFW 30M)",
                 standard: "Validación IETF RFC 7946"
             }
         },
         trust: {
-            label: "Compatible y Validado con Sistemas de Comercio Exterior:",
-            badges: ["TRACES NT (Comisión Europea)", "Sentinel-2 (Copernicus)", "IETF RFC 7946 GeoJSON", "WGS84 Decimal"]
+            label: "Estándares Técnicos de Apoyo a la Debida Diligencia:",
+            badges: ["Formatos EUDR Comisión Europea", "Global Forest Watch (GFW 30M)", "IETF RFC 7946 GeoJSON", "Coordenadas WGS84"]
         },
         scope: {
             tag: "Alcance Agrícola & Cadenas Productivas",
@@ -295,36 +287,28 @@ export const translations = {
             }
         },
         unifiedPlatform: {
-            tag: "Infraestructura de Precisión",
-            title1: "Conectando la Naturaleza con los Datos",
-            title2: "Acceso Libre al Mercado Europeo",
-            subtitle: "Desde la caminata perimetral en finca hasta la verificación satelital y la emisión de expedientes oficiales.",
-            stats: [
-                { val: "100%", label: "Autoservicio Digital", sub: "El operario mapea con su propio celular" },
-                { val: "0%", label: "Dependencia de Red", sub: "Captura de perímetro sin conexión en zonas remotas" },
-                { val: "100%", label: "Sello de Integridad (UID)", sub: "Trazabilidad con código de seguridad y hora UTC" }
-            ],
+            tag: "Cómo funciona",
+            title1: "El productor camina su lote.",
+            title2: "Usted recibe la evidencia.",
+            subtitle: "Georreferenciación hecha por quien conoce los linderos, con un informe que usted puede revisar.",
             cards: [
                 {
-                    image: "/images/field-technician.jpg",
-                    tag: "01 • Caminata Offline",
-                    title: "Caminata Digital de Campo",
-                    desc: "El operario recorre el perímetro de la parcela. AxisTrace captura coordenadas con filtro cinemático deadband que descarta rebotes GNSS.",
-                    bullet: "Cierre perimetral automático sin consumo de datos"
+                    tag: "Paso 01",
+                    title: "1. Caminata digital",
+                    desc: "El productor recorre el perímetro con su celular. La captura no necesita conexión y filtra el ruido del GPS bajo el dosel.",
+                    bullet: "Captura sin conexión bajo el dosel"
                 },
                 {
-                    image: "/images/satellite-survey.jpg",
-                    tag: "02 • Sentinel-2 Copernicus",
-                    title: "Auditoría Satelital de Deforestación",
-                    desc: "Cruce de geometrías con series históricas satelitales. Verificación técnica preliminar con fecha de corte oficial del 31 de diciembre de 2020.",
-                    bullet: "Comprobación topológica y formato WGS84 CRS84"
+                    tag: "Paso 02",
+                    title: "2. Verificación satelital preliminar",
+                    desc: "Consulta si hubo pérdida de cobertura arbórea después del 31 de diciembre de 2020. Mientras no se complete, el estado figura como NO VERIFICADO.",
+                    bullet: "Cruce preliminar con fecha de corte 2020"
                 },
                 {
-                    image: "/images/export-compliance.jpg",
-                    tag: "03 • Listo para TRACES NT",
-                    title: "Expediente de Diligencia Debida (DDS)",
-                    desc: "Generación de informes cartográficos en PDF A4 con código QR y archivos GeoJSON RFC 7946 listos para aduanas europeas.",
-                    bullet: "Formato técnico compatible con TRACES NT (Reglamento UE 2023/1115)"
+                    tag: "Paso 03",
+                    title: "3. Informe y archivo",
+                    desc: "PDF con código QR y GeoJSON (RFC 7946), con sello de integridad y fecha. Es un apoyo para su debida diligencia, no un certificado.",
+                    bullet: "GeoJSON RFC 7946 e informe con código QR"
                 }
             ]
         },
@@ -335,7 +319,7 @@ export const translations = {
             plans: {
                 audit: {
                     badge: "Sin caminata",
-                    title: "Auditoría Satelital",
+                    title: "Verificación Satelital",
                     subtitle: "Para predios con coordenadas o cartografía previa.",
                     price: "$10",
                     unit: "USD / predio",
@@ -343,9 +327,9 @@ export const translations = {
                     features: [
                         "Reparación topológica del polígono",
                         "Cruce satelital línea base bosque post-2020",
-                        "GeoJSON compatible TRACES NT + Informe PDF"
+                        "GeoJSON estandarizado (RFC 7946) + Informe PDF"
                     ],
-                    cta: "Auditar Coordenadas"
+                    cta: "Verificar Coordenadas"
                 },
                 walk: {
                     popular: "Más Popular en Finca",
@@ -357,7 +341,7 @@ export const translations = {
                     ref: "~ 100.000 COP",
                     features: [
                         "Modo bolsillo con telemetría inercial para mitigar manipulación",
-                        "Cruce satelital Copernicus & GFW post-2020",
+                        "Cruce satelital GFW post-2020",
                         "Informe cartográfico A4 con QR",
                         "GeoJSON RFC 7946 con Identificador de Integridad (UID)"
                     ],
@@ -373,7 +357,7 @@ export const translations = {
                     features: [
                         "100 pases para técnicos propios",
                         "Panel centralizado de lotes asociados",
-                        "Exportación masiva GeoJSON compatible con TRACES NT"
+                        "Exportación masiva en estándar RFC 7946"
                     ],
                     cta: "Pedir por WhatsApp",
                     ctaHref: "https://wa.me/573013970002?text=Hola%2C%20me%20interesa%20adquirir%20la%20Bolsa%20Corporativa%20(100%20predios)%20de%20AxisTRACE."

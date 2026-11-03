@@ -271,24 +271,13 @@ export default function LandingPage() {
                         </p>
                     </div>
 
-                    {/* Strip de 3 Métricas Clave de Ingeniería (Sin recuadro) */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-10 py-6 mb-12 border-y border-[#0C3C60]/40">
-                        {t.unifiedPlatform.stats.map((stat, idx) => (
-                            <div key={idx} className="text-center md:text-left md:pl-6 md:border-l first:border-l-0 border-[#0C3C60]/60">
-                                <div className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#83DF9C] tracking-tight">{stat.val}</div>
-                                <div className="text-sm sm:text-base font-bold text-white mt-1.5">{stat.label}</div>
-                                <div className="text-xs text-[#FAF2CA]/65 mt-0.5">{stat.sub}</div>
-                            </div>
-                        ))}
-                    </div>
-
                     {/* Las 3 Cards de Plataforma (Diseño Minimalista High-Tech sin Imágenes) */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         {t.unifiedPlatform.cards.map((card, idx) => {
                             const icons = [
                                 <Smartphone key="0" className="w-5 h-5" />,
                                 <Satellite key="1" className="w-5 h-5" />,
-                                <ShieldCheck key="2" className="w-5 h-5" />
+                                <FileText key="2" className="w-5 h-5" />
                             ];
                             return (
                                 <div 
