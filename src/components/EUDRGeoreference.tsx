@@ -1121,8 +1121,20 @@ export default function EUDRGeoreference({
                     setGpsPoints(polyCoords.slice(0, -1));
                 }
 
-                const sha256 = await calculatePolygonSha256(strGeoJson);
-                setImmutableHash(sha256);
+                // Restore properties from uploaded GeoJSON
+                if (parsedGeoJson.properties?.altitudeMeters) {
+                    setAltitudeMeters(parsedGeoJson.properties.altitudeMeters);
+                }
+                if (parsedGeoJson.properties?.timestampFormatted) {
+                    setSealedTimestamp(parsedGeoJson.properties.timestampFormatted);
+                }
+                if (parsedGeoJson.properties?.sha256Hash) {
+                    setImmutableHash(parsedGeoJson.properties.sha256Hash);
+                } else {
+                    const sha256 = await calculatePolygonSha256(strGeoJson);
+                    setImmutableHash(sha256);
+                }
+                setExportFileName(file.name.replace(/\.[^/.]+$/, ''));
                 if (onPolygonChange) onPolygonChange(strGeoJson);
 
                 validateDeforestationWithGFW(strGeoJson)
@@ -1302,6 +1314,13 @@ export default function EUDRGeoreference({
         >
             {/* EVIDENCE CARD CONTAINER TO BE CAPTURED BY HTML2CANVAS */}
             <div ref={evidenceCardRef} className="w-full bg-[#082840] flex flex-col">
+                <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".geojson,.json,.kml"
+                    onChange={handleFileUpload}
+                    className="hidden"
+                />
                 {/* Top Operational Status Bar */}
                 <div className="bg-[#0C3C60] text-white px-3 sm:px-5 py-2.5 sm:py-3 flex items-center justify-between gap-2 border-b border-white/10 select-none">
                     <div className="flex items-center gap-2 sm:gap-3 min-w-0">
@@ -1341,6 +1360,16 @@ export default function EUDRGeoreference({
                                 {gpsAccuracy ? `±${gpsAccuracy.toFixed(0)}m` : (isEn ? 'Searching GPS' : 'Buscando GPS')}
                             </span>
                         </div>
+
+                        {/* Load GeoJSON / KML Button */}
+                        <button
+                            onClick={() => fileInputRef.current?.click()}
+                            className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-[#FAF2CA] transition-colors cursor-pointer flex items-center gap-1 text-[10px] font-bold"
+                            title={isEn ? 'Load GeoJSON / KML File' : 'Cargar Archivo GeoJSON / KML'}
+                        >
+                            <UploadCloud className="w-3.5 h-3.5 text-[#83DF9C]" />
+                            <span className="hidden sm:inline">{isEn ? 'Load' : 'Cargar'}</span>
+                        </button>
 
                         {/* Fullscreen Toggle */}
                         <button
@@ -1729,6 +1758,15 @@ export default function EUDRGeoreference({
                                                 {isEn ? 'walk perimeter • auto-closes upon return' : 'camina el lindero • se cierra solo al volver'}
                                             </span>
                                         </div>
+                                    </button>
+
+                                    {/* LOAD EXISTING GEOJSON / KML */}
+                                    <button
+                                        onClick={() => fileInputRef.current?.click()}
+                                        className="w-full bg-[#0C3C60]/80 hover:bg-[#0C3C60] active:scale-98 text-[#FAF2CA] py-3 px-4 rounded-xl font-bold uppercase text-xs tracking-wider transition-all border border-white/10 flex items-center justify-center gap-2 cursor-pointer shadow-md"
+                                    >
+                                        <UploadCloud className="w-4 h-4 text-[#83DF9C]" />
+                                        <span>{isEn ? 'Load GeoJSON / KML File' : 'Cargar Archivo GeoJSON / KML'}</span>
                                     </button>
                                 </div>
                             ) : (
