@@ -68,6 +68,15 @@ function haversineDistanceMeters(coord1: [number, number], coord2: [number, numb
     return R * c;
 }
 
+// Normalize point to [lat, lon] regardless of whether it was passed as [lat, lon] or [lon, lat]
+function ensureLatLon(p: [number, number]): [number, number] {
+    // If p[0] is longitude (e.g. -75) and p[1] is latitude (e.g. 5)
+    if (Math.abs(p[0]) > 20 && Math.abs(p[1]) <= 20) {
+        return [p[1], p[0]]; // [lat, lon]
+    }
+    return [p[0], p[1]];
+}
+
 // Calculate polygon area in Hectares
 function calculatePolygonAreaHa(coords: [number, number][]): number {
     if (coords.length < 3) return 0;
@@ -77,16 +86,18 @@ function calculatePolygonAreaHa(coords: [number, number][]): number {
 
     for (let i = 0; i < len; i++) {
         const j = (i + 1) % len;
-        const p1 = coords[i];
-        const p2 = coords[j];
-        const lon1 = (p1[0] * Math.PI) / 180;
-        const lat1 = (p1[1] * Math.PI) / 180;
-        const lon2 = (p2[0] * Math.PI) / 180;
-        const lat2 = (p2[1] * Math.PI) / 180;
+        const p1 = ensureLatLon(coords[i]);
+        const p2 = ensureLatLon(coords[j]);
+        const lat1 = (p1[0] * Math.PI) / 180;
+        const lon1 = (p1[1] * Math.PI) / 180;
+        const lat2 = (p2[0] * Math.PI) / 180;
+        const lon2 = (p2[1] * Math.PI) / 180;
         total += (lon2 - lon1) * (2 + Math.sin(lat1) + Math.sin(lat2));
     }
     const areaSqMeters = Math.abs((total * R * R) / 2.0);
-    return Math.round((areaSqMeters / 10000) * 100) / 100;
+    const ha = areaSqMeters / 10000;
+    // For plots smaller than 0.05 ha (small tests / micro-plots), keep 4 decimals; otherwise 2 decimals
+    return ha < 0.05 ? Math.round(ha * 10000) / 10000 : Math.round(ha * 100) / 100;
 }
 
 // Calculate perimeter in meters
@@ -94,10 +105,9 @@ function calculatePerimeterMeters(coords: [number, number][]): number {
     if (coords.length < 2) return 0;
     let total = 0;
     for (let i = 0; i < coords.length - 1; i++) {
-        total += haversineDistanceMeters(
-            [coords[i][1], coords[i][0]],
-            [coords[i + 1][1], coords[i + 1][0]]
-        );
+        const p1 = ensureLatLon(coords[i]);
+        const p2 = ensureLatLon(coords[i + 1]);
+        total += haversineDistanceMeters(p1, p2);
     }
     return Math.round(total);
 }
@@ -1160,10 +1170,18 @@ export default function EUDRGeoreference({
         let poly: [number, number][] = [];
         let markers: [number, number][] = [];
         let center: [number, number] = [4.813294, -75.694821]; // Default Pereira
+        let explicitArea: number | null = null;
+        let explicitPerim: number | null = null;
 
         if (geoJsonData) {
             try {
                 const parsed = JSON.parse(geoJsonData);
+                if (typeof parsed.properties?.areaHa === 'number') {
+                    explicitArea = parsed.properties.areaHa;
+                }
+                if (typeof parsed.properties?.perimeterMeters === 'number') {
+                    explicitPerim = parsed.properties.perimeterMeters;
+                }
                 let coords: [number, number][] = [];
                 if (parsed.features?.[0]?.geometry?.coordinates?.[0]) {
                     coords = parsed.features[0].geometry.coordinates[0];
@@ -1186,8 +1204,8 @@ export default function EUDRGeoreference({
             center = currentPosition;
         }
 
-        const area = poly.length >= 3 ? calculatePolygonAreaHa(poly) : 0;
-        const perim = poly.length >= 2 ? calculatePerimeterMeters(poly) : 0;
+        const area = explicitArea !== null ? explicitArea : (poly.length >= 3 ? calculatePolygonAreaHa(poly) : 0);
+        const perim = explicitPerim !== null ? explicitPerim : (poly.length >= 2 ? calculatePerimeterMeters(poly) : 0);
 
         return {
             centerCoords: center,
